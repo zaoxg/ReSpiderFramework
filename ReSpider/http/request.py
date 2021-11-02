@@ -1,6 +1,7 @@
 from typing import Optional
 from ..utils import encrypt_md5
 from ..settings.default_settings import RETRY_ENABLED, MAX_RETRY_TIMES
+import requests
 
 
 class Request:
@@ -73,26 +74,21 @@ class Request:
         if self.do_filter:
             self._set_fingerprint()
 
+    @property
     def seen(self):
-        return dict(
-            url=self.url,
-            method=self.method,
-            headers=self.headers,
-            data=self.data,
-            cookies=self.cookies,
-            encoding=self.encoding,
-            proxy=self.proxy,
-            timeout=self.timeout,
-            meta=self.meta,
-            retry=self.retry,
-            retry_times=self.retry_times,
-            max_retry_times=self.max_retry_times,
-            priority=self.priority,
-            do_filter=self.do_filter,
-            fingerprint=self.fingerprint,
-            callback=self.callback,
-            errback=self.errback
-        )
+        return self.__dict__
+
+    def send(self):
+        """
+        用requests库进行测试
+        """
+        u = self.url
+        m = self.method
+        hd = self.headers.copy()
+        if 'user-agent' not in hd and 'User-Agent' not in hd:
+            hd.update({'user-agent': 'PostmanRuntime/7.28.4'})
+        kwg = {'headers': hd, 'cookies': self.cookies, 'params': self.params, 'data': self.data}
+        return requests.request(url=u, method=m, **kwg)
 
     def replace(self, *args, **kwargs):
         for x in ['url', 'method', 'headers', 'data', 'cookies', 'meta',

@@ -19,14 +19,14 @@ sslgen = SSLFactory()
 
 
 class DownloadHandler(LogMixin):
-    def __init__(self, spider):
+    def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        self.spider = spider
-        self.settings = spider.settings
+        self._observer = kwargs.pop('observer', None)
 
     @classmethod
-    def from_crawler(cls, spider):
-        return cls(spider)
+    def from_crawler(cls, spider, **kwargs):
+        cls.settings = spider.settings
+        return cls(spider, **kwargs)
 
     async def download_request(self, request):
         self.logger.info(request)

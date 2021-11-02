@@ -5,30 +5,36 @@ from .spider import RedisSpider
 
 
 class RedisScheduler(Scheduler):
+    name = 'redis scheduler'
+
     def __init__(self, spider=None, **kwargs):
         super().__init__(spider, **kwargs)
+        # self.settings = spider.settings
+        # self.spider = spider
+
+    @classmethod
+    def from_settings(cls, spider, **kwargs):
         tag_name = spider.name or spider.__class__.name or spider.__class__.__name__
-        self.settings = spider.settings
+        # cls._pool = redis.ConnectionPool(host=cls.settings.get('REDIS_HOST', '127.0.0.1'),
+        #                                  port=cls.settings.get('REDIS_PORT', 6379),
+        #                                  password=cls.settings.get('REDIS_PASSWORD', None),
+        #                                  db=cls.settings.get('REDIS_DB', 0))
+        # cls._r = redis.Redis(connection_pool=cls._pool)
+        cls.queue = f'{tag_name}:scheduler'
+        cls.df = f'{tag_name}:dupefilter'
+        cls.error_queue = f'{tag_name}:scheduler:error'
+        cls.redis_key = None
+        if isinstance(spider, RedisSpider):
+            # self._get = self._get_other
+            cls.redis_key = spider.redis_key
+        return cls(spider, **kwargs)
+
+    def open_spider(self):
         self._pool = redis.ConnectionPool(host=self.settings.get('REDIS_HOST', '127.0.0.1'),
                                           port=self.settings.get('REDIS_PORT', 6379),
                                           password=self.settings.get('REDIS_PASSWORD', None),
                                           db=self.settings.get('REDIS_DB', 0))
         self._r = redis.Redis(connection_pool=self._pool)
-        self.queue = f'{tag_name}:scheduler'
-        self.df = f'{tag_name}:dupefilter'
-        self.error_queue = f'{tag_name}:scheduler:error'
-        self.redis_key = None
-        if isinstance(spider, RedisSpider):
-            # self._get = self._get_other
-            self.redis_key = spider.redis_key
-
-    @classmethod
-    def open_spider(cls, spider=None):
-        return cls(spider)
-
-    @classmethod
-    def from_crawler(cls, spider, **kwargs):
-        return cls(spider, **kwargs)
 
     def __len__(self):
         return self._r.llen(self.queue)

@@ -4,10 +4,10 @@
 # @File    : middlewares.py
 
 from ...http import Request, Response
-from ...middlewares import MiddleWareManager
+from ...middlewares import MiddlewareManager
 
 
-class DownloaderMiddlewareManager(MiddleWareManager):
+class DownloaderMiddlewareManager(MiddlewareManager):
 
     name = 'downloader middlewares manager'
 

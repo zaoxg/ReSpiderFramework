@@ -9,18 +9,23 @@ from ..extend.logger import LogMixin
 from ..extend.misc import load_object
 
 
-class BaseMiddleWare(LogMixin):
-    name = 'base_middleware'
+class BaseMiddleware(LogMixin):
+    name = 'base middleware'
+
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider)
+        self._observer = kwargs.pop('observer', None)
+        if self._observer:
+            self._observer.register(self, default='middleware')
 
     @classmethod
-    def from_crawler(cls, spider):
-        pass
+    def from_crawler(cls, spider, **kwargs):
+        return cls(spider, **kwargs)
 
-    @classmethod
-    def open_spider(cls, spider=None):
-        return cls(spider)
+    def open_spider(self, spider=None, **kwargs):
+        return True
 
-    def close_spider(self, spider=None):
+    def close_spider(self, spider=None, **kwargs):
         pass
 
     async def process_request(self, request):
@@ -30,12 +35,15 @@ class BaseMiddleWare(LogMixin):
         return response
 
 
-class MiddleWareManager(LogMixin):
+class MiddlewareManager(LogMixin):
     name = 'middlewares manager'
 
-    def __init__(self, spider=None, *middlewares):
+    def __init__(self, spider=None, *middlewares, **kwargs):
         super().__init__(spider)
         self.logger.debug('MIDDLEWARES START INIT ...')
+        self._observer = kwargs.pop('observer', None)
+        if self._observer:
+            self._observer.register(self)
         self.spider = spider
         self.middleware_list = middlewares
         self.methods = defaultdict(deque)
@@ -47,11 +55,11 @@ class MiddleWareManager(LogMixin):
         self.logger.debug('MIDDLEWARES INIT SUCCESS.')
 
     @classmethod
-    def from_crawler(cls, spider):
-        return cls.from_settings(spider.settings, spider)
+    def from_crawler(cls, spider, **kwargs):
+        return cls.from_settings(spider.settings, spider, **kwargs)
 
     @classmethod
-    def from_settings(cls, settings, spider=None):
+    def from_settings(cls, settings, spider=None, **kwargs):
         mwlist = cls._get_mwlist_from_settings(settings)
         mws = sorted(mwlist.items(), key=lambda item: item[1])  # 通过排序来确定经过中间件的顺序
         mwlist = dict(mws)
@@ -59,10 +67,10 @@ class MiddleWareManager(LogMixin):
         for clspath in mwlist:
             mwcls = load_object(clspath)
             # cls.logger.debug(f'{mwcls} START INIT... ')
-            mw = mwcls.from_crawler(spider)
+            mw = mwcls.from_crawler(spider, **kwargs)
             # cls.logger.debug(f'{mwcls} INIT SUCCESS.')
             middlewares.append(mw)
-        return cls(spider, *middlewares)
+        return cls(spider, *middlewares, **kwargs)
 
     @classmethod
     def _get_mwlist_from_settings(cls, settings):
@@ -84,7 +92,7 @@ class MiddleWareManager(LogMixin):
             middleware_module = importlib.import_module(from_module)
             for _, obj in middleware_module.__dict__.items():
                 # 遍历module，对象是class(type)且是BaseMiddleware的子类并且不是类本身，那么就是{*}Middleware
-                if type(obj).__name__ == 'type' and issubclass(obj, BaseMiddleWare) and obj.__name__ not in BaseMiddleWare.__name__:
+                if type(obj).__name__ == 'type' and issubclass(obj, BaseMiddleware) and obj.__name__ not in BaseMiddleware.__name__:
                     # print(obj.__module__, obj.__name__)
                     pkn = ".".join([obj.__module__, obj.__name__])
                     self.logger.debug(f'{pkn} START INIT ... ')
@@ -108,8 +116,9 @@ class MiddleWareManager(LogMixin):
             mwfn()
 
     def open_spider(self, spider=None):
+        self.logger.debug('Process parallel "open_spider"')
         return self._process_parallel('open_spider', spider)
 
     def close_spider(self, spider=None):
-        self.logger.debug('Process parallel close_spider()')
+        self.logger.debug('Process parallel "close_spider"')
         return self._process_parallel('close_spider', spider)

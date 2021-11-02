@@ -3,18 +3,14 @@
 # @Author  : ZhaoXiangPeng
 # @File    : cookies.py
 
-from ..middlewares import BaseMiddleWare
+from ..middlewares import BaseMiddleware
 import random
 
 
-class CookiesMiddleware(BaseMiddleWare):
-    def __init__(self, spider):
-        super().__init__(spider)
+class CookiesMiddleware(BaseMiddleware):
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
         self.cookies_pool = []
-
-    @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider)
 
     async def process_request(self, request):
         cookies = request.cookies

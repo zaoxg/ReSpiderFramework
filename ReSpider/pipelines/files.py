@@ -10,13 +10,8 @@ from ReSpider.extend.item import FileItem, CSVItem, CSVItems
 class FilesPipeline(BasePipeline):
     name = 'files_pipeline'
 
-    def __init__(self, spider):
-        super().__init__(spider)
-        self.settings = spider.settings
-
-    @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider.settings, spider)
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
 
     async def process_item(self, item: FileItem, spider):
         file = f'{item.filename}.{item.filetype}'
@@ -34,27 +29,17 @@ class FilesPipeline(BasePipeline):
 
 
 class CSVPipeline(BasePipeline):
-    name = 'csv_pipeline'
+    name = 'csv pipeline'
 
-    def __init__(self, settings, spider=None):
-        super().__init__(spider)
-        self.settings = settings
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
         self.column_index = dict()
         self.writer = False
         self.head = []
 
     @classmethod
-    def open_spider(cls, settings, spider=None):
-        # 期待是创建一个文件
-        """
-        with open(f'{spider.name}.csv', 'a') as fp:
-            fp.close()
-        """
-        return cls(settings, spider)
-
-    @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider.settings, spider)
+    def from_crawler(cls, spider, **kwargs):
+        return cls(spider, **kwargs)
 
     async def process_item(self, item: CSVItem, spider):
         filename = spider.name

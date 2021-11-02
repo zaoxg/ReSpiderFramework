@@ -2,18 +2,27 @@
 # @Time    : 2021/1/31 10:28
 # @Author  : ZhaoXiangPeng
 # @File    : retry.py
+
 import ReSpider
-from ReSpider.middlewares import BaseMiddleWare
+from ReSpider.middlewares import BaseMiddleware
 
 
-class RetryMiddleware(BaseMiddleWare):
-    def __init__(self, spider):
-        super().__init__(spider)
-        self.retry_http_codes = spider.settings.get('RETRY_HTTP_CODES', [])
+class RetryMiddleware(BaseMiddleware):
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
 
     @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider)
+    def from_crawler(cls, spider, **kwargs):
+        cls.retry_http_codes = spider.settings.get('RETRY_HTTP_CODES', [])
+        cls.retry_enabled = spider.settings.get('RETRY_ENABLED', False)
+        cls.max_retry_times = spider.settings.get('MAX_RETRY_TIMES', 10)
+        return cls(spider, **kwargs)
+
+    async def process_request(self, request):
+        request.retry = self.retry_enabled
+        if self.retry_enabled is True:
+            request.max_retry_times = self.max_retry_times
+        return request
 
     async def process_response(self, request, response):
         if request.retry is False:

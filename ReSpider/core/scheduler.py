@@ -7,20 +7,30 @@ from ..extend import LogMixin
 
 
 class Scheduler(LogMixin):
+    name = 'scheduler'
+
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        self._observer = kwargs.get('observer')
+        self._observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self)
         # print(self._observer.observers())
-        self.spider = spider
-        self.settings = spider.settings
-        self.queue = PriorityQueue()
-        self.df = set()
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
+        cls.settings = spider.settings
+        return cls.from_settings(spider, **kwargs)
+
+    @classmethod
+    def from_settings(cls, spider, **kwargs):
         return cls(spider, **kwargs)
+
+    def open_spider(self):
+        self.queue = PriorityQueue()
+        self.df = set()
+
+    def close_spider(self):
+        pass
 
     def __len__(self):
         """

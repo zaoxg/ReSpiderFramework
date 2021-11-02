@@ -5,29 +5,34 @@
 
 from ..extend.logger import LogMixin
 from ..extend.item import Item
-from ..middlewares import MiddleWareManager
+from ..middlewares import MiddlewareManager
 
 
 class BasePipeline(LogMixin):
-    name = 'pipelines'
+    name = 'base pipeline'
+
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider)
+        self._observer = kwargs.pop('observer', None)
+        if self._observer:
+            self._observer.register(self, default='pipeline')
 
     @classmethod
-    def from_crawler(cls, spider):
-        pass
+    def from_crawler(cls, spider, **kwargs):
+        cls.settings = spider.settings
+        return cls(spider, **kwargs)
 
-    @classmethod
-    def open_spider(cls, settings, spider=None):
-        return cls(spider)
+    def open_spider(self, spider=None, **kwargs):
+        return True
 
-    @classmethod
-    def close_spider(cls, spider=None):
-        pass
+    def close_spider(self, spider=None, **kwargs):
+        return True
 
     async def process_item(self, item: Item, spider):
         return item
 
 
-class PipelineManager(MiddleWareManager):
+class PipelineManager(MiddlewareManager):
 
     name = 'pipelines manager'
 
@@ -36,8 +41,8 @@ class PipelineManager(MiddleWareManager):
         return settings.get('ITEM_PIPELINES', {})
 
     @classmethod
-    def from_crawler(cls, spider):
-        return cls.from_settings(spider.settings, spider)
+    def from_crawler(cls, spider, **kwargs):
+        return cls.from_settings(spider.settings, spider, **kwargs)
 
     def _add_middleware(self, mw):
         if hasattr(mw, 'open_spider'):

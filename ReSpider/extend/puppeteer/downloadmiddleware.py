@@ -11,34 +11,29 @@ import asyncio
 
 from ..puppeteer import PuppeteerRequest
 from ..puppeteer import PuppeteerResponse
-from ReSpider.middlewares import BaseMiddleWare
+from ReSpider.middlewares import BaseMiddleware
 from urllib.parse import urlsplit
 
 from pyppeteer import launch, errors
 from .settings import *
 
 
-class PuppeteerMiddleware(BaseMiddleWare):
-    def __init__(self, spider):
-        super().__init__(spider)
+class PuppeteerMiddleware(BaseMiddleware):
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
         self.browser = None
-        # loop = asyncio.get_running_loop()
-        # task = asyncio.ensure_future(self.getBrowser(self.options))
-        # loop.run_until_complete(task)
         self.BROWSER_OPENED = None
 
-    """
-    def open_spider(self, spider=None):
-        loop = asyncio.get_event_loop()
-        task = asyncio.ensure_future(self.getBrowser(self.options))
+    def open_spider(self, spider=None, **kwargs):
+        loop = self._observer.loop
+        task = loop.create_task(self.getBrowser())
         loop.run_until_complete(task)
-    """
 
-    def close_spider(self, spider=None):
+    def close_spider(self, spider=None, **kwargs):
         self.browser.close()
 
     @classmethod
-    def from_crawler(cls, spider):
+    def from_crawler(cls, spider, **kwargs):
         settings = spider.settings
         # cls.headless = None
         # init settings
@@ -122,7 +117,7 @@ class PuppeteerMiddleware(BaseMiddleWare):
             options['args'].append('--disable-gpu')
         cls.options = options
         # return cls.open_spider(spider)
-        return cls(spider)
+        return cls(spider, **kwargs)
 
     async def getBrowser(self, options=None):
         self.logger.info('Browser Render Opening...')
@@ -138,11 +133,11 @@ class PuppeteerMiddleware(BaseMiddleWare):
     async def process_request(self, request):
         if isinstance(request, PuppeteerRequest) is False:
             return request
-        if self.BROWSER_OPENED is None:
-            self.BROWSER_OPENED = False
-            await self.getBrowser()
-        elif self.BROWSER_OPENED is not True:  # 不确定是打开状态时先sleep一下
-            await asyncio.sleep(2)
+        # if self.BROWSER_OPENED is None:
+        #     self.BROWSER_OPENED = False
+        #     await self.getBrowser()
+        # elif self.BROWSER_OPENED is not True:  # 不确定是打开状态时先sleep一下
+        #     await asyncio.sleep(2)
         # get puppeteer meta
         puppeteer_meta = request.meta.get('puppeteer') or {}
         self.logger.debug('Puppeteer_meta: %s', puppeteer_meta)

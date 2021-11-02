@@ -4,7 +4,15 @@
 # @File    : setting_logger.py
 
 
-from ReSpider.extend.setting_loader import SettingLoader
+from ReSpider.testing.log_test import logger
 
 
-SettingLoader().from_crawler()
+class A:
+    logger.debug('A')
+
+    def func1(self):
+        logger.debug('func1')
+
+
+a = A()
+a.func1()

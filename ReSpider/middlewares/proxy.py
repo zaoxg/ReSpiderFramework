@@ -1,16 +1,15 @@
-import random
-from ..middlewares import BaseMiddleWare
+from ..middlewares import BaseMiddleware
 
 
-class ProxyMiddleware(BaseMiddleWare):
-    def __init__(self, spider):
-        super().__init__(spider)
+class ProxyMiddleware(BaseMiddleware):
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
         # self.proxys = []
 
     @classmethod
-    def from_crawler(cls, spider):
+    def from_crawler(cls, spider, **kwargs):
         cls.get_proxy()
-        return cls.open_spider(spider)
+        return cls(spider, **kwargs)
 
     async def process_request(self, request):
         try:

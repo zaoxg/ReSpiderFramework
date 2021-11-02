@@ -6,7 +6,6 @@ from ..extend import load_object
 from ..extend import LogMixin
 from ..extend.item import Item
 from ..settings.default_settings import CONCURRENT_REQUESTS  # 默认配置
-from ..pipelines import PipelineManager
 
 
 class Engine(LogMixin):
@@ -17,13 +16,15 @@ class Engine(LogMixin):
         self.logger.info('ENGINE START INIT ...')
         self.spider = spider
         self.settings = spider.settings
-        self.scheduler = load_object(self.settings['SCHEDULER']).from_crawler(spider)
-        self.downloader = load_object(self.settings['DOWNLOADER']).from_crawler(spider)
-        self.pipelines = load_object(self.settings['PIPELINE_MANAGER']).from_crawler(spider)
-        self.loop = asyncio.get_event_loop()
+
+        self.scheduler = load_object(self.settings['SCHEDULER']).from_crawler(spider, observer=self.observer)
+        self.downloader = load_object(self.settings['DOWNLOADER']).from_crawler(spider, observer=self.observer)
+        self.pipelines = load_object(self.settings['PIPELINE_MANAGER']).from_crawler(spider, observer=self.observer)
+        self.loop = self.observer.loop
         self.logger.info('ENGINE INIT SUCCESS.')
 
     def start(self):
+        self.observer.engine_status = 'START'
         start_time = time.time()
         self.logger.info('IT\'S EXCELLENT. IT\'S FLEXIBLE ...')
         # self.pipelines.open_spider()
@@ -87,10 +88,6 @@ class Engine(LogMixin):
                     if self.settings.get('ALWAYS_RUNNING', False) is True:
                         self.logger.debug('Continuous Monitoring...')
                         continue
-                    # from ReSpider import Spider
-                    # if isinstance(spider, Spider) is False:
-                    #     self.logger.debug('Continuous Monitoring...')
-                    #     continue
                     break
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler

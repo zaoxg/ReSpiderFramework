@@ -2,24 +2,44 @@
 # @Time    : 2021/8/21 22:03
 # @Author  : ZhaoXiangPeng
 # @File    : observer.py
+
 import asyncio
 import time
-import random
 
 
 class Observer:
-    _task_count = 0
-    __observers = []
     loop = asyncio.get_event_loop()
+    _task_count = 0
+    __observers = []  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
+    __pipelines = []  # 被观察的 pipeline obj 列表
+    __middlewares = []  # 被观察的 middleware obj 列表
+    __SIGNAL_STATUS = None
+
     __latestNews = None
 
-    # def __init__(self):
-    #     self._task_count = 0
-    #     self.__observers = []
-    #     self.loop = asyncio.get_event_loop()
+    def register(self, obj, default=None):
+        if default is None:
+            self.__observers.append(obj)
+        elif default == 'pipeline':
+            self.__pipelines.append(obj)
+        elif default == 'middleware':
+            self.__middlewares.append(obj)
 
-    def register(self, obj):
-        self.__observers.append(obj)
+    @property
+    def engine_status(self):
+        return self.__SIGNAL_STATUS
+
+    @engine_status.setter
+    def engine_status(self, value):
+        self.__SIGNAL_STATUS = value
+        if self.__SIGNAL_STATUS == 'START':
+            for _observer in self.__observers:
+                _observer.open_spider()
+        elif self.__SIGNAL_STATUS == 'STOP':
+            for _observer in self.__observers:
+                _observer.close_spider()
+        else:
+            pass
 
     @property
     def task_count(self):
@@ -66,7 +86,7 @@ class Observer:
 
     def notify(self):
         for observer in self.__observers:
-            observer.update()
+            observer.open_spider()
             # time.sleep(random.random())
 
 

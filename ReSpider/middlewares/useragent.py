@@ -1,5 +1,5 @@
 import random
-from ..middlewares import BaseMiddleWare
+from ..middlewares import BaseMiddleware
 
 
 def fake_useragent():
@@ -266,18 +266,16 @@ def fake_useragent():
     return chrome + firefox + opera + ie + safari
 
 
-class UserAgentMiddleware(BaseMiddleWare):
-    def __init__(self, spider):
-        super().__init__(spider)
-        self.ua = [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.56',
-        ] + fake_useragent()
+class UserAgentMiddleware(BaseMiddleware):
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
 
-    @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider)
+    def open_spider(self, spider=None, **kwargs):
+        self.ua = [
+                      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+                      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0',
+                      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.56'
+                  ] + fake_useragent()
 
     async def process_request(self, request):
         headers = request.headers

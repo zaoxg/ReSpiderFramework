@@ -4,11 +4,14 @@
 # @File    : __init__.py.py
 
 import logging
+import os
+import sys
+
 from .settings import STREAM_HANDLER_LEVEL, FILE_HANDLER_LEVEL
 
 
 class LogMixin:
-    def __init__(self, spider=None):
+    def __init__(self, spider=None, **kwargs):
         self.logger = self.get_logger(spider)
 
     def get_logger(self, spider, name=None):

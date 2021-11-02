@@ -7,21 +7,21 @@ from pymongo.errors import DuplicateKeyError
 class MongoDBPipeline(BasePipeline):
     name = 'mongodb pipeline'
 
-    def __init__(self, spider):
-        super().__init__(spider)
-        self._clint = AsyncIOMotorClient(self.mongodb_host, self.mongodb_port)
-        self._db = self._clint[self.mongodb_db]
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
 
     @classmethod
-    def open_spider(cls, settings, spider=None):
+    def from_crawler(cls, spider, **kwargs):
+        settings = spider.settings
         cls.mongodb_host = settings.get('MONGODB_HOST')
         cls.mongodb_port = settings.get('MONGODB_PORT')
         cls.mongodb_db = settings.get('MONGODB_DB')
-        return cls(spider)
+        return cls(spider, **kwargs)
 
-    @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider.settings, spider)
+    def open_spider(self, spider=None, **kwargs):
+        loop = self._observer.loop
+        self._clint = AsyncIOMotorClient(self.mongodb_host, self.mongodb_port, io_loop=loop)
+        self._db = self._clint[self.mongodb_db]
 
     async def process_item(self, item: DataItem, spider):
         collection = item.collection

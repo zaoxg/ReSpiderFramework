@@ -3,16 +3,16 @@
 # @Author  : ZhaoXiangPeng
 # @File    : httperror.py
 
-from ReSpider.middlewares import BaseMiddleWare
+from ReSpider.middlewares import BaseMiddleware
 
 
 class HttpError:
     pass
 
 
-class HttpErrorMiddleware(BaseMiddleWare):
-    def __init__(self, spider):
-        super().__init__()
+class HttpErrorMiddleware(BaseMiddleware):
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
         self.http_status_list = spider.settings.get('', [])
 
     def process_response(self, request, response):

@@ -16,26 +16,25 @@ class RedisPipeline(BasePipeline):
     """
     name = 'redis pipelines'
 
-    def __init__(self, settings, spider):
-        super().__init__(spider)
+    def __init__(self, spider, **kwargs):
+        super().__init__(spider, **kwargs)
+
+    @classmethod
+    def from_crawler(cls, spider, **kwargs):
+        settings = spider.settings
+        cls.redis_host = settings.get('REDIS_HOST', '127.0.0.1')
+        cls.redis_port = settings.get('REDIS_PORT', 6379)
+        cls.redis_password = settings.get('REDIS_PASSWORD', None)
+        cls.redis_db = settings.get('REDIS_DB', 0)
+        return cls(spider, **kwargs)
+
+    def open_spider(self, spider=None, **kwargs):
         self._pool = redis.ConnectionPool(host=self.redis_host,
                                           port=self.redis_port,
                                           password=self.redis_password,
                                           db=self.redis_db)
         self._r = redis.Redis(connection_pool=self._pool)
         self._keys = spider.name or spider.__class__.name or spider.__class__.__name__
-
-    @classmethod
-    def open_spider(cls, settings, spider=None):
-        cls.redis_host = settings.get('REDIS_HOST', '127.0.0.1')
-        cls.redis_port = settings.get('REDIS_PORT', 6379)
-        cls.redis_password = settings.get('REDIS_PASSWORD', None)
-        cls.redis_db = settings.get('REDIS_DB', 0)
-        return cls(settings, spider)
-
-    @classmethod
-    def from_crawler(cls, spider):
-        return cls.open_spider(spider.settings, spider)
 
     async def process_item(self, item: RdsItem, spider):
         keys = f'{self._keys}:{item.rds_type}'

@@ -9,16 +9,20 @@ class Downloader(LogMixin):
 
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        self._observer = kwargs.get('observer')
-        if self._observer:
-            self._observer.register(self)
-        self.spider = spider
-        self.settings = spider.settings
-        self.handler = DownloadHandler.from_crawler(spider)
-        self.middleware = DownloaderMiddlewareManager.from_crawler(spider)
+        # self.spider = spider
+        # self.settings = spider.settings
+        self._observer = kwargs.pop('observer', None)
+        # if self._observer:
+        #     self._observer.register(self)
+        self.handler = DownloadHandler.from_crawler(spider, observer=self._observer)
+        self.middleware = DownloaderMiddlewareManager.from_crawler(spider, observer=self._observer)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
+        return cls.from_settings(spider, **kwargs)
+
+    @classmethod
+    def from_settings(cls, spider, **kwargs):
         return cls(spider, **kwargs)
 
     def open_spider(self, spider):
@@ -40,7 +44,8 @@ class Downloader(LogMixin):
         if isinstance(process_req, Request):
             # 只有request是<Request>时才会发送
             response = await self.handler.download_request(request)  # 真正的 <Response>
-            process_resp = await self.middleware.process_response(request, response)  # 这个response不一定是 <Response>，也有可能是 <Request>
+            process_resp = await self.middleware.process_response(request,
+                                                                  response)  # 这个response不一定是 <Response>，也有可能是 <Request>
         if isinstance(process_req, Response):
             # 当中间件把<Request>改为<Response>时
             process_resp = await self.middleware.process_response(request, process_req)
