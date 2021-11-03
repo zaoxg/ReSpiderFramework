@@ -17,8 +17,8 @@ PUPPETEER_USER_DIR = './data'  # 用户数据目录
 
 
 # FRAMEWORK SETTING
-SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
-# SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
+# SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
+SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
 
 DOWNLOADER = 'ReSpider.core.downloader.Downloader'
 SSL_FINGERPRINT = True  # ssl指纹
@@ -58,5 +58,5 @@ MONGODB_DB = 'data_temp'
 # Redis配置
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
-REDIS_PASSWORD = 'admin000'  # 'admin000'
+REDIS_PASSWORD = None  # 'admin000'
 REDIS_DB = 0

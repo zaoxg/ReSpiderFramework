@@ -20,7 +20,7 @@ def urlParse(url: str):
     return result
 
 
-def urlDecode(query: str):
+def queryParse(query: str):
     string = unquote(query)
     params = string.split('&')
     formData = {}

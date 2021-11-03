@@ -74,8 +74,7 @@ class Request:
         if self.do_filter:
             self._set_fingerprint()
 
-    @property
-    def seen(self):
+    def cat(self):
         return self.__dict__
 
     def send(self):

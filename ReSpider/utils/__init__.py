@@ -4,4 +4,4 @@
 # @File    : __init__.py
 
 from .dupefilters import encrypt_md5
-from .urlProcess import urlParse, urlDecode
+from .urlProcess import urlParse, queryParse
