@@ -5,7 +5,7 @@ import requests
 
 
 class Request:
-    __name__ = 'Request'
+    name = 'request'
 
     def __init__(self, url: Optional[str], method: Optional[str] = None,
                  headers=None, params=None, data=None, cookies=None, allow_redirects: bool = True,
@@ -15,7 +15,6 @@ class Request:
                  meta=None,
                  priority: Optional[int] = 1, do_filter: bool = False,
                  callback=None, errback=None, *args, **kwargs):
-        # print(data)
         if url is None:
             raise ValueError(f'{self.__class__} url Cannot be empty')
         self._set_url(url)
