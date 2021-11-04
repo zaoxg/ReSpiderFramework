@@ -22,6 +22,17 @@ import time
 # 	middlewareManager需要实现以上两个方法
 # 	middlewareManager控制pipelines和middlewares的开启和关闭
 
+REQUEST_COUNT_INTERVAL_TIME = 60  # 请求统计通知间隔时间
+
+
+def callback(loop=None):
+    print('callback with {0}'.format(time.time()))
+    loop.call_later(1, callback, loop)
+
+
+def request_count_init(loop):
+    loop.call_later(REQUEST_COUNT_INTERVAL_TIME, callback)
+
 
 class Observer:
     loop = asyncio.get_event_loop()
@@ -51,6 +62,7 @@ class Observer:
         if self.__SIGNAL_STATUS == 'START':
             for _observer in self.__observers:
                 _observer.open_spider()
+            # Todo self.loop.call_later(1, callback, self.loop)
         elif self.__SIGNAL_STATUS == 'STOP':
             for _observer in self.__observers:
                 _observer.close_spider()
