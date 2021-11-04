@@ -6,6 +6,22 @@
 import asyncio
 import time
 
+# 被观察者列表
+# 	调度器
+# 	下载器
+# 		DownloaderMiddlewareManager
+# 	pipelineManager
+#
+# 启动方式
+# 	3个主要被观察者的from_crawler执行后加载进被观察者列表
+# 	当调度器里有任务时启动open_spider进行连接数据库等操作
+#
+# 观察者要做什么
+# 1. 控制pipeline和middleware的开关
+# 	open_spider 和 close_spider
+# 	middlewareManager需要实现以上两个方法
+# 	middlewareManager控制pipelines和middlewares的开启和关闭
+
 
 class Observer:
     loop = asyncio.get_event_loop()
