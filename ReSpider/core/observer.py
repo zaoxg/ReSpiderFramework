@@ -37,20 +37,20 @@ def request_count_init(loop):
 class Observer:
     loop = asyncio.get_event_loop()
     _task_count = 0
-    __observers = []  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
-    __pipelines = []  # 被观察的 pipeline obj 列表
-    __middlewares = []  # 被观察的 middleware obj 列表
+    __observers = {}  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
+    __pipelines = {}  # 被观察的 pipeline obj 列表
+    __middlewares = {}  # 被观察的 middleware obj 列表
     __SIGNAL_STATUS = None
 
     __latestNews = None
 
     def register(self, obj, default=None):
         if default is None:
-            self.__observers.append(obj)
+            self.__observers.update({obj.__class__.__name__: obj})
         elif default == 'pipeline':
-            self.__pipelines.append(obj)
+            self.__pipelines.update({obj.__class__.__name__: obj})
         elif default == 'middleware':
-            self.__middlewares.append(obj)
+            self.__middlewares.update({obj.__class__.__name__: obj})
 
     @property
     def engine_status(self):
@@ -60,12 +60,12 @@ class Observer:
     def engine_status(self, value):
         self.__SIGNAL_STATUS = value
         if self.__SIGNAL_STATUS == 'START':
-            for _observer in self.__observers:
-                _observer.open_spider()
+            for _observer in self.__observers.keys():
+                self.__observers[_observer].open_spider()
             # Todo self.loop.call_later(1, callback, self.loop)
         elif self.__SIGNAL_STATUS == 'STOP':
-            for _observer in self.__observers:
-                _observer.close_spider()
+            for _observer in self.__observers.keys():
+                self.__observers[_observer].close_spider()
         else:
             pass
 
