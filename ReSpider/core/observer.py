@@ -44,6 +44,8 @@ class Observer:
 
     __latestNews = None
 
+    REQUEST_COUNT = 0
+
     def register(self, obj, default=None):
         if default is None:
             self.__observers.update({obj.__class__.__name__: obj})

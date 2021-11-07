@@ -10,14 +10,15 @@ import ReSpider
 
 class Testing3(ReSpider.Spider):
     name = 'testing3'
-    start_urls = ['https://ja3er.com/json'] * 3
+    # start_urls = ['https://ja3er.com/json'] * 3
+    start_urls = ['https://www.baidu.com/'] * 100
 
     def __init__(self):
         super().__init__()
         self.settings.update(SSL_FINGERPRINT=True)
 
     def parse(self, response):
-        self.logger.debug(response.json())
+        self.logger.debug(response)
 
 
 if __name__ == '__main__':

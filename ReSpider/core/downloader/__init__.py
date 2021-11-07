@@ -9,8 +9,6 @@ class Downloader(LogMixin):
 
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        # self.spider = spider
-        # self.settings = spider.settings
         self._observer = kwargs.pop('observer', None)
         # if self._observer:
         #     self._observer.register(self)

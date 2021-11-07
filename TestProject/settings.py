@@ -17,8 +17,8 @@ PUPPETEER_USER_DIR = './data'  # 用户数据目录
 
 
 # FRAMEWORK SETTING
-# SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
-SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
+SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
+# SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
 
 DOWNLOADER = 'ReSpider.core.downloader.Downloader'
 SSL_FINGERPRINT = True  # ssl指纹

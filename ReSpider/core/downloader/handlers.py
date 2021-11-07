@@ -21,11 +21,12 @@ sslgen = SSLFactory()
 class DownloadHandler(LogMixin):
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        self._observer = kwargs.pop('observer', None)
+        # self._observer.REQUEST_COUNT = 0
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
         cls.settings = spider.settings
+        cls._observer: object = kwargs.pop('observer', None)
         return cls(spider, **kwargs)
 
     async def download_request(self, request):
@@ -50,6 +51,7 @@ class DownloadHandler(LogMixin):
                                          connector=aiohttp.TCPConnector(ssl=False), trust_env=True) as session:
             try:
                 response = await session.request(method=request.method, url=request.url, **kwargs)
+                # self._observer.REQUEST_COUNT += 1
                 content = await response.read()
                 return Response(url=response.url,
                                 status=response.status,

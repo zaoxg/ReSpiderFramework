@@ -30,7 +30,7 @@ class Engine(LogMixin):
         # self.pipelines.open_spider()
         start_requests = self.spider.start_requests()
         self.execute(self.spider, start_requests)
-        # self.pipelines.close_spider()
+        self.observer.engine_status = 'STOP'
         self.logger.info(f'RUNNING TIME ({int(time.time() - start_time)}) SECONDS.')
         self.logger.debug('及 其 优 秀 ,  弹 性 很 足.')
 
