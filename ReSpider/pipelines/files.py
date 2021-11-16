@@ -37,10 +37,6 @@ class CSVPipeline(BasePipeline):
         self.writer = False
         self.head = []
 
-    @classmethod
-    def from_crawler(cls, spider, **kwargs):
-        return cls(spider, **kwargs)
-
     async def process_item(self, item: CSVItem, spider):
         filename = spider.name
         if item.filename:
