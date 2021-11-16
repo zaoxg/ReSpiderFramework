@@ -38,11 +38,7 @@ class CSVItems(CSVItem):
     dict数组
     """
     def __init__(self, *args, **kwargs):
-        super().__init__()
-        self.pipeline = 'CSVPipeline'  # 指定 pipelines
-        self.filetype = 'csv'
-        self.mode = kwargs.get('mode', 'a')  # 文件写入方式, 默认从结束开始
-        self.fieldnames = kwargs.get('fieldnames')
+        super().__init__(*args, **kwargs)
 
 
 class RdsItem(Item):
