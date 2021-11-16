@@ -19,8 +19,11 @@ class RetryMiddleware(BaseMiddleware):
         return cls(spider, **kwargs)
 
     async def process_request(self, request):
-        request.retry = self.retry_enabled
-        if self.retry_enabled is True:
+        if self.retry_enabled ^ request.retry is True:
+            request.retry = True
+        elif (self.retry_enabled is True) and (request.retry is True):
+            request.retry = True
+        if request.max_retry_times < self.max_retry_times:
             request.max_retry_times = self.max_retry_times
         return request
 
