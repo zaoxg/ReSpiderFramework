@@ -80,7 +80,7 @@ class DownloadHandler(LogMixin):
                                 status=604,
                                 request=request)
             except Exception as exception:
-                self.logger.warning(request.seen())
+                self.logger.warning(request.cat())
                 self.logger.error(exception, exc_info=True)
                 return Response(url=request.url,
                                 status=999,
