@@ -56,6 +56,19 @@ class DataItem(Item):
         self.collection = kwargs.get('collection')
 
 
+def make_item(cls, data: dict):
+    """
+    @summary: idea form https://github.com/Boris-code/feapder
+    提供Item类与原数据，快速构建Item实例
+    :param cls: Item类
+    :param data: 字典格式的数据
+    """
+    item = cls()
+    for key, val in data.items():
+        setattr(item, key, val)
+    return item
+
+
 class It:
     pass
 
