@@ -18,7 +18,7 @@ class Scheduler(LogMixin):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        cls.settings = spider.settings
+        # cls.settings = spider.settings
         return cls.from_settings(spider, **kwargs)
 
     @classmethod

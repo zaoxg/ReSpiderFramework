@@ -1,5 +1,6 @@
 import os
 
+import ReSpider.setting as setting
 from ReSpider.pipelines import BasePipeline
 import aiofiles
 import csv
@@ -15,7 +16,7 @@ class FilesPipeline(BasePipeline):
 
     async def process_item(self, item: FileItem, spider):
         file = f'{item.filename}.{item.filetype}'
-        data_path = item.data_directory or self.settings['DATA_FILE_DIRECTORY']
+        data_path = item.data_directory or setting.DATA_PATH
         self.logger.debug(f'{data_path}/{file}')
         if not os.path.exists(data_path):
             os.mkdir(data_path)
@@ -23,7 +24,7 @@ class FilesPipeline(BasePipeline):
         encoding = item.encoding
         if mode[-1] == 'b':
             encoding = None
-        async with aiofiles.open(f'{data_path}/{file}', mode=mode, encoding=encoding) as fp:
+        async with aiofiles.open(f'{data_path}{file}', mode=mode, encoding=encoding) as fp:
             await fp.write(item.get('source'))
         return item    # Todo 为了兼容后续版本数据处理的pipeline
 
@@ -42,7 +43,7 @@ class CSVPipeline(BasePipeline):
         if item.filename:
             filename = item.filename
         file = f'{filename}.{item.filetype}'
-        data_path = item.data_directory or self.settings['DATA_FILE_DIRECTORY']  # item的数据存放路径
+        data_path = item.data_directory or setting.DATA_PATH  # item的数据存放路径
         if not os.path.exists(data_path):
             os.mkdir(data_path)
         mode = item.mode  # 写入方式

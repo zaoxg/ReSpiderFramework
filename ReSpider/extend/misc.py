@@ -34,7 +34,7 @@ def load_settings(module: str = None):
     :return:
     """
     settings = {}
-    module = load_object(module or 'ReSpider.settings.default_settings')
+    module = load_object(module or 'ReSpider.setting')
     for _, obj in module.__dict__.items():
         settings[_] = obj
     settings.pop('__name__')

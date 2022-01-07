@@ -5,6 +5,7 @@
 
 import importlib
 from collections import defaultdict, deque
+import ReSpider.setting as setting
 from ..extend.logger import LogMixin
 from ..extend.misc import load_object
 
@@ -56,7 +57,7 @@ class MiddlewareManager(LogMixin):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        return cls.from_settings(spider.settings, spider, **kwargs)
+        return cls.from_settings(setting.__dict__, spider, **kwargs)
 
     @classmethod
     def from_settings(cls, settings, spider=None, **kwargs):

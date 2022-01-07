@@ -1,5 +1,6 @@
+import ReSpider.setting as setting
 from ReSpider.core.spiders import Crawler
-from ...extend import SettingLoader
+# from ...extend import SettingLoader
 
 
 class RedisSpider(Crawler):
@@ -9,12 +10,12 @@ class RedisSpider(Crawler):
     """
     name = 'redis_spider'
     redis_key = None
-    settings = SettingLoader.from_crawler()
+    # settings = SettingLoader.from_crawler()
 
     def __init__(self, redis_key: str = None, **kwargs):
         super().__init__()
-        self.settings.update(SCHEDULER='ReSpider.extend.redis.scheduler.RedisScheduler')
-        self.settings.update(ALWAYS_RUNNING=True)
+        setting.SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'
+        setting.ALWAYS_RUNNING = True
         self.__dict__.update(**kwargs)
         if redis_key is None:
             raise AttributeError("Init Error")

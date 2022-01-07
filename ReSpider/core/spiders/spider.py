@@ -5,23 +5,18 @@
 
 from . import Crawler
 from ...http import Request
-from ...extend import SettingLoader
 
 
 class Spider(Crawler):
     name = 'base_spider'
+    __custom_setting__ = {}
 
-    settings = SettingLoader.from_crawler()
+    # settings = SettingLoader.from_crawler()
 
     start_urls = []
 
     def __init__(self, **kwargs):
-        # self.name = name or self.name
         super().__init__()
-        # if self.name is not None:
-        #     self.name = name
-        # else:
-        #     self.name = self.__class__.__name__
         self.__dict__.update(**kwargs)
         if not hasattr(self, 'start_urls'):
             self.start_urls = []

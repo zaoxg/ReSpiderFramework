@@ -1,3 +1,4 @@
+import ReSpider.setting as setting
 from . import BasePipeline
 from ..extend.item import DataItem
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -12,10 +13,9 @@ class MongoDBPipeline(BasePipeline):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        settings = spider.settings
-        cls.mongodb_host = settings.get('MONGODB_HOST')
-        cls.mongodb_port = settings.get('MONGODB_PORT')
-        cls.mongodb_db = settings.get('MONGODB_DB')
+        cls.mongodb_host = setting.MONGODB_HOST
+        cls.mongodb_port = setting.MONGODB_PORT
+        cls.mongodb_db = setting.MONGODB_DB
         return cls(spider, **kwargs)
 
     def open_spider(self, spider=None, **kwargs):

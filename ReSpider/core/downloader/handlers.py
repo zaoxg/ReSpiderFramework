@@ -8,6 +8,7 @@ import asyncio
 from asyncio.exceptions import TimeoutError
 import aiohttp
 
+import ReSpider.setting as setting
 from ._ssl import SSLFactory
 from ...http import Response
 from ...extend.logger import LogMixin
@@ -25,7 +26,7 @@ class DownloadHandler(LogMixin):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        cls.settings = spider.settings
+        # cls.settings = spider.settings
         cls._observer: object = kwargs.pop('observer', None)
         return cls(spider, **kwargs)
 
@@ -34,8 +35,8 @@ class DownloadHandler(LogMixin):
         kwargs = {}
         if request.headers:
             headers = request.headers
-        elif self.settings.get('headers', False):
-            headers = self.settings.get('headers')
+        elif setting.__dict__.get('headers', False):
+            headers = setting.__dict__.get('headers')
         else:
             headers = {}
         kwargs.setdefault('headers', headers)
@@ -44,7 +45,7 @@ class DownloadHandler(LogMixin):
         kwargs.setdefault('allow_redirects', request.allow_redirects)
         kwargs.setdefault('timeout', aiohttp.ClientTimeout(total=request.timeout))
         kwargs.setdefault('proxy', request.proxy)
-        if self.settings.get('SSL_FINGERPRINT', False) is True:
+        if setting.__dict__.get('SSL_FINGERPRINT', False) is True:
             kwargs.setdefault('ssl', sslgen())
 
         async with aiohttp.ClientSession(cookies=request.cookies,

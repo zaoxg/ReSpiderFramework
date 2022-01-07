@@ -1,11 +1,11 @@
 import asyncio
 import time
+import ReSpider.setting as setting
 from .observer import Observer
 from ..http import Request
 from ..extend import load_object
 from ..extend import LogMixin
 from ..extend.item import Item
-from ..settings.default_settings import CONCURRENT_REQUESTS  # 默认配置
 
 
 class Engine(LogMixin):
@@ -15,11 +15,11 @@ class Engine(LogMixin):
         super().__init__(spider)
         self.logger.info('ENGINE START INIT ...')
         self.spider = spider
-        self.settings = spider.settings
+        # self.settings = spider.settings
 
-        self.scheduler = load_object(self.settings['SCHEDULER']).from_crawler(spider, observer=self.observer)
-        self.downloader = load_object(self.settings['DOWNLOADER']).from_crawler(spider, observer=self.observer)
-        self.pipelines = load_object(self.settings['PIPELINE_MANAGER']).from_crawler(spider, observer=self.observer)
+        self.scheduler = load_object(setting.SCHEDULER).from_crawler(spider, observer=self.observer)
+        self.downloader = load_object(setting.DOWNLOADER).from_crawler(spider, observer=self.observer)
+        self.pipelines = load_object(setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)
         self.loop = self.observer.loop
         self.logger.info('ENGINE INIT SUCCESS.')
 
@@ -65,7 +65,7 @@ class Engine(LogMixin):
         :param spider:
         :return:
         """
-        task_limit = self.settings.get('TASK_LIMIT', CONCURRENT_REQUESTS)
+        task_limit = setting.TASK_LIMIT or setting.CONCURRENT_REQUESTS
         semaphore = asyncio.Semaphore(value=task_limit)
         while True:
             request = await self.scheduler.next_request()
@@ -85,13 +85,13 @@ class Engine(LogMixin):
                 """
                 # print(tasks)
                 if not self.scheduler.has_pending_requests() and len(tasks) <= 1:
-                    if self.settings.get('ALWAYS_RUNNING', False) is True:
+                    if setting.ALWAYS_RUNNING is True:
                         self.logger.debug('Continuous Monitoring...')
                         continue
                     break
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler
-            await asyncio.sleep(self.settings.get('DOWNLOAD_DELAY', 0))
+            await asyncio.sleep(setting.DOWNLOAD_DELAY or 0)
             self.loop.create_task(self._process_request(request, spider, semaphore))
 
     async def _process_request(self, request, spider, semaphore):

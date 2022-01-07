@@ -5,6 +5,6 @@
 
 from .logger import LogMixin
 from .misc import load_settings, load_object
-from .setting_loader import SettingLoader
+# from .setting_loader import SettingLoader
 
 from .puppeteer import PuppeteerRequest, PuppeteerResponse

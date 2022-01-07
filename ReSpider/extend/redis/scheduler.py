@@ -1,4 +1,5 @@
-from ...core.scheduler import Scheduler
+import ReSpider.setting as settings
+from ReSpider.core.scheduler import Scheduler
 import redis
 import pickle
 from .spider import RedisSpider
@@ -15,11 +16,6 @@ class RedisScheduler(Scheduler):
     @classmethod
     def from_settings(cls, spider, **kwargs):
         tag_name = spider.name or spider.__class__.name or spider.__class__.__name__
-        # cls._pool = redis.ConnectionPool(host=cls.settings.get('REDIS_HOST', '127.0.0.1'),
-        #                                  port=cls.settings.get('REDIS_PORT', 6379),
-        #                                  password=cls.settings.get('REDIS_PASSWORD', None),
-        #                                  db=cls.settings.get('REDIS_DB', 0))
-        # cls._r = redis.Redis(connection_pool=cls._pool)
         cls.queue = f'{tag_name}:scheduler'
         cls.df = f'{tag_name}:dupefilter'
         cls.error_queue = f'{tag_name}:scheduler:error'
@@ -30,10 +26,10 @@ class RedisScheduler(Scheduler):
         return cls(spider, **kwargs)
 
     def open_spider(self):
-        self._pool = redis.ConnectionPool(host=self.settings.get('REDIS_HOST', '127.0.0.1'),
-                                          port=self.settings.get('REDIS_PORT', 6379),
-                                          password=self.settings.get('REDIS_PASSWORD', None),
-                                          db=self.settings.get('REDIS_DB', 0))
+        self._pool = redis.ConnectionPool(host=settings.REDIS_HOST or '127.0.0.1',
+                                          port=settings.REDIS_PORT or 6379,
+                                          password=settings.REDIS_PASSWORD or None,
+                                          db=settings.REDIS_DB or 0)
         self._r = redis.Redis(connection_pool=self._pool)
 
     def __len__(self):

@@ -4,6 +4,7 @@
 # @File    : retry.py
 
 import ReSpider
+import ReSpider.setting as setting
 from ReSpider.middlewares import BaseMiddleware
 
 
@@ -13,9 +14,9 @@ class RetryMiddleware(BaseMiddleware):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        cls.retry_http_codes = spider.settings.get('RETRY_HTTP_CODES', [])
-        cls.retry_enabled = spider.settings.get('RETRY_ENABLED', False)
-        cls.max_retry_times = spider.settings.get('MAX_RETRY_TIMES', 10)
+        cls.retry_http_codes = setting.RETRY_HTTP_CODES or []
+        cls.retry_enabled = setting.RETRY_ENABLED or False
+        cls.max_retry_times = setting.MAX_RETRY_TIMES or 10
         return cls(spider, **kwargs)
 
     async def process_request(self, request):

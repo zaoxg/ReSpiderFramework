@@ -3,6 +3,7 @@
 # @Author  : ZhaoXiangPeng
 # @File    : redis.py
 
+import ReSpider.setting as setting
 from ..pipelines import BasePipeline
 from ..extend.item import RdsItem
 import redis
@@ -21,11 +22,11 @@ class RedisPipeline(BasePipeline):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        settings = spider.settings
-        cls.redis_host = settings.get('REDIS_HOST', '127.0.0.1')
-        cls.redis_port = settings.get('REDIS_PORT', 6379)
-        cls.redis_password = settings.get('REDIS_PASSWORD', None)
-        cls.redis_db = settings.get('REDIS_DB', 0)
+        # settings = spider.settings
+        cls.redis_host = setting.REDIS_HOST
+        cls.redis_port = setting.REDIS_PORT
+        cls.redis_password = setting.REDIS_PASSWORD
+        cls.redis_db = setting.REDIS_DB
         return cls(spider, **kwargs)
 
     def open_spider(self, spider=None, **kwargs):

@@ -6,7 +6,7 @@
 import os
 from .misc import load_settings
 from configparser import ConfigParser, NoSectionError
-from ..settings import SETTING_LIST, DEFAULT_PUPPETEER_SETTINGS
+# from ..settings import SETTING_LIST, DEFAULT_PUPPETEER_SETTINGS
 
 
 class SettingLoader:
@@ -55,7 +55,7 @@ class SettingLoader:
         cls.settings.update(WORKING_DIRECTORY=WORKING_DIRECTORY,
                             PROJECT_ABSOLUTE_PATH=PROJECT_ABSOLUTE_PATH,
                             SOURCE_ROOT=SOURCE_ROOT,
-                            LOG_FILE_DIRECTORY=f'{PROJECT_ABSOLUTE_PATH}/logs/',
+                            LOG_FILE_DIRECTORY=f'{PROJECT_ABSOLUTE_PATH}/log/',
                             DATA_FILE_DIRECTORY=f'{PROJECT_ABSOLUTE_PATH}/data/')
         cls.settings.update(custom_setting)
 

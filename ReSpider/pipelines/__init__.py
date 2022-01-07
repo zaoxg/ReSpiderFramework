@@ -3,6 +3,7 @@
 # @Author  : ZhaoXiangPeng
 # @File    : __init__.py
 
+import ReSpider.setting as setting
 from ..extend.logger import LogMixin
 from ..extend.item import Item
 from ..middlewares import MiddlewareManager
@@ -19,7 +20,7 @@ class BasePipeline(LogMixin):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        cls.settings = spider.settings
+        # cls.settings = spider.settings
         return cls(spider, **kwargs)
 
     def open_spider(self, spider=None, **kwargs):
@@ -42,7 +43,7 @@ class PipelineManager(MiddlewareManager):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        return cls.from_settings(spider.settings, spider, **kwargs)
+        return cls.from_settings(setting.__dict__, spider, **kwargs)
 
     def _add_middleware(self, mw):
         if hasattr(mw, 'open_spider'):

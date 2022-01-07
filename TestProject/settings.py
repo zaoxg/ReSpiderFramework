@@ -7,6 +7,7 @@
 # LOG SETTING
 FILE_HANDLER_LEVEL = 'WARNING'  # 保存文件日志级别
 STREAM_HANDLER_LEVEL = 'DEBUG'  # 输出日志级别
+LOG_FILE_DIRECTORY = ''  # 保存日志目录
 
 
 """"""

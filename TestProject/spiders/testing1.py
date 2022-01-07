@@ -3,16 +3,22 @@
 # @Author  : ZhaoXiangPeng
 # @File    : testing1.py
 
-import sys
-import os
-sys.path.append(os.getcwd().replace('\\spiders', '').rsplit('\\', maxsplit=1)[0])
+# import sys
+# import os
+# sys.path.append(os.getcwd().replace('\\spiders', '').rsplit('\\', maxsplit=1)[0])
 import json
 import ReSpider
 from ReSpider import item
 
 
 class Testing1(ReSpider.Spider):
-    name = 'testing_1'
+    # name = 'testing_1'
+
+    __custom_setting__ = {
+        'a': 1,
+        'SCHEDULER': 'ReSpider.extend.redis.scheduler.RedisScheduler',
+        'LOG_TO_FILE': True
+    }
 
     def __init__(self):
         super().__init__()
@@ -21,7 +27,7 @@ class Testing1(ReSpider.Spider):
         # self.settings.update(SCHEDULER='ReSpider.extend.redis.scheduler.RedisScheduler')
         # self.settings.update(SCHEDULER='ReSpider.core.scheduler.Scheduler')
         # self.settings.update(STREAM_HANDLER_LEVEL='INFO')
-        print(self.settings)
+        # print(self.settings)
 
     def start_requests(self):
         req = ReSpider.Request(

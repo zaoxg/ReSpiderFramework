@@ -134,3 +134,27 @@ def replace_str(source_str, regex, replace_str=""):
     """
     str_info = re.compile(regex)
     return str_info.sub(replace_str, source_str)
+
+
+def hump2underline(arg: str):
+    """
+    驼峰形式字符串转成下划线形式
+        mediaType -> media_type
+    :param arg: 驼峰形式字符串
+    :return: 字母全小写的下划线形式字符串
+    """
+    # 匹配正则，匹配小写字母和大写字母的分界位置
+    p = re.compile(r'([a-z]|\d)([A-Z])')
+    # 这里第二个参数使用了正则分组的后向引用
+    sub = re.sub(p, r'\1_\2', arg).lower()
+    return sub
+
+
+def underline2hump(arg: str):
+    """
+    下划线形式字符串转成驼峰形式
+    :param arg: 下划线形式字符串
+    :return: 驼峰形式字符串
+    """
+    sub = re.sub(r'(_\w)', lambda x: x.group(1)[1].upper(), arg)
+    return sub

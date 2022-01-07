@@ -1,6 +1,6 @@
 from typing import Optional
-from ..utils import encrypt_md5
-from ..settings.default_settings import RETRY_ENABLED, MAX_RETRY_TIMES
+import ReSpider.setting as setting
+from ReSpider.utils import encrypt_md5
 import requests
 
 
@@ -11,7 +11,7 @@ class Request:
                  headers=None, params=None, data=None, cookies=None, allow_redirects: bool = True,
                  encoding: Optional[str] = 'utf-8',
                  proxy='', timeout: Optional[int] = 30,
-                 retry: bool = RETRY_ENABLED, max_retry_times: int = MAX_RETRY_TIMES,
+                 retry: bool = setting.RETRY_ENABLED, max_retry_times: int = setting.MAX_RETRY_TIMES,
                  meta=None,
                  priority: Optional[int] = 1, do_filter: bool = False,
                  callback=None, errback=None, *args, **kwargs):
