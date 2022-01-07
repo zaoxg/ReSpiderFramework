@@ -22,7 +22,7 @@ SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
 # SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
 
 DOWNLOADER = 'ReSpider.core.downloader.Downloader'
-SSL_FINGERPRINT = True  # ssl指纹
+SSL_FINGERPRINT = False  # ssl指纹
 
 PIPELINE_MANAGER = 'ReSpider.pipelines.PipelineManager'  # 管道管理
 

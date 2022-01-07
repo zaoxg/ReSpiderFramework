@@ -16,18 +16,8 @@ class Testing1(ReSpider.Spider):
 
     __custom_setting__ = {
         'a': 1,
-        'SCHEDULER': 'ReSpider.extend.redis.scheduler.RedisScheduler',
         'LOG_TO_FILE': True
     }
-
-    def __init__(self):
-        super().__init__()
-        # self.settings.get('DOWNLOADER_MIDDLEWARES', {}).update(
-        #     {'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 6})
-        # self.settings.update(SCHEDULER='ReSpider.extend.redis.scheduler.RedisScheduler')
-        # self.settings.update(SCHEDULER='ReSpider.core.scheduler.Scheduler')
-        # self.settings.update(STREAM_HANDLER_LEVEL='INFO')
-        # print(self.settings)
 
     def start_requests(self):
         req = ReSpider.Request(

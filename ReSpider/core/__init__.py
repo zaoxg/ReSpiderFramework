@@ -6,4 +6,5 @@
 # from .engine import Engine
 # from .spiders import Crawler
 from .scheduler import Scheduler
+from .observer import Observer
 # from ..pipelines import BasePipeline

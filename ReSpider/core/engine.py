@@ -31,6 +31,7 @@ class Engine(LogMixin):
         start_requests = self.spider.start_requests()
         self.execute(self.spider, start_requests)
         self.observer.engine_status = 'STOP'
+        self.logger.info('请求 %s 次' % self.observer.request_count)
         self.logger.info(f'RUNNING TIME ({int(time.time() - start_time)}) SECONDS.')
         self.logger.debug('及 其 优 秀 ,  弹 性 很 足.')
 

@@ -2,6 +2,7 @@ from .handlers import DownloadHandler
 from ...http import Request, Response
 from .middleware import DownloaderMiddlewareManager
 from ...extend.logger import LogMixin
+from .. import Observer
 
 
 class Downloader(LogMixin):
@@ -9,7 +10,7 @@ class Downloader(LogMixin):
 
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        self._observer = kwargs.pop('observer', None)
+        self._observer: Observer = kwargs.pop('observer', None)
         # if self._observer:
         #     self._observer.register(self)
         self.handler = DownloadHandler.from_crawler(spider, observer=self._observer)
@@ -37,6 +38,7 @@ class Downloader(LogMixin):
         :param request:
         :return:
         """
+        self._observer.request_count = 1
         process_req = await self.middleware.process_request(request)
         process_resp = None
         if isinstance(process_req, Request):

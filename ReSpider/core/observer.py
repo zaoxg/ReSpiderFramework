@@ -27,10 +27,11 @@ REQUEST_COUNT_INTERVAL_TIME = 60  # 请求统计通知间隔时间
 
 def callback(loop=None):
     print('callback with {0}'.format(time.time()))
-    loop.call_later(1, callback, loop)
+    loop.call_later(3, callback, loop)
 
 
 def request_count_init(loop):
+    print('request count init.')
     loop.call_later(REQUEST_COUNT_INTERVAL_TIME, callback)
 
 
@@ -44,7 +45,8 @@ class Observer:
 
     __latestNews = None
 
-    REQUEST_COUNT = 0
+    __REQUEST_COUNT = 0
+    is_first_set = True
 
     def register(self, obj, default=None):
         if default is None:
@@ -64,7 +66,9 @@ class Observer:
         if self.__SIGNAL_STATUS == 'START':
             for _observer in self.__observers.keys():
                 self.__observers[_observer].open_spider()
-            # Todo self.loop.call_later(1, callback, self.loop)
+            # Todo
+            self.loop.call_soon(request_count_init, self.loop)
+            # self.loop.call_later(1, callback, self.loop)
         elif self.__SIGNAL_STATUS == 'STOP':
             for _observer in self.__observers.keys():
                 self.__observers[_observer].close_spider()
@@ -83,6 +87,14 @@ class Observer:
         elif self._task_count:
             for _observer in self.__observers:
                 _observer.open_spider()
+
+    @property
+    def request_count(self):
+        return self.__REQUEST_COUNT
+
+    @request_count.setter
+    def request_count(self, val: int = 1):
+        self.__REQUEST_COUNT += val
 
     async def app_check(self):
         # 当 task_count 变化时触发

@@ -16,10 +16,11 @@ class Crawler(LogMixin):
 
     def __init__(self, **kwargs):
         self.name = hump2underline(self.__class__.__name__)
-        super().__init__(self)
+
         # 更新自定义配置到setting
         for key, val in self.__class__.__custom_setting__.items():
             setattr(setting, key, val)
+        super().__init__(self)
         self.__dict__.update(**kwargs)
         if not hasattr(self, 'start_urls'):
             self.start_urls = []
