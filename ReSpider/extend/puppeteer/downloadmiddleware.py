@@ -11,6 +11,7 @@ import asyncio
 
 from ..puppeteer import PuppeteerRequest
 from ..puppeteer import PuppeteerResponse
+import ReSpider.setting as setting
 from ReSpider.middlewares import BaseMiddleware
 from urllib.parse import urlsplit
 
@@ -34,12 +35,12 @@ class PuppeteerMiddleware(BaseMiddleware):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        settings = spider.settings
+        settings = setting.PUPPETEER_SETTING
         # cls.headless = None
         # init settings
         cls.window_width = settings.get('PUPPETEER_WINDOW_WIDTH', PUPPETEER_WINDOW_WIDTH)
         cls.window_height = settings.get('PUPPETEER_WINDOW_HEIGHT', PUPPETEER_WINDOW_HEIGHT)
-        cls.headless = settings.get('PUPPETEER_HEADLESS', PUPPETEER_HEADLESS)
+        cls.headless = settings.get('PUPPETEER_HEADLESS', PUPPETEER_HEADLESS)  # 无头
         cls.dumpio = settings.get('PUPPETEER_DUMPIO', PUPPETEER_DUMPIO)
         cls.ignore_https_errors = settings.get('PUPPETEER_IGNORE_HTTPS_ERRORS',
                                                PUPPETEER_IGNORE_HTTPS_ERRORS)
@@ -71,7 +72,7 @@ class PuppeteerMiddleware(BaseMiddleware):
                                                        ENABLE_REQUEST_INTERCEPTION)
         cls.retry_enabled = settings.get('RETRY_ENABLED')
         cls.max_retry_times = settings.get('RETRY_TIMES')
-        cls.retry_http_codes = set(int(x) for x in settings.get('RETRY_HTTP_CODES'))
+        cls.retry_http_codes = set(int(x) for x in setting.RETRY_HTTP_CODES)
         cls.priority_adjust = settings.get('RETRY_PRIORITY_ADJUST')
         cls.user_dir = settings.get('PUPPETEER_USER_DIR', PUPPETEER_USER_DIR)
         options = {

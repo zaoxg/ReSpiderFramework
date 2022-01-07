@@ -48,7 +48,6 @@ REDIS_PORT = 6379
 REDIS_PASSWORD = None  # 'admin000'
 REDIS_DB = 0
 
-
 # 日志配置
 LOG_PATH = f'{WORKER_PATH}/log/'  # 保存日志目录
 LOG_TO_CONSOLE = True  # 打印到控制台
@@ -58,13 +57,23 @@ LOG_ENCODING = 'utf-8'  # log文件编码
 LOG_LEVEL_CONSOLE = 'DEBUG'
 LOG_LEVEL_FILE = 'WARNING'
 
-
 # 爬虫常驻
 ALWAYS_RUNNING = False
 
 # 数据存储
 DATA_PATH = f'{WORKER_PATH}/data/'
 
+# PUPPETEER SETTING(浏览器渲染)
+PUPPETEER_SETTING = dict(
+    PUPPETEER_HEADLESS=False,  # 无头
+    PUPPETEER_EXECUTABLE_PATH='D:/Package/Chromium64/chrome.exe',
+    PUPPETEER_USER_DIR='./data',  # 用户数据目录
+    # pyppeteer timeout
+    PUPPETEER_DOWNLOAD_TIMEOUT=60,
+    # pyppeteer browser window
+    PUPPETEER_WINDOW_WIDTH=1400,
+    PUPPETEER_WINDOW_HEIGHT=700
+)
 
 # 加载自定义的setting
 # 需要把自定义的path加入到这里（作用域）
@@ -75,11 +84,18 @@ except ModuleNotFoundError:
 # 兼容老版本配置
 try:
     from settings import *
+
     # 日志
     LOG_PATH = LOG_FILE_DIRECTORY or LOG_PATH
     LOG_LEVEL_CONSOLE = STREAM_HANDLER_LEVEL
     LOG_LEVEL_FILE = FILE_HANDLER_LEVEL
     # 数据文件
     # DATA_PATH = DATA_FILE_DIRECTORY
+    # 浏览器渲染
+    PUPPETEER_SETTING.update({
+        'PUPPETEER_HEADLESS': PUPPETEER_HEADLESS,
+        'PUPPETEER_EXECUTABLE_PATH': PUPPETEER_EXECUTABLE_PATH,
+        'PUPPETEER_USER_DIR': PUPPETEER_USER_DIR
+    })
 except ModuleNotFoundError:
     pass

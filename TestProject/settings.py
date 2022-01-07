@@ -13,7 +13,7 @@ LOG_FILE_DIRECTORY = ''  # 保存日志目录
 """"""
 # PUPPETEER SETTING
 PUPPETEER_HEADLESS = False  # 无头
-PUPPETEER_EXECUTABLE_PATH = 'D:/Package/Chromium64/chrome.exe'
+PUPPETEER_EXECUTABLE_PATH = 'D:/Package/Chromium89/chrome.exe'
 PUPPETEER_USER_DIR = './data'  # 用户数据目录
 
 

@@ -3,6 +3,11 @@
 # @Author  : ZhaoXiangPeng
 # @File    : __init__.py
 
+__all__ = [
+    'PuppeteerRequest',
+    'PuppeteerResponse'
+]
+
 from .logger import LogMixin
 from .misc import load_settings, load_object
 # from .setting_loader import SettingLoader

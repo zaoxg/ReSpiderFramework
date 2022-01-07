@@ -7,7 +7,12 @@ import ReSpider
 
 
 class Testing2(ReSpider.Spider):
-    name = 'testing_2'
+    __custom_setting__ = {
+        'DOWNLOADER_MIDDLEWARES': {
+            'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 6
+        }
+    }
+    # name = 'testing_2'
     """
     需要加载浏览器相关配置
     """
@@ -16,9 +21,9 @@ class Testing2(ReSpider.Spider):
                   'http://qikan.cqvip.com/Qikan/Article/Detail?id=7101531000',
                   'http://qikan.cqvip.com/Qikan/Article/Detail?id=7103385685']
 
-    def __init__(self):
-        super().__init__()
-        self.settings['DOWNLOADER_MIDDLEWARES'].update({'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 6})
+    # def __init__(self):
+    #     super().__init__()
+    #     self.settings['DOWNLOADER_MIDDLEWARES'].update({'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 6})
 
     def start_requests(self):
         for url in self.start_urls:
