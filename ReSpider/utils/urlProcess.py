@@ -40,11 +40,11 @@ def unquote_url(url: str, encoding='utf-8'):
     return unquote(url, encoding=encoding)
 
 
-def quote_url(url: str, encoding='utf-8'):
+def quote_url(url: str, safe='%;/?:@&=+$,', encoding='utf-8'):
     """
     @summary: url编码
     """
-    return quote(url, safe="%;/?:@&=+$,", encoding=encoding)
+    return quote(url, safe=safe, encoding=encoding)
 
 
 if __name__ == '__main__':
