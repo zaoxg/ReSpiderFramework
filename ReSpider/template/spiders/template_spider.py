@@ -10,15 +10,17 @@ import ReSpider
 
 
 class TemplateSpider(ReSpider.Spider):
+    __custom_setting__ = {}
 
     name = 'template_spider'
     start_urls = []
-
-    def __init__(self):
-        super().__init__()
 
     def start_requests(self):
         pass
 
     def parse(self, response):
         pass
+
+
+if __name__ == '__main__':
+    TemplateSpider().start()
