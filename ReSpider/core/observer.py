@@ -22,7 +22,7 @@ import time
 # 	middlewareManager需要实现以上两个方法
 # 	middlewareManager控制pipelines和middlewares的开启和关闭
 
-REQUEST_COUNT_INTERVAL_TIME = 60  # 请求统计通知间隔时间
+REQUEST_COUNT_INTERVAL_TIME = 10  # 请求统计通知间隔时间
 
 
 def callback(loop=None):
@@ -32,7 +32,7 @@ def callback(loop=None):
 
 def request_count_init(loop):
     print('request count init.')
-    loop.call_later(REQUEST_COUNT_INTERVAL_TIME, callback)
+    loop.call_later(REQUEST_COUNT_INTERVAL_TIME, callback, loop)
 
 
 class Observer:
