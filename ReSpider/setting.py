@@ -99,3 +99,5 @@ try:
     })
 except ModuleNotFoundError:
     pass
+except NameError:
+    pass
