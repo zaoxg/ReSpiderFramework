@@ -1,8 +1,8 @@
 from .handlers import DownloadHandler
-from ...http import Request, Response
+from ReSpider.http import Request, Response
 from .middleware import DownloaderMiddlewareManager
-from ...extend.logger import LogMixin
-from .. import Observer
+from ReSpider.extend.logger import LogMixin
+from ReSpider.core.observer import Observer
 
 
 class Downloader(LogMixin):

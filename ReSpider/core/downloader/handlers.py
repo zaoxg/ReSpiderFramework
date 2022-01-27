@@ -31,7 +31,7 @@ class DownloadHandler(LogMixin):
         return cls(spider, **kwargs)
 
     async def download_request(self, request):
-        self.logger.info(request)
+        self.logger.debug(request)
         kwargs = {}
         if request.headers:
             headers = request.headers
@@ -62,6 +62,7 @@ class DownloadHandler(LogMixin):
                                 request=request)
             except TimeoutError as timeoutError:
                 self.logger.error(timeoutError, exc_info=True)
+                self._observer.fail_count = 1
                 return Response(url=request.url,
                                 status=601,
                                 request=request)
@@ -77,12 +78,14 @@ class DownloadHandler(LogMixin):
                                 request=request)
             except aiohttp.ClientHttpProxyError as proxy_error:
                 self.logger.error(proxy_error, exc_info=True)
+                self._observer.fail_count = 1
                 return Response(url=request.url,
                                 status=604,
                                 request=request)
             except Exception as exception:
                 self.logger.warning(request.cat())
                 self.logger.error(exception, exc_info=True)
+                self._observer.fail_count = 1
                 return Response(url=request.url,
                                 status=999,
                                 request=request)

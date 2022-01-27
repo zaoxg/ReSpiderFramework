@@ -5,8 +5,7 @@
 
 import ReSpider.setting as setting
 from ReSpider.utils.tools import hump2underline
-from ..engine import Engine
-from ...extend.logger import LogMixin
+from ReSpider.extend.logger import LogMixin
 
 
 class Crawler(LogMixin):
@@ -20,6 +19,8 @@ class Crawler(LogMixin):
         # 更新自定义配置到setting
         for key, val in self.__class__.__custom_setting__.items():
             setattr(setting, key, val)
+        if not setting.LOG_NAME:
+            setattr(setting, 'LOG_NAME', self.name)
         super().__init__(self)
         self.__dict__.update(**kwargs)
         if not hasattr(self, 'start_urls'):
@@ -33,5 +34,6 @@ class Crawler(LogMixin):
 
     def start(self):
         self.logger.info('SPIDER START INIT ...')
+        from ReSpider.core.engine import Engine
         engine = Engine(self)
         engine.start()

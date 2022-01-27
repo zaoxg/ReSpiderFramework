@@ -1,11 +1,11 @@
 import asyncio
 import time
 import ReSpider.setting as setting
-from .observer import Observer
-from ..http import Request
-from ..extend import load_object
-from ..extend import LogMixin
-from ..extend.item import Item
+from ReSpider.core.observer import Observer
+from ReSpider.http import Request
+from ReSpider.extend import load_object
+from ReSpider.extend import LogMixin
+from ReSpider.extend.item import Item
 
 
 class Engine(LogMixin):
@@ -16,7 +16,6 @@ class Engine(LogMixin):
         self.logger.info('ENGINE START INIT ...')
         self.spider = spider
         # self.settings = spider.settings
-
         self.scheduler = load_object(setting.SCHEDULER).from_crawler(spider, observer=self.observer)
         self.downloader = load_object(setting.DOWNLOADER).from_crawler(spider, observer=self.observer)
         self.pipelines = load_object(setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)
@@ -31,7 +30,6 @@ class Engine(LogMixin):
         start_requests = self.spider.start_requests()
         self.execute(self.spider, start_requests)
         self.observer.engine_status = 'STOP'
-        self.logger.info('请求 %s 次' % self.observer.request_count)
         self.logger.info(f'RUNNING TIME ({int(time.time() - start_time)}) SECONDS.')
         self.logger.debug('及 其 优 秀 ,  弹 性 很 足.')
 

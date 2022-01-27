@@ -4,6 +4,11 @@
 # @File    : item.py
 
 
+class ItemMetaclass(type):
+    def __new__(mcs, *args, **kwargs):
+        return type.__new__(mcs, *args, **kwargs)
+
+
 class Item:
     # pipeline = None
     # data_directory = None

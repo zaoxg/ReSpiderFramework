@@ -5,6 +5,17 @@
 
 import os, sys
 import re
+
+from ReSpider import setting
+from ReSpider.core.spiders.spider import Spider
+from ReSpider.extend.redis.spider import RedisSpider
+# from .core.spiders.auto_spider import AutoSpider
+
+from ReSpider.http import Request, Response
+from ReSpider.extend import PuppeteerRequest, PuppeteerResponse
+
+from ReSpider.extend import item
+
 # 添加作用域, 神奇的操作
 sys.path.insert(0, re.sub(r'([\\/]items$)|([\\/]spiders$)', '', os.getcwd()))
 
@@ -17,13 +28,3 @@ __all__ = [
     'PuppeteerResponse',
     'item'
 ]
-
-from . import setting
-from .core.spiders.spider import Spider
-from .extend.redis.spider import RedisSpider
-# from .core.spiders.auto_spider import AutoSpider
-
-from .http import Request, Response
-from .extend import PuppeteerRequest, PuppeteerResponse
-
-from .extend import item

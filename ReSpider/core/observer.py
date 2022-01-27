@@ -3,8 +3,11 @@
 # @Author  : ZhaoXiangPeng
 # @File    : observer.py
 
+
 import asyncio
 import time
+from ReSpider.extend import LogMixin
+import ReSpider.setting as setting
 
 # 被观察者列表
 # 	调度器
@@ -22,20 +25,15 @@ import time
 # 	middlewareManager需要实现以上两个方法
 # 	middlewareManager控制pipelines和middlewares的开启和关闭
 
-REQUEST_COUNT_INTERVAL_TIME = 10  # 请求统计通知间隔时间
+
+__all__ = [
+    'Observer'
+]
+
+REQUEST_COUNT_INTERVAL_TIME = 120  # 请求统计通知间隔时间
 
 
-def callback(loop=None):
-    print('callback with {0}'.format(time.time()))
-    loop.call_later(3, callback, loop)
-
-
-def request_count_init(loop):
-    print('request count init.')
-    loop.call_later(REQUEST_COUNT_INTERVAL_TIME, callback, loop)
-
-
-class Observer:
+class Observer(LogMixin):
     loop = asyncio.get_event_loop()
     _task_count = 0
     __observers = {}  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
@@ -43,12 +41,13 @@ class Observer:
     __middlewares = {}  # 被观察的 middleware obj 列表
     __SIGNAL_STATUS = None
 
-    __latestNews = None
-
-    __REQUEST_COUNT = 0
-    is_first_set = True
+    __requestCount = 0
+    __requestFailCount = 0
+    __intervalCount = 0
+    __intervalFailCount = 0
 
     def register(self, obj, default=None):
+        self.logger.debug('<%s> register in observer.' % obj.__class__.__name__)
         if default is None:
             self.__observers.update({obj.__class__.__name__: obj})
         elif default == 'pipeline':
@@ -67,11 +66,12 @@ class Observer:
             for _observer in self.__observers.keys():
                 self.__observers[_observer].open_spider()
             # Todo
-            self.loop.call_soon(request_count_init, self.loop)
+            self.loop.call_soon(self.request_count_init, self.loop)
             # self.loop.call_later(1, callback, self.loop)
         elif self.__SIGNAL_STATUS == 'STOP':
             for _observer in self.__observers.keys():
                 self.__observers[_observer].close_spider()
+            self.logger.info('send request <%d> times total, fail request <%d> times total' % (self.request_count, self.request_count_fail))
         else:
             pass
 
@@ -90,11 +90,32 @@ class Observer:
 
     @property
     def request_count(self):
-        return self.__REQUEST_COUNT
+        return self.__requestCount
 
     @request_count.setter
     def request_count(self, val: int = 1):
-        self.__REQUEST_COUNT += val
+        self.__intervalCount += val  # 阶段请求 +1
+        self.__requestCount += val
+
+    @property
+    def request_count_fail(self):
+        return self.__requestFailCount
+
+    @request_count_fail.setter
+    def request_count_fail(self, val: int = 1):
+        self.__intervalFailCount += val  # 阶段请求 +1
+        self.__requestFailCount += val
+
+    def callback(self, loop=None):
+        # print('callback with {0}'.format(time.time()))
+        # a = self.fail_count / self.request_count
+        self.logger.info('last %d minutes, send request <%s> times, fail <%s> times.' % (REQUEST_COUNT_INTERVAL_TIME/60, self.__intervalCount, self.__intervalFailCount))
+        self.__intervalCount, self.__intervalFailCount = 0, 0  # 通知后重置请求和失败次数
+        loop.call_later(REQUEST_COUNT_INTERVAL_TIME, self.callback, loop)
+
+    def request_count_init(self, loop):
+        self.logger.debug('request count init.')
+        loop.call_later(REQUEST_COUNT_INTERVAL_TIME, self.callback, loop)
 
     async def app_check(self):
         # 当 task_count 变化时触发
@@ -116,6 +137,7 @@ class Observer:
 
     @latestNews.setter
     def latestNews(self, value):
+        print('.'.join([self.__module__, self.__class__.__name__]))
         if self.__latestNews != value:
             self.__latestNews = value
             self.notify()
@@ -167,11 +189,12 @@ class PhoneSubscriber(Monitor):
 
 if __name__ == '__main__':
     obs = Observer()
-    for sub in [SMSSubscriber, EmailSubscriber, PhoneSubscriber]:
-        sub(obs)
-    print(obs.observers())
-    for i in range(200):
-        obs.latestNews = '({})不要回答! 不要回答! 不要回答!'.format(i)
+    obs.latestNews = '收到请回答! 收到请回答! 收到请回答!'
+    # for sub in [SMSSubscriber, EmailSubscriber, PhoneSubscriber]:
+    #     sub(obs)
+    # print(obs.observers())
+    # for i in range(200):
+    #     obs.latestNews = '({})不要回答! 不要回答! 不要回答!'.format(i)
         # time.sleep(random.random())
         # obs.latestNews = '收到请回答! 收到请回答! 收到请回答!'
         # obs.latestNews = '不要回答! 不要回答! 不要回答!'

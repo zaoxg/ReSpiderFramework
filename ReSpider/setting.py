@@ -49,6 +49,7 @@ REDIS_PASSWORD = None  # 'admin000'
 REDIS_DB = 0
 
 # 日志配置
+LOG_NAME = None
 LOG_PATH = f'{WORKER_PATH}/log/'  # 保存日志目录
 LOG_TO_CONSOLE = True  # 打印到控制台
 LOG_TO_FILE = False  # 保存到文件
@@ -56,6 +57,9 @@ LOG_MODE = 'w'  # 写文件模式
 LOG_ENCODING = 'utf-8'  # log文件编码
 LOG_LEVEL_CONSOLE = 'DEBUG'
 LOG_LEVEL_FILE = 'WARNING'
+
+# 请求次数统计
+REQUEST_COUNT_INTERVAL_TIME = 60
 
 # 爬虫常驻
 ALWAYS_RUNNING = False
