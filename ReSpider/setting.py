@@ -21,6 +21,7 @@ MAX_RETRY_TIMES = 5  # 最大重试次数
 # 管道
 ITEM_PIPELINES = {
     'ReSpider.pipelines.files.CSVPipeline': 4,
+    'ReSpider.pipelines.redis.RedisPipeline': 5,
     'ReSpider.pipelines.files.FilesPipeline': 6,
     'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
 }
@@ -78,6 +79,9 @@ PUPPETEER_SETTING = dict(
     PUPPETEER_WINDOW_WIDTH=1400,
     PUPPETEER_WINDOW_HEIGHT=700
 )
+
+# cookies 池配置
+COOKIE_POOL_KEY = None
 
 # 加载自定义的setting
 # 需要把自定义的path加入到这里（作用域）

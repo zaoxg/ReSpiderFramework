@@ -112,14 +112,14 @@ class MiddlewareManager(LogMixin):
         for mwfn in self.methods[methodname]:
             pass
 
-    def _process_parallel(self, methodname, obj, spider=None):
+    def _process_parallel(self, methodname, spider=None):
         for mwfn in self.methods[methodname]:
-            mwfn()
+            mwfn(spider)
 
     def open_spider(self, spider=None):
         self.logger.debug('Process parallel "open_spider"')
-        return self._process_parallel('open_spider', spider)
+        return self._process_parallel('open_spider', spider or self.spider)
 
     def close_spider(self, spider=None):
         self.logger.debug('Process parallel "close_spider"')
-        return self._process_parallel('close_spider', spider)
+        return self._process_parallel('close_spider', spider or self.spider)

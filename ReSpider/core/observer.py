@@ -150,7 +150,7 @@ class Observer(LogMixin):
         return [type(x).__name__ for x in self.__observers]
 
     def notify(self, msg):
-        self.logger.warning('rnm this local has some little trouble, content is <%s>' % msg)
+        self.logger.warning('RNM this local has trouble, is <%s>' % msg)
         # for observer in self.__observers:
         #     observer.open_spider()
 
