@@ -40,7 +40,7 @@ class RedisPipeline(BasePipeline):
     async def process_item(self, item: RdsItem, spider):
         keys = f'{self._keys}:{item.rds_type}'
         if item.keys:
-            keys = f'{self._keys}:{item.keys}'
+            keys = item.keys
         if item.rds_type == 'LIST':
             self._r.rpush(keys, json.dumps(item))
             pass
