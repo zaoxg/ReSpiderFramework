@@ -9,9 +9,6 @@ from ReSpider.middlewares import BaseMiddleware
 
 
 class RetryMiddleware(BaseMiddleware):
-    def __init__(self, spider, **kwargs):
-        super().__init__(spider, **kwargs)
-
     @classmethod
     def from_crawler(cls, spider, **kwargs):
         cls.retry_http_codes = setting.RETRY_HTTP_CODES or []

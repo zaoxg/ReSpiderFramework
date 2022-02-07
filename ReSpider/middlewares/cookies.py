@@ -8,9 +8,7 @@ import random
 
 
 class CookiesMiddleware(BaseMiddleware):
-    def __init__(self, spider, **kwargs):
-        super().__init__(spider, **kwargs)
-        self.cookies_pool = []
+    cookies_pool = []
 
     async def process_request(self, request):
         cookies = request.cookies

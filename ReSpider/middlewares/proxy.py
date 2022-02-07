@@ -2,10 +2,6 @@ from ..middlewares import BaseMiddleware
 
 
 class ProxyMiddleware(BaseMiddleware):
-    def __init__(self, spider, **kwargs):
-        super().__init__(spider, **kwargs)
-        # self.proxys = []
-
     @classmethod
     def from_crawler(cls, spider, **kwargs):
         cls.get_proxy()

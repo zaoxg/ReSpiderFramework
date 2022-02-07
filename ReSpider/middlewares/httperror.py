@@ -4,6 +4,7 @@
 # @File    : httperror.py
 
 from ReSpider.middlewares import BaseMiddleware
+import ReSpider.setting as setting
 
 
 class HttpError:
@@ -11,9 +12,7 @@ class HttpError:
 
 
 class HttpErrorMiddleware(BaseMiddleware):
-    def __init__(self, spider, **kwargs):
-        super().__init__(spider, **kwargs)
-        self.http_status_list = spider.settings.get('', [])
+    http_status_list = setting.get('', [])
 
     def process_response(self, request, response):
         if response.status in self.http_status_list:

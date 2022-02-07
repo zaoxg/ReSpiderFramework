@@ -267,9 +267,6 @@ def fake_useragent():
 
 
 class UserAgentMiddleware(BaseMiddleware):
-    def __init__(self, spider, **kwargs):
-        super().__init__(spider, **kwargs)
-
     def open_spider(self, spider=None, **kwargs):
         self.ua = [
                       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
