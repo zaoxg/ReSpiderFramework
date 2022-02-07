@@ -81,6 +81,8 @@ PUPPETEER_SETTING = dict(
 
 # 加载自定义的setting
 # 需要把自定义的path加入到这里（作用域）
+import sys
+sys.path.append(WORKER_PATH)
 try:
     from setting import *
 except ModuleNotFoundError:
