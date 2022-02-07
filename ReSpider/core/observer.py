@@ -46,6 +46,8 @@ class Observer(LogMixin):
     __intervalCount = 0
     __intervalFailCount = 0
 
+    __latestNews = None
+
     def register(self, obj, default=None):
         self.logger.debug('<%s> register in observer.' % obj.__class__.__name__)
         if default is None:
@@ -109,7 +111,7 @@ class Observer(LogMixin):
     def callback(self, loop=None):
         # print('callback with {0}'.format(time.time()))
         # a = self.fail_count / self.request_count
-        self.logger.info('last %d minutes, send request <%s> times, fail <%s> times.' % (REQUEST_COUNT_INTERVAL_TIME/60, self.__intervalCount, self.__intervalFailCount))
+        self.logger.info('last %d minutes, send request <%s> , fail <%s> .' % (REQUEST_COUNT_INTERVAL_TIME/60, self.__intervalCount, self.__intervalFailCount))
         self.__intervalCount, self.__intervalFailCount = 0, 0  # 通知后重置请求和失败次数
         loop.call_later(REQUEST_COUNT_INTERVAL_TIME, self.callback, loop)
 
@@ -137,10 +139,9 @@ class Observer(LogMixin):
 
     @latestNews.setter
     def latestNews(self, value):
-        print('.'.join([self.__module__, self.__class__.__name__]))
         if self.__latestNews != value:
             self.__latestNews = value
-            self.notify()
+            self.notify(value)
 
     def getNews(self):
         return time.time().__str__() + " | Got News: " + self.__latestNews
@@ -148,10 +149,10 @@ class Observer(LogMixin):
     def observers(self):
         return [type(x).__name__ for x in self.__observers]
 
-    def notify(self):
-        for observer in self.__observers:
-            observer.open_spider()
-            # time.sleep(random.random())
+    def notify(self, msg):
+        self.logger.warning('rnm this local has some little trouble, content is <%s>' % msg)
+        # for observer in self.__observers:
+        #     observer.open_spider()
 
 
 class Monitor:
