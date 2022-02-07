@@ -92,7 +92,7 @@ try:
     from settings import *
 
     # 日志
-    LOG_PATH = LOG_FILE_DIRECTORY or LOG_PATH
+    LOG_PATH = LOG_PATH or LOG_FILE_DIRECTORY
     LOG_LEVEL_CONSOLE = STREAM_HANDLER_LEVEL
     LOG_LEVEL_FILE = FILE_HANDLER_LEVEL
     # 数据文件
