@@ -73,7 +73,7 @@ class Observer(LogMixin):
         elif self.__SIGNAL_STATUS == 'STOP':
             for _observer in self.__observers.keys():
                 self.__observers[_observer].close_spider()
-            self.logger.info('send request <%d> times total, fail request <%d> times total' % (self.request_count, self.request_count_fail))
+            self.logger.info('send request <%d> total, fail request <%d> total.' % (self.request_count, self.request_count_fail))
         else:
             pass
 
@@ -111,7 +111,8 @@ class Observer(LogMixin):
     def callback(self, loop=None):
         # print('callback with {0}'.format(time.time()))
         # a = self.fail_count / self.request_count
-        self.logger.info('last %d minutes, send request <%s> , fail <%s> .' % (REQUEST_COUNT_INTERVAL_TIME/60, self.__intervalCount, self.__intervalFailCount))
+        self.logger.info('last %d minutes, send request <%s> total, fail <%s> total.' %
+                         (REQUEST_COUNT_INTERVAL_TIME/60, self.__intervalCount, self.__intervalFailCount))
         self.__intervalCount, self.__intervalFailCount = 0, 0  # 通知后重置请求和失败次数
         loop.call_later(REQUEST_COUNT_INTERVAL_TIME, self.callback, loop)
 
