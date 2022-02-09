@@ -3,7 +3,7 @@ import re
 
 # DEFAULT SETTING
 
-WORKER_PATH = re.sub(r'([\\/]items$)|([\\/]spiders$)', '', os.getcwd())
+WORKER_PATH = re.sub(r'([\\/]items$)|([\\/]spiders$)|([\\/]utils$)', '', os.getcwd())
 
 SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
 # SCHEDULER = 'ReSpider.component.redis.scheduler.RedisScheduler'  # redis 队列
@@ -29,6 +29,7 @@ ITEM_PIPELINES = {
 # 下载中间件
 DOWNLOADER_MIDDLEWARES = {
     'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
+    'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 5,
     'ReSpider.middlewares.retry.RetryMiddleware': 8
 }
 

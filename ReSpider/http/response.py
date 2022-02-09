@@ -1,3 +1,4 @@
+from urllib.parse import urljoin
 import cchardet
 import json
 from parsel import Selector
@@ -23,6 +24,9 @@ class Response:
     @property
     def apparent_encoding(self):
         return cchardet.detect(self.content).get('encoding', 'utf-8')
+
+    def urljoin(self, val):
+        return urljoin(str(self.url), val)
 
     @property
     def text(self):
