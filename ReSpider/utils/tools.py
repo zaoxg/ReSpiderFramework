@@ -70,24 +70,24 @@ def table_json(table, save_one_blank=True):
     return data
 
 
-def get_table_row_data(table):
+def get_table_row_data(table, custom='string(.)', default=''):
     """
     获取表格里每一行数据
     @summary: Copy from https://github.com/Boris-code/feapder/blob/master/feapder/utils/tools.py  549
     @param table: 使用selector封装后的具有xpath的selector
+    @param custom: 自定义xpath, 用于匹配列值
+    @param default: 未匹配到时替换的值
     @return: [[],[]..]
     """
-
     datas = []
     rows = table.xpath(".//tr")
     for row in rows:
         cols = row.xpath("./td|./th")
         row_datas = []
         for col in cols:
-            data = col.xpath("string(.)").extract_first(default="").strip()
+            data = col.xpath(custom).extract_first(default).strip()
             row_datas.append(data)
         datas.append(row_datas)
-
     return datas
 
 
