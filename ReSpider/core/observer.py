@@ -111,14 +111,16 @@ class Observer(LogMixin):
     def callback(self, loop=None):
         # print('callback with {0}'.format(time.time()))
         # a = self.fail_count / self.request_count
+        interval_time = setting.REQUEST_COUNT_INTERVAL_TIME or REQUEST_COUNT_INTERVAL_TIME
         self.logger.info('last %d minutes, send request <%s> total, fail <%s> total.' %
-                         (REQUEST_COUNT_INTERVAL_TIME/60, self.__intervalCount, self.__intervalFailCount))
+                         (interval_time/60, self.__intervalCount, self.__intervalFailCount))
         self.__intervalCount, self.__intervalFailCount = 0, 0  # 通知后重置请求和失败次数
-        loop.call_later(REQUEST_COUNT_INTERVAL_TIME, self.callback, loop)
+        loop.call_later(interval_time, self.callback, loop)
 
     def request_count_init(self, loop):
-        self.logger.debug('request count init.')
-        loop.call_later(REQUEST_COUNT_INTERVAL_TIME, self.callback, loop)
+        self.logger.debug('requestCount service init.')
+        interval_time = setting.REQUEST_COUNT_INTERVAL_TIME or REQUEST_COUNT_INTERVAL_TIME
+        loop.call_later(interval_time, self.callback, loop)
 
     async def app_check(self):
         # 当 task_count 变化时触发
