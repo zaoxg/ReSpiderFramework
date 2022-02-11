@@ -34,7 +34,7 @@ class DataItem(dict, Item):
         self.collection = collection
 
 
-class DataItems(ArrayItem, Item):
+class DataListItem(ArrayItem, Item):
     pipeline = 'MongoDBPipeline'
     collection = None
 
