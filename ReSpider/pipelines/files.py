@@ -25,7 +25,7 @@ class FilesPipeline(BasePipeline):
         if mode[-1] == 'b':
             encoding = None
         async with aiofiles.open(f'{data_path}{file}', mode=mode, encoding=encoding) as fp:
-            await fp.write(item.get('source'))
+            await fp.write(item.get('source', item))  # 兼容旧版本
         return item    # Todo 为了兼容后续版本数据处理的pipeline
 
 
@@ -58,6 +58,8 @@ class CSVPipeline(BasePipeline):
                 self.column_index[filename] = True
             if isinstance(item, CSVItems):  # 传入多个item
                 await self.writer.writerows(item.get('rows'))
+            elif isinstance(item, list):
+                await self.writer.writerows(item)
             else:
                 await self.writer.writerow(item)
         return item

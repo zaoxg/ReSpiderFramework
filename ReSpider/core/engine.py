@@ -5,7 +5,8 @@ from ReSpider.core.observer import Observer
 from ReSpider.http import Request
 from ReSpider.extend import load_object
 from ReSpider.extend import LogMixin
-from ReSpider.extend.item import Item
+# from ReSpider.extend.item import Item
+from ReSpider.core.item import Item
 
 
 class Engine(LogMixin):
@@ -87,6 +88,8 @@ class Engine(LogMixin):
                     if setting.ALWAYS_RUNNING is True:
                         self.logger.debug('Continuous Monitoring...')
                         continue
+                    for t in tasks:
+                        pass
                     break
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler

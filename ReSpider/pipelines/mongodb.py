@@ -26,11 +26,14 @@ class MongoDBPipeline(BasePipeline):
     async def process_item(self, item: DataItem, spider):
         collection = item.collection
         try:
-            await self._db[collection].insert_one(item)
+            if isinstance(item, dict):
+                await self._db[collection].insert_one(item)
+            else:
+                await self._db[collection].insert_many(item)
         except DuplicateKeyError:
             self.logger.info('%s error with %s' % (self.name, DuplicateKeyError))
-        # except Exception as e:
-        #     self.logger.info('%s error with %s' % (self.name, e))
+        except Exception as e:
+            self.logger.error('%s error with %s' % (self.name, e))
         else:
             return item
         return item  # Todo 为了兼容后续版本数据处理的pipeline

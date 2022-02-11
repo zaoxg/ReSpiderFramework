@@ -3,112 +3,102 @@
 # @Author  : ZhaoXiangPeng
 # @File    : item.py
 
-from typing import List
+
+class Item(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(**kwargs)
 
 
-class ItemMetaclass(type):
-    def __new__(mcs, name, bases, attrs):
-        attrs['set_attribute'] = mcs.set_attribute
-        return type.__new__(mcs, name, bases, attrs)
+class FileItem(Item):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.pipeline = 'FilesPipeline'  # 指定 pipelines
+        self.data_directory = kwargs.get('data_directory')
+        self.filename = kwargs.get('filename')
+        self.filetype = kwargs.get('filetype', '').lower()
+        self.mode = kwargs.get('mode', 'w')  # 文件写入方式, 默认从头开始
+        self.encoding = 'utf-8' or kwargs.get('encoding')
 
-    def set_attribute(self, **kwargs):
-        for key, val in kwargs.items():
-            self.__dict__[key] = val
+
+class CSVItem(Item):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.pipeline = 'CSVPipeline'  # 指定 pipelines
+        self.data_directory = kwargs.get('data_directory')
+        self.filename = kwargs.get('filename')
+        self.filetype = 'csv'
+        self.mode = kwargs.get('mode', 'a')  # 文件写入方式, 默认从结束开始
+        if kwargs.get('fieldnames') is None:
+            assert ValueError('Field "fieldnames" Cannot be empty')
+        self.fieldnames = kwargs.get('fieldnames')
 
 
-class Item(metaclass=ItemMetaclass):
+class CSVItems(CSVItem):
+    """
+    dict数组
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class RdsItem(Item):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.pipeline = 'RedisPipeline'
+        self.rds_type = kwargs.get('rds_type', 'LIST').upper()  # string, set
+        self.keys = kwargs.get('keys')
+
+
+class DataItem(Item):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.pipeline = 'MongoDBPipeline'  # 指定 pipelines
+        self.collection = kwargs.get('collection')
+
+
+def make_item(cls, data: dict):
+    """
+    @summary: idea form https://github.com/Boris-code/feapder
+    提供Item类与原数据，快速构建Item实例
+    :param cls: Item类
+    :param data: 字典格式的数据
+    """
+    item = cls()
+    for key, val in data.items():
+        setattr(item, key, val)
+    return item
+
+
+class It:
     pass
 
 
-class ArrayItem(List[dict]):
-    def set_attribute(self, **kwargs):
-        for key, val in kwargs.items():
-            self.__dict__[key] = val
+class Items(list, It):
+    def __init__(self, arg, *args, **kwargs):
+        super().__init__(arg)
+        self._ = 'ITEMS'
+        self.a = kwargs.get('a')
+        self.b = kwargs.get('b')
 
 
-class DataItem(dict, Item):
-    pipeline = 'MongoDBPipeline'
-    collection = None
-
-    def set_attribute(self, collection, **kwargs):
-        self.collection = collection
-
-
-class DataListItem(ArrayItem, Item):
-    pipeline = 'MongoDBPipeline'
-    collection = None
-
-    def set_attribute(self, collection, **kwargs):
-        self.collection = collection
+class ItemData(dict, It):
+    def __init__(self, arg, *args, **kwargs):
+        super().__init__(arg)
+        self._ = 'ITEMDATA'
+        self.a = kwargs.get('a')
+        self.b = kwargs.get('b')
 
 
-class IoItem(bytes, Item):
-    pipeline = 'FilePipeline'
-    data_directory: str = None
-    filename: str = None
-    filetype: str = None
-    mode: str = 'w'
+if __name__ == '__main__':
 
-    def set_attribute(self, data_directory, filename, filetype, mode, **kwargs):
-        self.data_directory = data_directory
-        self.filename = filename
-        self.filetype = filetype
-        self.mode = mode
+    i = Items([5, 6, 7, 4], a=1, b='k')
+    print(i)
+    print(i.a)
+    print(i.__class__)
+    print(isinstance(i, list))
 
-
-class FileItem(str, Item):
-    pipeline = 'FilePipeline'
-    data_directory: str = None
-    filename: str = None
-    filetype: str = None
-    mode: str = 'w'
-    encoding: str = 'utf-8'
-
-    def set_attribute(self, data_directory, filename, filetype, mode, encoding, **kwargs):
-        self.data_directory = data_directory
-        self.filename = filename
-        self.filetype = filetype
-        self.mode = mode
-        self.encoding = encoding
-
-
-class CSVItem(dict, Item):
-    pipeline = 'CSVPipeline'
-    data_directory: str = None
-    filename: str = None
-    filetype: str = 'csv'
-    mode: str = 'a'
-    encoding: str = 'utf-8'
-
-    def set_attribute(self, data_directory, filename, filetype, mode, encoding, **kwargs):
-        self.data_directory = data_directory
-        self.filename = filename
-        self.filetype = filetype
-        self.mode = mode
-        self.encoding = encoding
-
-
-class CSVListItem(ArrayItem, Item):
-    pipeline = 'CSVPipeline'
-    data_directory: str = None
-    filename: str = None
-    filetype: str = 'csv'
-    mode: str = 'a'
-    encoding: str = 'utf-8'
-
-    def set_attribute(self, data_directory, filename, filetype, mode, encoding, **kwargs):
-        self.data_directory = data_directory
-        self.filename = filename
-        self.filetype = filetype
-        self.mode = mode
-        self.encoding = encoding
-
-
-class RdsItem(dict, Item):
-    pipeline: str = 'RedisPipeline'
-    rds_type: str = 'LIST'
-    keys: str = None
-
-    def set_attribute(self, rds_type, keys, **kwargs):
-        self.rds_type = rds_type
-        self.keys = keys
+    d = ItemData({}, a=143, b='j')
+    print(d)
+    d.update(a=5)
+    d.update(l=7)
+    print(d)

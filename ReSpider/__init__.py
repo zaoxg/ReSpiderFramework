@@ -14,7 +14,7 @@ from ReSpider.extend.redis.spider import RedisSpider
 from ReSpider.http import Request, Response
 from ReSpider.extend import PuppeteerRequest, PuppeteerResponse
 
-from ReSpider.extend import item
+from ReSpider.core import item
 
 # 添加作用域, 神奇的操作
 sys.path.insert(0, re.sub(r'([\\/]items$)|([\\/]spiders$)', '', os.getcwd()))

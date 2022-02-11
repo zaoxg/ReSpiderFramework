@@ -4,6 +4,7 @@
 # @File    : tools.py
 import json
 import re
+import os
 
 
 def get_cookies_from_str(cookie_str: str):
@@ -158,3 +159,67 @@ def underline2hump(arg: str):
     """
     sub = re.sub(r'(_\w)', lambda x: x.group(1)[1].upper(), arg)
     return sub
+
+
+################################
+def mkdir(path):
+    try:
+        if not os.path.exists(path):
+            os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        pass
+
+
+def is_exist(file_path):
+    """
+    @summary: 文件是否存在
+    ---------
+    @param file_path:
+    ---------
+    @result:
+    """
+
+    return os.path.exists(file_path)
+
+
+def read_file(filename, readlines=False, encoding="utf-8"):
+    """
+    @summary: 读文件
+    ---------
+    @param filename: 文件名（有路径）
+    @param readlines: 按行读取 （默认False）
+    ---------
+    @result: 按行读取返回List，否则返回字符串
+    """
+
+    content = None
+    try:
+        with open(filename, "r", encoding=encoding) as file:
+            content = file.readlines() if readlines else file.read()
+    except Exception as e:
+        raise e
+
+    return content
+
+
+'''
+def exec_js(js_code):
+    """
+    @summary: 执行js代码
+    @param js_code: js代码
+    @result: 返回执行结果
+    """
+
+    return execjs.eval(js_code)
+
+
+def compile_js(js_func):
+    """
+    @summary: 编译js函数
+    @param js_func:js函数
+    @result: 返回函数对象 调用 fun('js_funName', param1,param2)
+    """
+
+    ctx = execjs.compile(js_func)
+    return ctx.call
+'''

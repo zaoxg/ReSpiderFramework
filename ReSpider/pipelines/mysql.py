@@ -7,7 +7,7 @@ from . import BasePipeline
 import re
 
 
-class MongoDBPipeline(BasePipeline):
+class MySQLPipeline(BasePipeline):
     name = 'mysql pipeline'
 
     def sql_from_dict(self, ema_item, spider):
