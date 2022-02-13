@@ -118,7 +118,7 @@ class Observer(LogMixin):
         loop.call_later(interval_time, self.callback, loop)
 
     def request_count_init(self, loop):
-        self.logger.debug('requestCount service init.')
+        self.logger.debug('request count service init.')
         interval_time = setting.REQUEST_COUNT_INTERVAL_TIME or REQUEST_COUNT_INTERVAL_TIME
         loop.call_later(interval_time, self.callback, loop)
 
