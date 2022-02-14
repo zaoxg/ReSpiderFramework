@@ -201,6 +201,7 @@ class CSVItem(dict, Item):
         if arg is None:
             arg = {}
         super().__init__(self, **arg)
+        self.fieldnames = self.keys()
         for key, val in kwargs.items():
             self.__dict__[key] = val
 
@@ -213,6 +214,10 @@ class CSVListItem(MyArray, Item):
     mode: str = 'a'
     encoding: str = 'utf-8'
     fieldnames = None
+
+    def __init__(self, initlist=None, **kwargs):
+        super().__init__(initlist=initlist, **kwargs)
+        self.fieldnames = self.fieldnames or (self[0].keys() if len(self) else [])
 
     def set_attribute(self,
                       data_directory=None,

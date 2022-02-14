@@ -6,6 +6,7 @@ import aiofiles
 import csv
 from aiocsv import AsyncDictWriter
 from ReSpider.extend.item import FileItem, CSVItem, CSVItems
+from ReSpider.core.item import MyArray
 
 
 class FilesPipeline(BasePipeline):
@@ -58,7 +59,7 @@ class CSVPipeline(BasePipeline):
                 self.column_index[filename] = True
             if isinstance(item, CSVItems):  # 传入多个item
                 await self.writer.writerows(item.get('rows'))
-            elif isinstance(item, list):
+            elif isinstance(item, MyArray):
                 await self.writer.writerows(item)
             else:
                 await self.writer.writerow(item)

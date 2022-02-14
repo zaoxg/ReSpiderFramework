@@ -25,6 +25,8 @@ class MongoDBPipeline(BasePipeline):
 
     async def process_item(self, item: DataItem, spider):
         collection = item.collection
+        if not item:  # 先检查一下
+            return item
         try:
             if isinstance(item, dict):
                 await self._db[collection].insert_one(item)
