@@ -53,7 +53,7 @@ class RetryMiddleware(BaseMiddleware):
         if retries <= request.max_retry_times:  # 小于指定的最大重试次数就接着请求
             request.retry_times = retries
             request.do_filter = False  # 在重试次数内不去重
-            self.logger.debug('retry.  %s' % request.cat())
+            self.logger.info('retry.  %s' % request.cat())
             return request
         else:  # 超出最大重试次数后删除指纹
             self.logger.info('Max retry.  \n%s' % request.cat())
