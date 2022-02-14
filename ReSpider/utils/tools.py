@@ -102,6 +102,8 @@ def rows2json(rows, keys=None):
     """
     data_start_pos = 0 if keys else 1
     datas = []
+    if len(rows) < (1 if keys else 2):  # 先判断一下是不是空的, 如果为空直接返回, 防止后面通过索引取值时报错 IndexError
+        return datas
     keys = keys or rows[0]
     for values in rows[data_start_pos:]:
         datas.append(dict(zip(keys, values)))
