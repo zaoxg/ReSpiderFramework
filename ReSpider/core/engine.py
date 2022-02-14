@@ -95,6 +95,8 @@ class Engine(LogMixin):
                         setting.HEART_BEAT_TIME = 60  # 把心跳时间修改为60s
                         self.logger.debug('Continuous Monitoring...')
                         continue
+                    else:
+                        self.logger.info('Event loop has %s task, about to stop running' % tasks.__len__())
                     break
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler
