@@ -150,45 +150,16 @@ class Observer(LogMixin):
         return time.time().__str__() + " | Got News: " + self.__latestNews
 
     def observers(self):
-        return [type(x).__name__ for x in self.__observers]
+        return [x.__name__ for x in self.__observers]
+
+    @classmethod
+    def execute_func(cls, func, **kwargs):
+        func(**kwargs)
 
     def notify(self, msg):
         self.logger.warning('RNM this local has trouble, is <%s>' % msg)
         # for observer in self.__observers:
         #     observer.open_spider()
-
-
-class Monitor:
-    def update(self):
-        pass
-
-
-class SMSSubscriber(Monitor):
-    def __init__(self, observer):
-        self._observer = observer
-        self._observer.register(self)
-
-    def update(self):
-        print(f'[{type(self).__name__}]', self._observer.getNews())
-
-
-class EmailSubscriber(Monitor):
-    def __init__(self, observer):
-        self._observer = observer
-        self._observer.register(self)
-
-    def update(self):
-        # time.sleep(random.random())
-        print(f'[{type(self).__name__}]', self._observer.getNews())
-
-
-class PhoneSubscriber(Monitor):
-    def __init__(self, observer):
-        self._observer = observer
-        self._observer.register(self)
-
-    def update(self):
-        print(f'[{type(self).__name__}]', self._observer.getNews())
 
 
 if __name__ == '__main__':
