@@ -172,7 +172,7 @@ class Engine(LogMixin):
             # 先不管有什么问题, 请求重新入队列
             if request.retry is True:
                 self._add_task(self._set_request_retry(request))
-            self.logger.error(other_exec, exc_info=True)
+            self.logger.error('spider parse error: %s' % other_exec, exc_info=True)
 
     def _init_start_request(self, start_requests):
         """

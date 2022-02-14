@@ -36,7 +36,7 @@ class RetryMiddleware(BaseMiddleware):
             return await self._retry(request)
         """
         if response.status in self.retry_http_codes:  # 根据状态码判断来决定是否重试
-            self.logger.debug(response)
+            self.logger.info(response)
             # self.logger.warning('<CONTENT> %s' % response.content)
             # 出现异常状态码时，去重新处理请求进行重试
             return await self._retry(request)  # 重试的请求 返回 <Request>
