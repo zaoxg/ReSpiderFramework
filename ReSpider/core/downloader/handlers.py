@@ -52,7 +52,6 @@ class DownloadHandler(LogMixin):
                                          connector=aiohttp.TCPConnector(ssl=False), trust_env=True) as session:
             try:
                 response = await session.request(method=request.method, url=request.url, **kwargs)
-                # self._observer.REQUEST_COUNT += 1
                 content = await response.read()
                 return Response(url=response.url,
                                 status=response.status,
@@ -61,31 +60,33 @@ class DownloadHandler(LogMixin):
                                 content=content,
                                 request=request)
             except TimeoutError as timeoutError:
-                self.logger.error(timeoutError, exc_info=True)
                 self._observer.request_count_fail = 1
+                self.logger.error(timeoutError, exc_info=True)
                 return Response(url=request.url,
                                 status=601,
                                 request=request)
             except aiohttp.ClientConnectorError as client_conn_error:
-                self.logger.error(client_conn_error, exc_info=True)
+                self._observer.request_count_fail = 1
+                self.logger.error(client_conn_error)
                 return Response(url=request.url,
                                 status=602,
                                 request=request)
             except aiohttp.InvalidURL as invalid_url:
+                self._observer.request_count_fail = 1
                 self.logger.error(invalid_url, exc_info=True)
                 return Response(url=request.url,
                                 status=603,
                                 request=request)
             except aiohttp.ClientHttpProxyError as proxy_error:
-                self.logger.error(proxy_error, exc_info=True)
                 self._observer.request_count_fail = 1
+                self.logger.error(proxy_error, exc_info=True)
                 return Response(url=request.url,
                                 status=604,
                                 request=request)
             except Exception as exception:
+                self._observer.request_count_fail = 1
                 self.logger.warning(request.cat())
                 self.logger.error(exception, exc_info=True)
-                self._observer.request_count_fail = 1
                 return Response(url=request.url,
                                 status=999,
                                 request=request)
