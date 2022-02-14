@@ -5,7 +5,7 @@
 
 import ReSpider.setting as setting
 from ..pipelines import BasePipeline
-from ..extend.item import RdsItem
+from ReSpider.core.item import RdsItem
 import redis
 import json
 
@@ -35,14 +35,14 @@ class RedisPipeline(BasePipeline):
                                           password=self.redis_password,
                                           db=self.redis_db)
         self._r = redis.Redis(connection_pool=self._pool)
-        self._keys = spider.name or spider.__class__.name or spider.__class__.__name__
+        self._key = spider.name or spider.__class__.name or spider.__class__.__name__
 
     async def process_item(self, item: RdsItem, spider):
-        keys = f'{self._keys}:{item.rds_type}'
-        if item.keys:
-            keys = item.keys
+        key = f'{self._key}:{item.rds_type}'
+        if item.key:
+            key = item.key
         if item.rds_type == 'LIST':
-            self._r.rpush(keys, json.dumps(item))
+            self._r.rpush(key, json.dumps(item))
             pass
         elif item.rds_type == 'SET':
             # Todo: 实现的话可能需要修改类型

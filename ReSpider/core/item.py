@@ -133,8 +133,9 @@ class DataItem(dict, Item):
     def __init__(self, arg=None, **kwargs):
         if arg is None:
             arg = {}
-        self.__dict__ = kwargs or self.__dict__
         super().__init__(self, **arg)
+        for key, val in kwargs.items():
+            self.__dict__[key] = val
 
     def set_attribute(self, collection=None, **kwargs):
         self.collection = collection
@@ -199,8 +200,9 @@ class CSVItem(dict, Item):
     def __init__(self, arg=None, **kwargs):
         if arg is None:
             arg = {}
-        self.__dict__ = kwargs or self.__dict__
         super().__init__(self, **arg)
+        for key, val in kwargs.items():
+            self.__dict__[key] = val
 
 
 class CSVListItem(MyArray, Item):
@@ -228,10 +230,11 @@ class CSVListItem(MyArray, Item):
 class RdsItem(dict, Item):
     pipeline: str = 'RedisPipeline'
     rds_type: str = 'LIST'
-    keys: str = None
+    key: str = None
 
     def __init__(self, arg=None, **kwargs):
         if arg is None:
             arg = {}
-        self.__dict__ = kwargs or self.__dict__
         super().__init__(self, **arg)
+        for key, val in kwargs.items():
+            self.__dict__[key] = val
