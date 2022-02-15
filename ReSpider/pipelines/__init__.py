@@ -7,6 +7,7 @@ import ReSpider.setting as setting
 from ..extend.logger import LogMixin
 from ..extend.item import Item
 from ..middlewares import MiddlewareManager
+from ..core.observer import Observer
 
 
 class BasePipeline(LogMixin):
@@ -14,7 +15,7 @@ class BasePipeline(LogMixin):
 
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        self._observer = kwargs.pop('observer', None)
+        self._observer: Observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self, default='pipeline')
 
