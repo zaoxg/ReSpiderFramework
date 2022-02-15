@@ -11,7 +11,7 @@ class RedisScheduler(Scheduler):
     def __init__(self, spider=None, **kwargs):
         super().__init__(spider, **kwargs)
         # self.settings = spider.settings
-        # self.spider = spider
+        self.spider = spider
 
     @classmethod
     def from_settings(cls, spider, **kwargs):
