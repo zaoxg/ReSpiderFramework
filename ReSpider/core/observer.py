@@ -3,7 +3,7 @@
 # @Author  : ZhaoXiangPeng
 # @File    : observer.py
 
-
+import math
 import asyncio
 import time
 from ReSpider.extend import LogMixin
@@ -31,22 +31,28 @@ __all__ = [
 ]
 
 REQUEST_COUNT_INTERVAL_TIME = 120  # 请求统计通知间隔时间
+ORIGINAL_DOWNLOAD_DELAY = setting.DOWNLOAD_DELAY  # 存一下原始的值
+ORIGINAL_TASK_LIMIT = setting.CONCURRENT_REQUESTS = setting.TASK_LIMIT
+OPERATION_TIME = 20  # 操作间隔时间
 
 
 class Observer(LogMixin):
     loop = asyncio.get_event_loop()
+    lock = asyncio.Lock()
     _task_count = 0
     __observers = {}  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
     __pipelines = {}  # 被观察的 pipeline obj 列表
     __middlewares = {}  # 被观察的 middleware obj 列表
     __SIGNAL_STATUS = None
 
+    __ScheduledTask__ = {}
+
     __requestCount = 0
     __requestFailCount = 0
     __intervalCount = 0
     __intervalFailCount = 0
 
-    __latestNews = None
+    __latestMassage = None
 
     def register(self, obj, default=None):
         self.logger.debug('<%s> register in observer.' % obj.__class__.__name__)
@@ -69,10 +75,11 @@ class Observer(LogMixin):
                 self.__observers[_observer].open_spider()
             # Todo
             self.loop.call_soon(self.request_count_init, self.loop)
-            # self.loop.call_later(1, callback, self.loop)
         elif self.__SIGNAL_STATUS == 'STOP':
             for _observer in self.__observers.keys():
                 self.__observers[_observer].close_spider()
+            for scheduled_task in self._scheduled_task().keys():
+                scheduled_task.cancel()
             self.logger.info('send request <%d> total, fail request <%d> total.' % (self.request_count, self.request_count_fail))
         else:
             pass
@@ -109,8 +116,6 @@ class Observer(LogMixin):
         self.__requestFailCount += val
 
     def callback(self, loop=None):
-        # print('callback with {0}'.format(time.time()))
-        # a = self.fail_count / self.request_count
         interval_time = setting.REQUEST_COUNT_INTERVAL_TIME or REQUEST_COUNT_INTERVAL_TIME
         self.logger.info('last %d minutes, send request <%s> total, fail <%s> total.' %
                          (interval_time/60, self.__intervalCount, self.__intervalFailCount))
@@ -137,40 +142,76 @@ class Observer(LogMixin):
             pass
 
     @property
-    def latestNews(self):
-        return self.__latestNews
+    def latest_massage(self):
+        return self.__latestMassage
 
-    @latestNews.setter
-    def latestNews(self, value):
-        if self.__latestNews != value:
-            self.__latestNews = value
+    @latest_massage.setter
+    def latest_massage(self, value):
+        def reset_news():
+            self.__latestMassage = None
+        if self.__latestMassage != value:
+            self.__latestMassage = value
+            self.loop.call_later(OPERATION_TIME, reset_news)  # 指定时间后重新设置值
             self.notify(value)
 
-    def getNews(self):
-        return time.time().__str__() + " | Got News: " + self.__latestNews
+    def getMsg(self):
+        return time.time().__str__() + " | Got Massage: " + self.__latestMassage
 
     def observers(self):
         return [x.__name__ for x in self.__observers]
 
-    @classmethod
-    def execute_func(cls, func, **kwargs):
-        func(**kwargs)
+    def set_concurrent(self, val: int = 2, limit: int = None):
+        def restore(t):
+            setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = t
+            self.logger.warning('恢复请求并发, 恢复后配置为: 并发: %s' % setting.TASK_LIMIT)
+        async with self.lock:
+            if self._get_scheduled('TASK_LIMIT_TASK'):
+                # 如果已经设置则取消, 等待重新设置
+                self._get_scheduled('TASK_LIMIT_TASK').cancel()  # 取消执行
+            else:
+                setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = limit or math.ceil(setting.TASK_LIMIT/val)
+                self.logger.warning('限制请求频次, 修改后配置为: 并发: %s' % setting.TASK_LIMIT)
+            # 重新设置
+            self._set_scheduled(
+                'TASK_LIMIT_TASK',
+                self.loop.call_later(30 * 60, restore, ORIGINAL_DOWNLOAD_DELAY)
+            )  # 30分钟后还原
+
+    def set_delay(self, delay: int = 1):
+        def restore(d):
+            setting.DOWNLOAD_DELAY = d
+            self.logger.warning('恢复请求延迟, 恢复后配置为: 延迟: %s' % setting.DOWNLOAD_DELAY)
+        async with self.lock:
+            if self._get_scheduled('DOWNLOAD_DELAY_TASK'):
+                # 如果已经设置则取消, 等待重新设置
+                self._get_scheduled('DOWNLOAD_DELAY_TASK').cancel()  # 取消执行
+            else:
+                setting.DOWNLOAD_DELAY = delay
+                self.logger.warning('修改延迟, 修改后配置为: 延迟: %s' % setting.DOWNLOAD_DELAY)
+            # 重新设置
+            self._set_scheduled(
+                'DOWNLOAD_DELAY_TASK',
+                self.loop.call_later(30 * 60, restore, ORIGINAL_DOWNLOAD_DELAY)
+            )  # 30分钟后还原
+
+    def _scheduled_task(self):
+        return self.__ScheduledTask__
+
+    def _set_scheduled(self, task_name, task_obj):
+        # 存储定时任务
+        self.__ScheduledTask__.update({task_name: task_obj})
+
+    def _get_scheduled(self, task_name):
+        return self.__ScheduledTask__.get(task_name)
+
+    def execute_func(self, func, **kwargs):
+        # Todo 锁一下, 防止重复操作
+        with self.lock:
+            func(**kwargs)
 
     def notify(self, msg):
         self.logger.warning('RNM this local has trouble, is <%s>' % msg)
-        # for observer in self.__observers:
-        #     observer.open_spider()
 
 
 if __name__ == '__main__':
     obs = Observer()
-    obs.latestNews = '收到请回答! 收到请回答! 收到请回答!'
-    # for sub in [SMSSubscriber, EmailSubscriber, PhoneSubscriber]:
-    #     sub(obs)
-    # print(obs.observers())
-    # for i in range(200):
-    #     obs.latestNews = '({})不要回答! 不要回答! 不要回答!'.format(i)
-        # time.sleep(random.random())
-        # obs.latestNews = '收到请回答! 收到请回答! 收到请回答!'
-        # obs.latestNews = '不要回答! 不要回答! 不要回答!'
-    # obs.notify()
