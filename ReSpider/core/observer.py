@@ -38,7 +38,6 @@ OPERATION_TIME = 20  # 操作间隔时间
 
 class Observer(LogMixin):
     loop = asyncio.get_event_loop()
-    lock = asyncio.Lock()
     _task_count = 0
     __observers = {}  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
     __pipelines = {}  # 被观察的 pipeline obj 列表
@@ -52,7 +51,7 @@ class Observer(LogMixin):
     __intervalCount = 0
     __intervalFailCount = 0
 
-    __latestMassage = None
+    __latestMessage = None
 
     def register(self, obj, default=None):
         self.logger.debug('<%s> register in observer.' % obj.__class__.__name__)
@@ -142,20 +141,23 @@ class Observer(LogMixin):
             pass
 
     @property
-    def latest_massage(self):
-        return self.__latestMassage
+    def latest_message(self):
+        return self.__latestMessage
 
-    @latest_massage.setter
-    def latest_massage(self, value):
+    @latest_message.setter
+    def latest_message(self, value):
         def reset_news():
-            self.__latestMassage = None
-        if self.__latestMassage != value:
-            self.__latestMassage = value
-            self.loop.call_later(OPERATION_TIME, reset_news)  # 指定时间后重新设置值
+            self.__latestMessage = None
+        if self.__latestMessage != value:
+            self.__latestMessage = value
+            self._set_scheduled(
+                'RESET_MESSAGE',
+                self.loop.call_later(OPERATION_TIME, reset_news)  # 指定时间后重新设置值
+            )
             self.notify(value)
 
     def getMsg(self):
-        return time.time().__str__() + " | Got Massage: " + self.__latestMassage
+        return time.time().__str__() + " | Got Massage: " + self.__latestMessage
 
     def observers(self):
         return [x.__name__ for x in self.__observers]
@@ -164,35 +166,33 @@ class Observer(LogMixin):
         def restore(t):
             setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = t
             self.logger.warning('恢复请求并发, 恢复后配置为: 并发: %s' % setting.TASK_LIMIT)
-        async with self.lock:
-            if self._get_scheduled('TASK_LIMIT_TASK'):
-                # 如果已经设置则取消, 等待重新设置
-                self._get_scheduled('TASK_LIMIT_TASK').cancel()  # 取消执行
-            else:
-                setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = limit or math.ceil(setting.TASK_LIMIT/val)
-                self.logger.warning('限制请求频次, 修改后配置为: 并发: %s' % setting.TASK_LIMIT)
-            # 重新设置
-            self._set_scheduled(
-                'TASK_LIMIT_TASK',
-                self.loop.call_later(30 * 60, restore, ORIGINAL_DOWNLOAD_DELAY)
-            )  # 30分钟后还原
+        if self._get_scheduled('TASK_LIMIT_TASK'):
+            # 如果已经设置则取消, 等待重新设置
+            self._get_scheduled('TASK_LIMIT_TASK').cancel()  # 取消执行
+        else:
+            setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = limit or math.ceil(setting.TASK_LIMIT/val)
+            self.logger.warning('限制请求频次, 修改后配置为: 并发: %s' % setting.TASK_LIMIT)
+        # 重新设置
+        self._set_scheduled(
+            'TASK_LIMIT_TASK',
+            self.loop.call_later(30 * 60, restore, ORIGINAL_DOWNLOAD_DELAY)
+        )  # 30分钟后还原
 
     def set_delay(self, delay: int = 1):
         def restore(d):
             setting.DOWNLOAD_DELAY = d
             self.logger.warning('恢复请求延迟, 恢复后配置为: 延迟: %s' % setting.DOWNLOAD_DELAY)
-        async with self.lock:
-            if self._get_scheduled('DOWNLOAD_DELAY_TASK'):
-                # 如果已经设置则取消, 等待重新设置
-                self._get_scheduled('DOWNLOAD_DELAY_TASK').cancel()  # 取消执行
-            else:
-                setting.DOWNLOAD_DELAY = delay
-                self.logger.warning('修改延迟, 修改后配置为: 延迟: %s' % setting.DOWNLOAD_DELAY)
-            # 重新设置
-            self._set_scheduled(
-                'DOWNLOAD_DELAY_TASK',
-                self.loop.call_later(30 * 60, restore, ORIGINAL_DOWNLOAD_DELAY)
-            )  # 30分钟后还原
+        if self._get_scheduled('DOWNLOAD_DELAY_TASK'):
+            # 如果已经设置则取消, 等待重新设置
+            self._get_scheduled('DOWNLOAD_DELAY_TASK').cancel()  # 取消执行
+        else:
+            setting.DOWNLOAD_DELAY = delay
+            self.logger.warning('修改延迟, 修改后配置为: 延迟: %s' % setting.DOWNLOAD_DELAY)
+        # 重新设置
+        self._set_scheduled(
+            'DOWNLOAD_DELAY_TASK',
+            self.loop.call_later(30 * 60, restore, ORIGINAL_DOWNLOAD_DELAY)
+        )  # 30分钟后还原
 
     def _scheduled_task(self):
         return self.__ScheduledTask__
@@ -206,8 +206,7 @@ class Observer(LogMixin):
 
     def execute_func(self, func, **kwargs):
         # Todo 锁一下, 防止重复操作
-        with self.lock:
-            func(**kwargs)
+        func(**kwargs)
 
     def notify(self, msg):
         self.logger.warning('RNM this local has trouble, is <%s>' % msg)
