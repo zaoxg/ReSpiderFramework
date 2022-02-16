@@ -104,6 +104,9 @@ class Response:
     def re(self, regex, replace_entities=True):
         return self.selector.re(regex, replace_entities)
 
+    def re_first(self, regex, default=None, replace_entities=True):
+        return self.selector.re_first(regex, default, replace_entities)
+
     def set_request(self, request):
         """
         先保留吧
