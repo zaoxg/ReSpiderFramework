@@ -75,10 +75,10 @@ class Observer(LogMixin):
             # Todo
             self.loop.call_soon(self.request_count_init, self.loop)
         elif self.__SIGNAL_STATUS == 'STOP':
+            for scheduled_task, task_obj in self._scheduled_task().items():
+                task_obj.cancel()  # 取消定时任务
             for _observer in self.__observers.keys():
                 self.__observers[_observer].close_spider()
-            for scheduled_task in self._scheduled_task().keys():
-                scheduled_task.cancel()
             self.logger.info('send request <%d> total, fail request <%d> total.' % (self.request_count, self.request_count_fail))
         else:
             pass
@@ -164,13 +164,13 @@ class Observer(LogMixin):
 
     def set_concurrent(self, val: int = 2, limit: int = None):
         def restore(t):
-            setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = t
+            setting.CONCURRENT_REQUESTS = setting.TASK_LIMIT = t
             self.logger.warning('恢复请求并发, 恢复后配置为: 并发: %s' % setting.TASK_LIMIT)
         if self._get_scheduled('TASK_LIMIT_TASK'):
             # 如果已经设置则取消, 等待重新设置
             self._get_scheduled('TASK_LIMIT_TASK').cancel()  # 取消执行
         else:
-            setting.TASK_LIMIT = setting.CONCURRENT_REQUESTS = limit or math.ceil(setting.TASK_LIMIT/val)
+            setting.CONCURRENT_REQUESTS = setting.TASK_LIMIT = limit or math.ceil(setting.TASK_LIMIT/val)
             self.logger.warning('限制请求频次, 修改后配置为: 并发: %s' % setting.TASK_LIMIT)
         # 重新设置
         self._set_scheduled(
