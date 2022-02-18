@@ -3,8 +3,8 @@
 # @Author  : ZhaoXiangPeng
 # @File    : middlewares.py
 
-from ReSpider.middlewares import BaseMiddleWare
+from ReSpider.middlewares import BaseMiddleware
 
 
-class TemplateMiddleware(BaseMiddleWare):
+class TemplateMiddleware(BaseMiddleware):
     pass

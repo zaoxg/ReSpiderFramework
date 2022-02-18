@@ -3,10 +3,10 @@
 # @Author  : ZhaoXiangPeng
 # @File    : template_spider.py
 
+import ReSpider
 import sys
 import os
 sys.path.append(os.getcwd().replace('\\spiders', '').rsplit('\\', maxsplit=1)[0])
-import ReSpider
 
 
 class TemplateSpider(ReSpider.Spider):
