@@ -4,7 +4,7 @@
 # @File    : setting_logger.py
 
 
-from ReSpider.tests.log_test import logger
+from tests.log_test import logger
 
 
 class A:
