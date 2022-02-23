@@ -2,13 +2,15 @@
 # @Time    : 2022/2/23 16:17
 # @Author  : ZhaoXiangPeng
 # @File    : create_project.py
+
 import getpass
 import os
 import shutil
+import ReSpider.utils.tools as tools
 
 
 def deal_file_info(file):
-    # file = file.replace("{DATE}", tools.get_current_date())
+    file = file.replace("{DATE}", tools.get_current_date(date_format="%Y/%m/%d %H:%M"))
     file = file.replace("{USER}", getpass.getuser())
 
     return file

@@ -24,7 +24,7 @@ if version_info < (3, 8, 0):
 with open(join(dirname(__file__), "ReSpider/VERSION"), "rb") as f:
     version = f.read().decode("ascii").strip()
 
-with open("ReSpider/README.md", "r", encoding="utf-8") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 packages = setuptools.find_packages(

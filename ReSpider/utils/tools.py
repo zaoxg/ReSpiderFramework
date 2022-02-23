@@ -2,9 +2,20 @@
 # @Time    : 2022/1/6 10:24
 # @Author  : ZhaoXiangPeng
 # @File    : tools.py
+
 import json
 import re
 import os
+import time
+import datetime
+
+
+def get_current_timestamp():
+    return int(time.time())
+
+
+def get_current_date(date_format="%Y-%m-%d %H:%M:%S"):
+    return datetime.datetime.now().strftime(date_format)
 
 
 def get_cookies_from_str(cookie_str: str):
