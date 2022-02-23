@@ -33,7 +33,9 @@ packages = setuptools.find_packages(
 )
 packages.extend([
     "ReSpider",
-    "ReSpider.template",
+    "ReSpider.templates",
+    "ReSpider.templates.project_template",
+    "ReSpider.templates.project_template.spiders"
 ])
 
 requires = [
@@ -70,5 +72,6 @@ setuptools.setup(
     include_package_data=True,
     packages=packages,
     python_requires=">=3.8",
-    install_requires=requires
+    install_requires=requires,
+    entry_points={"console_scripts": ["respider = ReSpider.extend.cmd.cmdline:execute", "ReSpider = ReSpider.extend.cmd.cmdline:execute"]}
 )

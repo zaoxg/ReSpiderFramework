@@ -11,8 +11,24 @@ parser = argparse.ArgumentParser(description='Parser Test.')
 parser.add_argument('-C', dest='CONCURRENT_REQUESTS', help='Concurrent Total.')
 parser.add_argument('-D', dest='DOWNLOAD_DELAY', help='Download Delay.')
 
+parser.add_argument(
+    '-p',
+    '--project',
+    help="创建项目 如 feapder create -p <project_name>",
+    metavar=""
+)
+parser.add_argument(
+    '-s',
+    '--spider',
+    nargs='+'
+)
+
 args = parser.parse_args()
 print(args)
 print(args.CONCURRENT_REQUESTS)
 print(args.DOWNLOAD_DELAY)
+if args.spider:
+    print('创建爬虫 %s ' % args.spider)
+elif args.project:
+    print('创建项目 %s ' % args.project)
 
