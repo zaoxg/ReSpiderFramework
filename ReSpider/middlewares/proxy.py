@@ -1,11 +1,14 @@
 from ..middlewares import BaseMiddleware
+import ReSpider.setting as setting
 
 
 class ProxyMiddleware(BaseMiddleware):
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        cls.get_proxy()
         return cls(spider, **kwargs)
+
+    def open_spider(self, spider=None, **kwargs):
+        self.get_proxy()
 
     async def process_request(self, request):
         try:
@@ -23,8 +26,7 @@ class ProxyMiddleware(BaseMiddleware):
             self.proxys.append(request.proxy)
         return response
 
-    @classmethod
-    def get_proxy(cls):
+    def get_proxy(self):
         import requests
-        cls.proxys = requests.get("http://iproxy.zhaoxp.run/get_all/").json()
-        cls.proxys = [f'http://{proxy.get("proxy")}' for proxy in cls.proxys]
+        self.proxys = requests.get(setting.PROXY_POOL_URL).json()
+        self.proxys = [f'http://{proxy.get("proxy")}' for proxy in self.proxys]

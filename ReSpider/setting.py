@@ -86,6 +86,9 @@ PUPPETEER_SETTING = dict(
 # cookies 池配置
 COOKIE_POOL_KEY = None
 
+# ip池配置
+PROXY_POOL_URL = None
+
 # 加载自定义的setting
 # 需要把自定义的path加入到这里（作用域）
 import sys
