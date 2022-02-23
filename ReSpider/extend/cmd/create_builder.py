@@ -24,9 +24,8 @@ def main():
 
     args = create.parse_args()
     if args.spider:
-        print('创建爬虫 %s ' % args.spider)
-        CreateSpider().create(args.spider[0])
+        spider_name, *spider_type = args.spider
+        CreateSpider().create(spider_name, spider_type)
     elif args.project:
-        print('创建项目 %s ' % args.project)
         CreateProject().create(args.project)
 
