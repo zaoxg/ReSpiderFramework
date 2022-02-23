@@ -39,7 +39,7 @@ class LogMixin:
         logger.setLevel(level=logging.DEBUG)
 
         # Formatter
-        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | line:%(lineno)d | %(message)s",
+        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | line:%(lineno)d - %(message)s",
                                       datefmt='%Y-%m-%d %H:%M:%S')
         # FileHandler
         if setting.LOG_TO_FILE is True:
