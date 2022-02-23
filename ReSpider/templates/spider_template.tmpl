@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+# @Time    : {DATE}
+# @Author  : {USER}
+# @File    : ${spider_name}.py
+
+import ReSpider
+
+
+class ${spider_name}(ReSpider.Spider):
+    __custom_setting__ = {}
+    start_urls = []
+
+    def start_requests(self):
+        yield ReSpider.Request(
+            url='https://www.baidu.com'
+        )
+
+    def parse(self, response):
+        print(response)
+
+
+if __name__ == '__main__':
+    ${spider_name}().start()
