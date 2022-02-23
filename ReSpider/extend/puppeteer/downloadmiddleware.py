@@ -166,7 +166,7 @@ class PuppeteerMiddleware(BaseMiddleware):
         if puppeteer_meta.get('timeout') is not None:
             _timeout = puppeteer_meta.get('timeout')
 
-        self.logger.info('Crawling %s', request.url)
+        self.logger.debug('Crawling %s', request.url)
 
         _response = None
         try:
@@ -228,7 +228,9 @@ class PuppeteerMiddleware(BaseMiddleware):
         # print(_cookies)
 
         if not _response:
-            self.logger.error('Get null response by puppeteer of url %s', request.url)
+            self.logger.warning('Get null response by puppeteer of url %s', request.url)
+            request.retry_times += 1
+            return request
 
         _response.headers.pop('content-encoding', None)
         _response.headers.pop('Content-Encoding', None)
