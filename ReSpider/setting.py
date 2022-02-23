@@ -34,7 +34,7 @@ DOWNLOADER_MIDDLEWARES = {
 }
 
 # 并发请求
-TASK_LIMIT = CONCURRENT_REQUESTS = 16
+TASK_LIMIT = CONCURRENT_REQUESTS = 4
 # 等待任务时间
 HEART_BEAT_TIME = 3
 
@@ -75,7 +75,7 @@ DATA_PATH = f'{WORKER_PATH}/data/'
 PUPPETEER_SETTING = dict(
     PUPPETEER_HEADLESS=False,  # 无头
     PUPPETEER_EXECUTABLE_PATH='D:/Package/Chromium64/chrome.exe',
-    PUPPETEER_USER_DIR='./data',  # 用户数据目录
+    PUPPETEER_USER_DIR=None,  # 用户数据目录
     # pyppeteer timeout
     PUPPETEER_DOWNLOAD_TIMEOUT=60,
     # pyppeteer browser window
