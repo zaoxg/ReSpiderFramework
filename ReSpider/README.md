@@ -1,8 +1,10 @@
-# RestSpider
+# ReSpider
 
 ## 开始一个爬虫
+> 爬虫继承自 <ReSpider.Spider> 类
 ```
 import ReSpider
+
 
 class TestSpider(ReSpider.Spider):
     # 自定义配置
@@ -17,7 +19,36 @@ class TestSpider(ReSpider.Spider):
 
 
 if __name__ == '__main__':
-    TemplateSpider().start()    
+    TestSpider().start()    
+```
+
+## 自定义设置
+```
+__custom__ = {
+    'TASK_LIMIT': 1,  # 设置并发数, 默认为1
+    'SCHEDULER': 'ReSpider.extend.redis.scheduler.RedisScheduler',  # 设置任务队列, 默认为内存
+    'DOWNLOAD_DELAY': 1,  # 下载延迟, 默认为0
+    'RETRY_ENABLED': True,  # 重试, 设置为True开启重试, 默认关闭
+    'SSL_FINGERPRINT': False  # ssl指纹, 默认关闭, 在创建ssl上下文时会阻塞, 开启后并发会降为1 
+}
+```
+
+## 中间件设置
+```
+# 管道
+ITEM_PIPELINES = {
+    'ReSpider.pipelines.files.CSVPipeline': 4,
+    'ReSpider.pipelines.redis.RedisPipeline': 5,
+    'ReSpider.pipelines.files.FilesPipeline': 6,
+    'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
+}
+
+# 下载中间件
+DOWNLOADER_MIDDLEWARES = {
+    'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
+    # 'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 5,
+    'ReSpider.middlewares.retry.RetryMiddleware': 8
+}
 ```
 
 ## 信号 (待开发)
@@ -26,7 +57,7 @@ if __name__ == '__main__':
 - 中间件和管道增加关闭标志(is_closed)
 - 根据传递的信号参数对是否关闭标志进行赋值，根据标志来开关中间件或管道
  
-## ITEM
+## 保存数据
 ### Item
 一般的数据实体
 ```
@@ -59,10 +90,17 @@ yield data
 ```
 
 ## Log
-### 全局日志 (已完成)
-- 日志写入.log文件
-- 各个模块继承Logger类 (细节需要修改)
+### 日志设置
+```
+__custom_setting__ = {
+    'LOG_PATH': None,  # log文件写入位置
+    'LOG_TO_CONSOLE': True,  # 输出日志到控制台, 默认开启
+    'LOG_LEVEL_CONSOLE': 'DEBUG',  # 输出日志到控制台级别, 默认DEBUG
+    'LOG_TO_FILE': False,  # 输出日志到文件, 默认关闭, 设置为True开启
+    'LOG_LEVEL_FILE': 'WARNING'  # 输出日志到文件级别, 默认WARNING
+}
+```
 
 
 ## JS渲染
-### 无头模式下cookie问题 (维普为例)
+### 无头模式下cookie问题

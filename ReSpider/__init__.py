@@ -9,7 +9,6 @@ import re
 from ReSpider import setting
 from ReSpider.core.spiders.spider import Spider
 from ReSpider.extend.redis.spider import RedisSpider
-# from .core.spiders.auto_spider import AutoSpider
 
 from ReSpider.http import Request, Response
 from ReSpider.extend import PuppeteerRequest, PuppeteerResponse

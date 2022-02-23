@@ -10,6 +10,11 @@ from ..extend.logger import LogMixin
 from ..extend.misc import load_object
 from ..core.observer import Observer
 
+__all__ = [
+    'BaseMiddleware',
+    'MiddlewareManager'
+]
+
 
 class BaseMiddleware(LogMixin):
     name = 'base middleware'

@@ -2,7 +2,6 @@ import asyncio
 # from asyncio import Queue
 from queue import Queue, PriorityQueue
 from queue import Empty
-# from ..utils import encrypt_md5
 from ..extend import LogMixin
 
 

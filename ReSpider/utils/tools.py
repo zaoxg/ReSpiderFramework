@@ -33,13 +33,10 @@ def cookiejar2str(cookies: dict):
     """
     cookie字典转字符串
     """
-    cookie_str = ''
+    cookie_list = []
     for k, v in cookies.items():
-        cookie_str += k
-        cookie_str += '='
-        cookie_str += v
-        cookie_str += '; '
-    return cookie_str
+        cookie_list.append(k+'='+v)
+    return '; '.join(cookie_list)
 
 
 def table_json(table, save_one_blank=True):

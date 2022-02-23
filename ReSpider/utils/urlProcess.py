@@ -4,7 +4,6 @@
 # @File    : urlProcess.py
 
 import json
-from pprint import pprint
 from urllib.parse import urlencode, urlparse, quote, unquote, parse_qs
 
 

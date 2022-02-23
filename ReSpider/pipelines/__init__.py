@@ -9,6 +9,11 @@ from ..extend.item import Item
 from ..middlewares import MiddlewareManager
 from ..core.observer import Observer
 
+__all__ = [
+    'BasePipeline',
+    'PipelineManager'
+]
+
 
 class BasePipeline(LogMixin):
     name = 'base pipeline'
