@@ -227,11 +227,14 @@ class PuppeteerMiddleware(BaseMiddleware):
             self.logger.warning('get content error: %s' % ne, exc_info=True)
             request.retry_times += 1
             return request
-            # await page.reload()
+        finally:
+            await page.close()
         try:
             _cookies = await page.cookies()
         except errors.NetworkError as ne:
             self.logger.warning('get cookies error: %s' % ne, exc_info=True)
+        finally:
+            await page.close()
 
         if not _response:
             self.logger.warning('Get null response by puppeteer of url %s', request.url)
