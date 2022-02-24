@@ -22,9 +22,15 @@ if __name__ == '__main__':
     TestSpider().start()    
 ```
 
+## 通过命令创建
+```
+respider create -p project_name  # 创建项目
+respider create -s spider_name  # 创建爬虫程序, 需要符合命名规范
+```
+
 ## 自定义设置
 ```
-__custom__ = {
+__custom_setting__ = {
     'TASK_LIMIT': 1,  # 设置并发数, 默认为1
     'SCHEDULER': 'ReSpider.extend.redis.scheduler.RedisScheduler',  # 设置任务队列, 默认为内存
     'DOWNLOAD_DELAY': 1,  # 下载延迟, 默认为0
