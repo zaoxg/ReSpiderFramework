@@ -167,7 +167,7 @@ class PuppeteerMiddleware(BaseMiddleware):
                     _cookie['domain'] = domain
         await page.setCookie(*_cookies)
 
-        _timeout = puppeteer_meta.get('timeout', self.download_timeout)
+        _timeout = puppeteer_meta.get('timeout') or self.download_timeout
 
         self.logger.debug('Crawling %s', request.url)
 
@@ -214,7 +214,7 @@ class PuppeteerMiddleware(BaseMiddleware):
         if puppeteer_meta.get('sleep') is not None:
             _sleep = puppeteer_meta.get('sleep')
         if _sleep is not None:
-            self.logger.debug('Sleep for %ss', _sleep)
+            # self.logger.debug('Sleep for %ss', _sleep)
             await asyncio.sleep(_sleep)
 
         _text = ''
@@ -252,14 +252,16 @@ class PuppeteerMiddleware(BaseMiddleware):
         # if screenshot:
         #     response.meta['screenshot'] = screenshot
         await page.close()
+        pages = await self.browser.pages()
+        if len(pages) <= 1 and pages[0].url == 'about:blank':
+            await self._close_browser()
         """
         print(page.isClosed())
         # print(self.browser.process.pid)
         pages = await self.browser.pages()
         for p in pages:
             print(p.url)
-        if len(pages) <= 1 and pages[0].url == 'about:blank':
-            await self.browser.close()
+        
         # tasks = asyncio.all_tasks()
         # for task in tasks:
         #     print(task)

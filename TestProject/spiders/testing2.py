@@ -16,10 +16,11 @@ class Testing2(ReSpider.Spider):
     """
     需要加载浏览器相关配置
     """
-    start_urls = ['http://qikan.cqvip.com/Qikan/Article/Detail?id=7103439850',
-                  'http://qikan.cqvip.com/Qikan/Article/Detail?id=7102760064',
-                  'http://qikan.cqvip.com/Qikan/Article/Detail?id=7101531000',
-                  'http://qikan.cqvip.com/Qikan/Article/Detail?id=7103385685']
+    # start_urls = ['http://qikan.cqvip.com/Qikan/Article/Detail?id=7103439850',
+    #               'http://qikan.cqvip.com/Qikan/Article/Detail?id=7102760064',
+    #               'http://qikan.cqvip.com/Qikan/Article/Detail?id=7101531000',
+    #               'http://qikan.cqvip.com/Qikan/Article/Detail?id=7103385685']
+    start_urls = ['http://127.0.0.1:8000/'] * 10
 
     # def __init__(self):
     #     super().__init__()
@@ -34,7 +35,7 @@ class Testing2(ReSpider.Spider):
 
     def parse(self, response):
         # self.logger.warning(response.cookies)
-        print(response.text)
+        print(response)
         cookiejar = response.cookies
         cookies = []
         for c in cookiejar:
