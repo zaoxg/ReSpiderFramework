@@ -27,7 +27,7 @@ class PuppeteerMiddleware(BaseMiddleware):
 
     def open_spider(self, spider=None, **kwargs):
         loop = self._observer.loop
-        task = loop.create_task(self.getBrowser())
+        task = loop.create_task(self._open_browser())
         loop.run_until_complete(task)
 
     def close_spider(self, spider=None, **kwargs):
@@ -122,7 +122,7 @@ class PuppeteerMiddleware(BaseMiddleware):
         # return cls.open_spider(spider)
         return cls(spider, **kwargs)
 
-    async def getBrowser(self, options=None):
+    async def _open_browser(self, options=None):
         self.logger.debug('Browser Render Opening...')
         self.browser = await launch(options or self.options)
         self.BROWSER_OPENED = True
@@ -148,7 +148,7 @@ class PuppeteerMiddleware(BaseMiddleware):
         puppeteer_meta = request.meta.get('puppeteer') or {}
         self.logger.debug('Puppeteer_meta: %s', puppeteer_meta)
         if not isinstance(puppeteer_meta, dict) or len(puppeteer_meta.keys()) == 0:
-            return
+            return request
 
         page = await self.browser.newPage()
 
@@ -167,9 +167,7 @@ class PuppeteerMiddleware(BaseMiddleware):
                     _cookie['domain'] = domain
         await page.setCookie(*_cookies)
 
-        _timeout = self.download_timeout
-        if puppeteer_meta.get('timeout') is not None:
-            _timeout = puppeteer_meta.get('timeout')
+        _timeout = puppeteer_meta.get('timeout', self.download_timeout)
 
         self.logger.debug('Crawling %s', request.url)
 
@@ -218,28 +216,26 @@ class PuppeteerMiddleware(BaseMiddleware):
         if _sleep is not None:
             self.logger.debug('Sleep for %ss', _sleep)
             await asyncio.sleep(_sleep)
-        # print(await page.content())
 
         _text = ''
         try:
             _text = await page.content()
-        except errors.NetworkError as ne:
-            self.logger.warning('get content error: %s' % ne, exc_info=True)
-            request.retry_times += 1
-            return request
-        finally:
-            await page.close()
-        try:
             _cookies = await page.cookies()
         except errors.NetworkError as ne:
-            self.logger.warning('get cookies error: %s' % ne, exc_info=True)
-        finally:
-            await page.close()
+            self.logger.warning('get attrs error: %s' % ne, exc_info=True)
 
         if not _response:
             self.logger.warning('Get null response by puppeteer of url %s', request.url)
-            request.retry_times += 1
-            return request
+            # 返回一个异常的 <Response>
+            response = PuppeteerResponse(
+                url=page.url,
+                status=600,
+                # content=bytes(text, encoding='utf-8'),
+                text=_text,
+                request=request
+            )
+            await page.close()
+            return response
 
         _response.headers.pop('content-encoding', None)
         _response.headers.pop('Content-Encoding', None)
