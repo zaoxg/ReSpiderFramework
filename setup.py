@@ -18,8 +18,8 @@ from os.path import dirname, join
 from sys import version_info
 import setuptools
 
-if version_info < (3, 8, 0):
-    raise SystemExit("Sorry! ReSpider requires python 3.8.0 or later.")
+if version_info < (3, 7, 0):
+    raise SystemExit("Sorry! ReSpider requires python 3.7.0 or later.")
 
 with open(join(dirname(__file__), "ReSpider/VERSION"), "rb") as f:
     version = f.read().decode("ascii").strip()
@@ -71,7 +71,7 @@ setuptools.setup(
     ],
     include_package_data=True,
     packages=packages,
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     install_requires=requires,
     entry_points={"console_scripts": ["respider = ReSpider.extend.cmd.cmdline:execute", "ReSpider = ReSpider.extend.cmd.cmdline:execute"]}
 )

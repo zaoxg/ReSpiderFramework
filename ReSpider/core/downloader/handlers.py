@@ -5,16 +5,18 @@
 
 import sys
 import asyncio
-from asyncio.exceptions import TimeoutError
 import aiohttp
-
 import ReSpider.setting as setting
 from ._ssl import SSLFactory
 from ...http import Response
 from ...extend.logger import LogMixin
 
-if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith('win'):
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+if sys.version_info >= (3, 8):
+    from asyncio.exceptions import TimeoutError
+    if sys.platform.startswith('win'):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+else:
+    from asyncio import TimeoutError
 
 sslgen = SSLFactory()
 

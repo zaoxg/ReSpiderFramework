@@ -7,8 +7,8 @@ puppeteer组件
 使用puppeteer渲染动态网页
 在下载器中间件使用
 """
-import asyncio
 
+import asyncio
 from ..puppeteer import PuppeteerRequest
 from ..puppeteer import PuppeteerResponse
 import ReSpider.setting as setting
@@ -31,7 +31,9 @@ class PuppeteerMiddleware(BaseMiddleware):
         loop.run_until_complete(task)
 
     def close_spider(self, spider=None, **kwargs):
-        self.browser.close()
+        loop = self._observer.loop or asyncio.get_event_loop()
+        task = loop.create_task(self._close_browser())
+        loop.run_until_complete(task)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
@@ -121,10 +123,13 @@ class PuppeteerMiddleware(BaseMiddleware):
         return cls(spider, **kwargs)
 
     async def getBrowser(self, options=None):
-        self.logger.info('Browser Render Opening...')
+        self.logger.debug('Browser Render Opening...')
         self.browser = await launch(options or self.options)
         self.BROWSER_OPENED = True
-        self.logger.info('Browser Render Open Success.')
+        self.logger.debug('Browser Render Open Success.')
+
+    async def _close_browser(self):
+        await self.browser.close()
 
     async def check_browser_status(self):
         if self.BROWSER_OPENED is not True:
@@ -218,14 +223,15 @@ class PuppeteerMiddleware(BaseMiddleware):
         _text = ''
         try:
             _text = await page.content()
-        except errors.NetworkError:
-            self.logger.warning(errors.NetworkError, exc_info=True)
+        except errors.NetworkError as ne:
+            self.logger.warning('get content error: %s' % ne, exc_info=True)
+            request.retry_times += 1
+            return request
             # await page.reload()
         try:
             _cookies = await page.cookies()
-        except Exception as e:
-            self.logger.error(e, exc_info=True)
-        # print(_cookies)
+        except errors.NetworkError as ne:
+            self.logger.warning('get cookies error: %s' % ne, exc_info=True)
 
         if not _response:
             self.logger.warning('Get null response by puppeteer of url %s', request.url)

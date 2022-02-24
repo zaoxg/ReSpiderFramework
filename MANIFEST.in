@@ -4,3 +4,5 @@ include LICENSE
 include ReSpider/VERSION
 
 recursive-include ReSpider/templates *
+
+global-exclude __pycache__ *.py[cod]
