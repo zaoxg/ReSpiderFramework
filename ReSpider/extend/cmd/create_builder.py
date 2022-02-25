@@ -19,12 +19,23 @@ def main():
         '-s',
         '--spider',
         nargs='+',
-        help="创建爬虫 如 ReSpider create -s <spider_name>",
+        help="创建爬虫 如 ReSpider create -s <spider_name> <spider_type>"
+        "spider_type=1 Spider;"
+        "spider_type=2 RedisSpider;",
+        metavar=""
     )
 
     args = create.parse_args()
     if args.spider:
         spider_name, *spider_type = args.spider
+        if not spider_type:
+            spider_type = 1
+        else:
+            spider_type = spider_type[0]
+        try:
+            spider_type = int(spider_type)
+        except:
+            raise ValueError("spider_type error, support 1, 2, 3")
         CreateSpider().create(spider_name, spider_type)
     elif args.project:
         CreateProject().create(args.project)

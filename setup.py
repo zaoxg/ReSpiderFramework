@@ -58,7 +58,7 @@ setuptools.setup(
     version=version,
     author="zhaoxiangpeng",
     author_email="zhaoxiangpengSR@gmail.com",
-    description="ReSpider 是一款 整合了实用工具的 python 爬虫程序",
+    description="ReSpider是一款基于 aiohttp 请求库的python爬虫程序",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/zhaoxplab/ReSpiderFramework",

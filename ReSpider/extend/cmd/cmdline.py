@@ -20,9 +20,9 @@ def _print_commands():
     print("  ReSpider <command> [options] [args]\n")
     print("Available commands:")
     cmds = {
-        "create": "create project、spider、item and so on",
-        "shell": "debug response",
-        "zip": "zip project",
+        "create": "create project、spider",
+        # "shell": "debug response",
+        # "zip": "zip project",
     }
     for cmdname, cmdclass in sorted(cmds.items()):
         print("  %-13s %s" % (cmdname, cmdclass))

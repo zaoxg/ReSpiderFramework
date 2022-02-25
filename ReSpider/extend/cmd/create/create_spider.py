@@ -26,13 +26,18 @@ class CreateSpider:
             print("爬虫命名不符合规范，请用蛇形或驼峰命名方式")
             return
         if spider_name.islower():
-            spider_name = tools.underline2hump(spider_name)
+            spider_name = tools.underline2hump(spider_name).title()
         spider_template = self.get_spider_template(spider_type=spider_type)
         spider = self.create_spider(spider_template, spider_name)
         self.save_spider_to_file(spider, spider_name)
 
-    def get_spider_template(self, **kwargs):
-        template = 'spider_template.tmpl'
+    def get_spider_template(self, spider_type, **kwargs):
+        if spider_type == 1:
+            template = 'spider_template.tmpl'
+        elif spider_type == 2:
+            template = 'redis_spider_template.tmpl'
+        else:
+            raise ValueError("spider type error, support 1 2 3")
         template_path = os.path.abspath(
             os.path.join(__file__, '../../../../templates', template)
         )
