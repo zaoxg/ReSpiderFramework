@@ -252,18 +252,10 @@ class PuppeteerMiddleware(BaseMiddleware):
         # if screenshot:
         #     response.meta['screenshot'] = screenshot
         await page.close()
+
+        # 检查是否还有正在请求的, 如果队列有需要等待的任务, 那么其实就不行了, 需要加一个打开浏览器
         pages = await self.browser.pages()
         if len(pages) <= 1 and pages[0].url == 'about:blank':
             await self._close_browser()
-        """
-        print(page.isClosed())
-        # print(self.browser.process.pid)
-        pages = await self.browser.pages()
-        for p in pages:
-            print(p.url)
-        
-        # tasks = asyncio.all_tasks()
-        # for task in tasks:
-        #     print(task)
-        """
+
         return response

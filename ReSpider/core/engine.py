@@ -79,17 +79,6 @@ class Engine(LogMixin):
                 await self.heart_beat()
                 tasks = asyncio.all_tasks(self.loop)
                 self.logger.debug(f'Not has new request, Current Event loop has %s task.' % tasks.__len__())
-                """
-                # Todo
-                for t in tasks:
-                # self.logger.info('Before Event loop is Null %s ' % t.get_core().__name__)
-                    if t.get_coro().__name__ != '_next_request':
-                        try:
-                            t.cancel()
-                        except RuntimeWarning:
-                            pass
-                """
-                # print(tasks)
                 if not self.scheduler.has_pending_requests() and len(tasks) <= 1:
                     if setting.ALWAYS_RUNNING is True:
                         setting.HEART_BEAT_TIME = 60  # 把心跳时间修改为60s
@@ -101,7 +90,7 @@ class Engine(LogMixin):
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler
             await asyncio.sleep(setting.DOWNLOAD_DELAY or 0)
-            task = self.loop.create_task(self._process_request(request, spider, semaphore))
+            task = self.loop.create_task(self._process_request(request, spider, semaphore), name='process_request')
             task.add_done_callback(functools.partial(self._handle_response_output, request, spider))
 
     async def _process_request(self, request, spider, semaphore):
@@ -138,7 +127,7 @@ class Engine(LogMixin):
             # 返回的response是<Request>的话就加到任务队列
             self._add_task(response)
         else:
-            self.loop.create_task(self._process_response(response, request, spider))
+            self.loop.create_task(self._process_response(response, request, spider), name='process_response')
 
     async def _process_response(self, response, request, spider):
         """
