@@ -20,6 +20,7 @@ class Testing2(ReSpider.Spider):
     #               'http://qikan.cqvip.com/Qikan/Article/Detail?id=7102760064',
     #               'http://qikan.cqvip.com/Qikan/Article/Detail?id=7101531000',
     #               'http://qikan.cqvip.com/Qikan/Article/Detail?id=7103385685']
+
     start_urls = ['http://127.0.0.1:8000/'] * 10
 
     # def __init__(self):
@@ -35,7 +36,7 @@ class Testing2(ReSpider.Spider):
 
     def parse(self, response):
         # self.logger.warning(response.cookies)
-        print(response)
+        print(response.text)
         cookiejar = response.cookies
         cookies = []
         for c in cookiejar:

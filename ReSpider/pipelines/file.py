@@ -9,8 +9,8 @@ from ReSpider.extend.item import FileItem, CSVItem, CSVItems
 from ReSpider.core.item import MyArray
 
 
-class FilesPipeline(BasePipeline):
-    name = 'files_pipeline'
+class FilePipeline(BasePipeline):
+    name = 'file_pipeline'
 
     def __init__(self, spider, **kwargs):
         super().__init__(spider, **kwargs)
@@ -25,8 +25,8 @@ class FilesPipeline(BasePipeline):
         encoding = item.encoding
         if mode[-1] == 'b':
             encoding = None
-        async with aiofiles.open(f'{data_path}{file}', mode=mode, encoding=encoding) as fp:
-            await fp.write(item.get('source', item))  # 兼容旧版本
+        async with aiofiles.open(f'{data_path}/{file}', mode=mode, encoding=encoding) as fp:
+            await fp.write(str(item) or item.get('source'))  # 兼容旧版本
         return item    # Todo 为了兼容后续版本数据处理的pipeline
 
 
