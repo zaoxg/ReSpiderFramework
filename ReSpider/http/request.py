@@ -2,6 +2,8 @@ from typing import Optional
 import ReSpider.setting as setting
 from ReSpider.utils import encrypt_md5
 import requests
+import aiohttp
+from .response import Response
 
 
 class Request:
@@ -88,8 +90,31 @@ class Request:
         kwg = {'headers': hd, 'cookies': self.cookies, 'params': self.params, 'data': self.data}
         return requests.request(url=u, method=m, **kwg)
 
-    def __call__(self, *args, **kwargs):
-        return self.send()
+    async def __call__(self, *args, **kwargs):
+        """
+        实现个 asyncio 的 __call__ 异步直接执行，需要在await中使用
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        kwargs = {}
+        kwargs.setdefault('headers', self.headers)
+        kwargs.setdefault('params', self.params)
+        kwargs.setdefault('data', self.data)
+        kwargs.setdefault('allow_redirects', self.allow_redirects)
+        kwargs.setdefault('timeout', aiohttp.ClientTimeout(total=self.timeout))
+        kwargs.setdefault('proxy', self.proxy)
+        async with aiohttp.ClientSession(cookies=self.cookies,
+                                         connector=aiohttp.TCPConnector(ssl=False), trust_env=True) as session:
+            response = await session.request(method=self.method, url=self.url, **kwargs)
+            content = await response.read()
+            # print(content)
+            return Response(url=response.url,
+                            status=response.status,
+                            headers=response.headers,
+                            cookies=response.cookies,
+                            content=content,
+                            request=self)
 
     def replace(self, *args, **kwargs):
         for x in ['url', 'method', 'headers', 'data', 'cookies', 'meta',

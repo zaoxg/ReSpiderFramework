@@ -8,8 +8,9 @@ import ReSpider
 
 class Testing2(ReSpider.Spider):
     __custom_setting__ = {
+        'TASK_LIMIT': 6,
         'DOWNLOADER_MIDDLEWARES': {
-            'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 6
+                'TestProject.middleware.RequestMiddleware': 3
         }
     }
     # name = 'testing_2'
@@ -36,7 +37,7 @@ class Testing2(ReSpider.Spider):
 
     def parse(self, response):
         # self.logger.warning(response.cookies)
-        print(response.text)
+        print(response)
         cookiejar = response.cookies
         cookies = []
         for c in cookiejar:

@@ -13,7 +13,7 @@ LOG_FILE_DIRECTORY = ''  # 保存日志目录
 """"""
 # PUPPETEER SETTING
 PUPPETEER_HEADLESS = False  # 无头
-PUPPETEER_EXECUTABLE_PATH = 'D:/Package/Chromium89/chrome.exe'
+PUPPETEER_EXECUTABLE_PATH = 'D:/Package/Chromium64/chrome.exe'
 PUPPETEER_USER_DIR = './data'  # 用户数据目录
 
 
@@ -33,8 +33,8 @@ MAX_RETRY_TIMES = 5  # 最大重试次数
 
 # 管道
 ITEM_PIPELINES = {
-    'ReSpider.pipelines.files.CSVPipeline': 4,
-    'ReSpider.pipelines.files.FilesPipeline': 6,
+    'ReSpider.pipelines.file.CSVPipeline': 4,
+    'ReSpider.pipelines.file.FilePipeline': 6,
     'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
 }
 
