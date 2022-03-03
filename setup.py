@@ -61,9 +61,9 @@ setuptools.setup(
     description="ReSpider是一款基于 aiohttp 请求库的python爬虫程序",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/zhaoxplab/ReSpiderFramework",
+    url="https://github.com/zaoxg/ReSpiderFramework",
     project_urls={
-        "Bug Tracker": "https://github.com/zhaoxplab/ReSpiderFramework/issues",
+        "Bug Tracker": "https://github.com/zaoxg/ReSpiderFramework/issues",
     },
     keywords='aiohttp spider',
     classifiers=[
