@@ -63,7 +63,7 @@ class DownloadHandler(LogMixin):
                                 request=request)
             except TimeoutError as timeoutError:
                 self._observer.request_count_fail = 1
-                self.logger.error(timeoutError, exc_info=True)
+                self.logger.error(timeoutError)
                 return Response(url=request.url,
                                 status=601,
                                 request=request)

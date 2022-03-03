@@ -192,11 +192,20 @@ class CSVItem(dict, Item):
     encoding: str = 'utf-8'
     # fieldnames = None
 
-    def __init__(self, initdict=None, **kwargs):
+    def __init__(self, initdict=None,
+                 data_directory=None, filename=None,
+                 mode=None, encoding=None, fieldnames=None,
+                 **kwargs):
         if initdict is None:
             initdict = {}
         super().__init__(self, **initdict)
-        self.fieldnames = self.keys()
+        self.data_directory = data_directory
+        self.filename = filename
+        if mode:
+            self.mode = mode
+        if encoding:
+            self.encoding = encoding
+        self.fieldnames = fieldnames or self.keys()
         for key, val in kwargs.items():
             self.__dict__[key] = val
 
@@ -222,10 +231,16 @@ class CSVListItem(MyArray, Item):
     # fieldnames = None
 
     def __init__(self,
-                 initlist=None, data_directory=None, filename=None, filetype=None,
+                 initlist=None, data_directory=None, filename=None,
                  mode=None, encoding=None, fieldnames=None,
                  **kwargs):
         super().__init__(initlist=initlist, **kwargs)
+        self.data_directory = data_directory
+        self.filename = filename
+        if mode:
+            self.mode = mode
+        if encoding:
+            self.encoding = encoding
         self.__fieldnames = fieldnames or (self[0].keys() if len(self) else None)
 
     @property

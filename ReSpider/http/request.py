@@ -88,6 +88,9 @@ class Request:
         kwg = {'headers': hd, 'cookies': self.cookies, 'params': self.params, 'data': self.data}
         return requests.request(url=u, method=m, **kwg)
 
+    def __call__(self, *args, **kwargs):
+        return self.send()
+
     def replace(self, *args, **kwargs):
         for x in ['url', 'method', 'headers', 'data', 'cookies', 'meta',
                   'encoding', 'priority', 'do_filter', 'callback', 'errback']:
