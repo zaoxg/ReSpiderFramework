@@ -3,8 +3,6 @@
 # @Author  : ZhaoXiangPeng
 # @File    : item.py
 
-from collections import UserList, UserString
-
 __all__ = [
     'Item',
     'DataItem',
@@ -14,7 +12,10 @@ __all__ = [
     'CSVItem',
     'CSVListItem',
     'RdsItem',
+    'RdsListItem'
 ]
+
+from collections import UserList, UserString
 
 
 class ItemMetaclass(type):
@@ -47,10 +48,6 @@ class MyArray(UserList):
                 self.data[:] = initlist.data[:]
             else:
                 self.data = list(initlist)
-        for key, val in kwargs.items():
-            self.__dict__[key] = val
-
-    def set_attribute(self, **kwargs):
         for key, val in kwargs.items():
             self.__dict__[key] = val
 
@@ -130,15 +127,13 @@ class DataItem(dict, Item):
     pipeline = 'MongoDBPipeline'
     collection = None
 
-    def __init__(self, arg=None, **kwargs):
-        if arg is None:
-            arg = {}
-        super().__init__(self, **arg)
+    def __init__(self, initdict=None, collection=None, **kwargs):
+        if initdict is None:
+            initdict = {}
+        super().__init__(self, **initdict)
+        self.collection = collection
         for key, val in kwargs.items():
             self.__dict__[key] = val
-
-    def set_attribute(self, collection=None, **kwargs):
-        self.collection = collection
 
 
 class DataListItem(MyArray, Item):
@@ -195,15 +190,26 @@ class CSVItem(dict, Item):
     filetype: str = 'csv'
     mode: str = 'a'
     encoding: str = 'utf-8'
-    fieldnames = None
+    # fieldnames = None
 
-    def __init__(self, arg=None, **kwargs):
-        if arg is None:
-            arg = {}
-        super().__init__(self, **arg)
+    def __init__(self, initdict=None, **kwargs):
+        if initdict is None:
+            initdict = {}
+        super().__init__(self, **initdict)
         self.fieldnames = self.keys()
         for key, val in kwargs.items():
             self.__dict__[key] = val
+
+    @property
+    def fieldnames(self):
+        if self.__fieldnames is None:
+            self.__fieldnames = self[0].keys() if len(self) else []
+        return self.__fieldnames
+
+    @fieldnames.setter
+    def fieldnames(self, val):
+        if self.__fieldnames != val:
+            self.__fieldnames = val
 
 
 class CSVListItem(MyArray, Item):
@@ -213,11 +219,25 @@ class CSVListItem(MyArray, Item):
     filetype: str = 'csv'
     mode: str = 'a'
     encoding: str = 'utf-8'
-    fieldnames = None
+    # fieldnames = None
 
-    def __init__(self, initlist=None, **kwargs):
+    def __init__(self,
+                 initlist=None, data_directory=None, filename=None, filetype=None,
+                 mode=None, encoding=None, fieldnames=None,
+                 **kwargs):
         super().__init__(initlist=initlist, **kwargs)
-        self.fieldnames = self.fieldnames or (self[0].keys() if len(self) else [])
+        self.__fieldnames = fieldnames or (self[0].keys() if len(self) else None)
+
+    @property
+    def fieldnames(self):
+        if self.__fieldnames is None:
+            self.__fieldnames = self[0].keys() if len(self) else []
+        return self.__fieldnames
+
+    @fieldnames.setter
+    def fieldnames(self, val):
+        if self.__fieldnames != val:
+            self.__fieldnames = val
 
     def set_attribute(self,
                       data_directory=None,
@@ -237,9 +257,15 @@ class RdsItem(dict, Item):
     rds_type: str = 'LIST'
     key: str = None
 
-    def __init__(self, arg=None, **kwargs):
-        if arg is None:
-            arg = {}
-        super().__init__(self, **arg)
+    def __init__(self, initdict=None, **kwargs):
+        if initdict is None:
+            initdict = {}
+        super().__init__(self, **initdict)
         for key, val in kwargs.items():
             self.__dict__[key] = val
+
+
+class RdsListItem(MyArray, Item):
+    pipeline: str = 'RedisPipeline'
+    rds_type: str = 'LIST'
+    key: str = None

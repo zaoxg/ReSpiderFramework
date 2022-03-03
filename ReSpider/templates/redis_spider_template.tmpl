@@ -6,12 +6,11 @@
 import ReSpider
 
 
-class ${spider_name}(ReSpider.Spider):
+class ${spider_name}(ReSpider.RedisSpider):
     __custom_setting__ = {}
-    start_urls = []
 
-    def start_requests(self):
-        yield ReSpider.Request(
+    def make_request(self, **kwargs):
+        return ReSpider.Request(
             url='https://www.baidu.com'
         )
 
@@ -20,4 +19,6 @@ class ${spider_name}(ReSpider.Spider):
 
 
 if __name__ == '__main__':
-    ${spider_name}().start()
+    ${spider_name}(
+        redis_key=''
+    ).start()

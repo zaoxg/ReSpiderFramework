@@ -25,8 +25,8 @@ class CreateSpider:
         if not re.search(r'^[a-zA-Z][a-zA-Z0-9_]*$', spider_name):
             print("爬虫命名不符合规范，请用蛇形或驼峰命名方式")
             return
-        if spider_name.islower():
-            spider_name = tools.underline2hump(spider_name).title()
+        # if spider_name.islower():
+        #     spider_name = tools.underline2hump(spider_name)
         spider_template = self.get_spider_template(spider_type=spider_type)
         spider = self.create_spider(spider_template, spider_name)
         self.save_spider_to_file(spider, spider_name)
@@ -47,6 +47,11 @@ class CreateSpider:
         return spider_template
 
     def create_spider(self, template: str, spider_name):
+        file_name = self.cover_to_underline(spider_name)
+        if spider_name.islower():
+            spider_name = tools.underline2hump(spider_name)
+            spider_name = spider_name[:1].upper()+spider_name[1:]  # 驼峰 testSpider -> TestSpider
+        spider_template = template.replace('${file_name}', file_name)
         spider_template = template.replace('${spider_name}', spider_name)
         spider_template = deal_file_info(spider_template)
         return spider_template
