@@ -41,7 +41,7 @@ ITEM_PIPELINES = {
 # 下载中间件
 DOWNLOADER_MIDDLEWARES = {
     'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
-    'ReSpider.middlewares.retry.RetryMiddleware': 8,
+    # 'ReSpider.middlewares.retry.RetryMiddleware': 8,
     # 'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 6,
 }
 

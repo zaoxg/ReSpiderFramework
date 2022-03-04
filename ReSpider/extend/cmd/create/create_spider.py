@@ -51,7 +51,7 @@ class CreateSpider:
         if spider_name.islower():
             spider_name = tools.underline2hump(spider_name)
             spider_name = spider_name[:1].upper()+spider_name[1:]  # 驼峰 testSpider -> TestSpider
-        spider_template = template.replace('${file_name}', file_name)
+        template = template.replace('${file_name}', file_name)
         spider_template = template.replace('${spider_name}', spider_name)
         spider_template = deal_file_info(spider_template)
         return spider_template

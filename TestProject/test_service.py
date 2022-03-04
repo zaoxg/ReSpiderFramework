@@ -43,7 +43,7 @@ html = """
 
 @app.get('/')
 async def get():
-    await asyncio.sleep(2)
+    await asyncio.sleep(5)
     return HTMLResponse(html)
 
 

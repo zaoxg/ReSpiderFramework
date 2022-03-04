@@ -38,12 +38,12 @@ class Testing2(ReSpider.Spider):
     def parse(self, response):
         # self.logger.warning(response.cookies)
         print(response)
-        cookiejar = response.cookies
-        cookies = []
-        for c in cookiejar:
-            cookies.append(f'{c["name"]}={c["value"]}')
-        cookie = '; '.join(cookies)
-        self.logger.info('parse cookie -> %s' % cookie)
+        # cookiejar = response.cookies
+        # cookies = []
+        # for c in cookiejar:
+        #     cookies.append(f'{c["name"]}={c["value"]}')
+        # cookie = '; '.join(cookies)
+        # self.logger.info('parse cookie -> %s' % cookie)
 
 
 if __name__ == '__main__':
