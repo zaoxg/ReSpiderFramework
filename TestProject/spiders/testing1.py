@@ -51,12 +51,10 @@ class Testing1(ReSpider.Spider):
 
     async def parse2(self, response):
         self.logger.warning(response.cookies)
-        file_item1 = item.FileItem(filename='testing1', filetype='json')
-        file_item1['source'] = json.dumps(response.cookiejar)
+        file_item1 = item.FileItem(json.dumps(response.cookiejar), filename='testing1', filetype='json')
         yield file_item1
         # self.logger.warning(response.text)
-        file_item = item.FileItem(filename='testing1', filetype='html')
-        file_item['source'] = response.text
+        file_item = item.FileItem(response.text, filename='testing1', filetype='html')
         yield file_item
 
 
