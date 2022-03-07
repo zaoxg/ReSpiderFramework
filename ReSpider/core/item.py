@@ -190,7 +190,7 @@ class CSVItem(dict, Item):
     filetype: str = 'csv'
     mode: str = 'a'
     encoding: str = 'utf-8'
-    # fieldnames = None
+    __fieldnames = None
 
     def __init__(self, initdict=None,
                  data_directory=None, filename=None,
@@ -228,7 +228,7 @@ class CSVListItem(MyArray, Item):
     filetype: str = 'csv'
     mode: str = 'a'
     encoding: str = 'utf-8'
-    # fieldnames = None
+    __fieldnames = None
 
     def __init__(self,
                  initlist=None, data_directory=None, filename=None,

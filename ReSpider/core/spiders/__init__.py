@@ -18,7 +18,7 @@ class Crawler(LogMixin):
 
         # 更新自定义配置到setting
         for key, val in self.__class__.__custom_setting__.items():
-            if getattr(setting, key).__class__ == dict:
+            if setting.__dict__.get(key).__class__ == dict:
                 getattr(setting, key).update(val)
                 continue
             setattr(setting, key, val)
