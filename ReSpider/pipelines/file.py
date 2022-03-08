@@ -1,12 +1,12 @@
 import os
-
+import re
 import ReSpider.setting as setting
 from ReSpider.pipelines import BasePipeline
+from ReSpider.extend.item import CSVItem, CSVItems, FileItem
+from ReSpider.core.item import MyArray
 import aiofiles
 import csv
 from aiocsv import AsyncDictWriter
-from ReSpider.extend.item import CSVItem, CSVItems, FileItem
-from ReSpider.core.item import MyArray
 
 
 class FilePipeline(BasePipeline):
@@ -16,6 +16,7 @@ class FilePipeline(BasePipeline):
         super().__init__(spider, **kwargs)
 
     async def process_item(self, item: FileItem, spider):
+        item.filename = re.sub(r'[\\/:*?"<>|]', '`', item.filename)
         file = f'{item.filename}.{item.filetype}'
         data_path = item.data_directory or setting.DATA_PATH
         self.logger.debug(f'{data_path}/{file}')
@@ -45,7 +46,7 @@ class CSVPipeline(BasePipeline):
     async def process_item(self, item: CSVItem, spider):
         filename = spider.name
         if item.filename:
-            filename = item.filename
+            filename = re.sub(r'[\\/:*?"<>|]', '`', item.filename)
         file = f'{filename}.{item.filetype}'
         data_path = item.data_directory or setting.DATA_PATH  # item的数据存放路径
         if not os.path.exists(data_path):
