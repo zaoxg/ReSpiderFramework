@@ -55,7 +55,7 @@ class CSVPipeline(BasePipeline):
         fieldnames = item.fieldnames or self._get_fieldnames(item)
         if fieldnames is None or []:
             return item
-        async with aiofiles.open(data_path + file, mode=mode, encoding='utf-8', newline='') as afp:
+        async with aiofiles.open(data_path + '/' + file, mode=mode, encoding='utf-8', newline='') as afp:
             # if not self.writer:
             self.writer = AsyncDictWriter(afp, fieldnames, restval="NULL", quoting=csv.QUOTE_ALL)
             if self.column_index.get(filename, False) is False:  # 表头是否写入过使用<dict>来存储

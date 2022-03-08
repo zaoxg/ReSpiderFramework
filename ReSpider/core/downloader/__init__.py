@@ -50,4 +50,7 @@ class Downloader(LogMixin):
             # 当中间件把<Request>改为<Response>时
             process_resp = await self.middleware.process_response(request, process_req)
         # response = await self.process_response(request, response)  # 这个response不一定是 <Response>，也有可能是 <Request>
+        # if process_resp is None:
+        #     # 测试
+        #     self.logger.warning('Response type is None')
         return process_resp

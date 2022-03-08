@@ -97,6 +97,7 @@ class Engine(LogMixin):
         try:
             response = await self._process_download(request, spider)
         except Exception as e:
+            self._add_task(request)  # 下载出错时任务重新加入队里
             self.logger.error('Process request %s' % e, exc_info=True)
         else:
             return response
