@@ -30,7 +30,7 @@ class RetryMiddleware(BaseMiddleware):
             # 当重试关闭时，不管响应如何，直接返回
             return response
         if response.status != 200:
-            self.logger.debug(response.status)
+            self.logger.debug('Abnormal status code: %s' % response.status)
         """
         if len(response.content) < 100 and 'window.location.href' in str(response.content):
             # 这个可能需要先判断响应的大小
