@@ -157,7 +157,7 @@ class IoItem(MyBytes, Item):
                       filetype=None,
                       mode=None, **kwargs):
         self.data_directory = data_directory
-        self.filename = filename
+        self.filename = str(filename)
         self.filetype = filetype
         self.mode = mode or self.mode
 
@@ -177,7 +177,7 @@ class FileItem(MyStr, Item):
                       mode=None,
                       encoding=None, **kwargs):
         self.data_directory = data_directory
-        self.filename = filename
+        self.filename = str(filename)
         self.filetype = filetype
         self.mode = mode or self.mode
         self.encoding = encoding or self.encoding
@@ -200,7 +200,7 @@ class CSVItem(dict, Item):
             initdict = {}
         super().__init__(self, **initdict)
         self.data_directory = data_directory
-        self.filename = filename
+        self.filename = str(filename)
         if mode:
             self.mode = mode
         if encoding:
@@ -236,7 +236,7 @@ class CSVListItem(MyArray, Item):
                  **kwargs):
         super().__init__(initlist=initlist, **kwargs)
         self.data_directory = data_directory
-        self.filename = filename
+        self.filename = str(filename)
         if mode:
             self.mode = mode
         if encoding:
