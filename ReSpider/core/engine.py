@@ -90,7 +90,7 @@ class Engine(LogMixin):
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler
             await asyncio.sleep(setting.DOWNLOAD_DELAY or 0)
-            task = self.loop.create_task(self._process_request(request, spider, semaphore), name='process_request')
+            task = self.loop.create_task(self._process_request(request, spider, semaphore))
             task.add_done_callback(functools.partial(self._handle_response_output, request, spider))
 
     async def _process_request(self, request, spider, semaphore):
@@ -127,8 +127,11 @@ class Engine(LogMixin):
         if isinstance(response, Request):
             # 返回的response是<Request>的话就加到任务队列
             self._add_task(response)
+        elif response is None:
+            # 返回的response是 None 的话重新请求
+            self._add_task(response)
         else:
-            self.loop.create_task(self._process_response(response, request, spider), name='process_response')
+            self.loop.create_task(self._process_response(response, request, spider))
 
     async def _process_response(self, response, request, spider):
         """

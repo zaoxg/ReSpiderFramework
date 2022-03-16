@@ -11,7 +11,7 @@ from ReSpider.middlewares import BaseMiddleware
 class RetryMiddleware(BaseMiddleware):
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        cls.retry_http_codes = setting.RETRY_HTTP_CODES or []
+        cls.retry_http_codes = set(setting.RETRY_HTTP_CODES or [])
         cls.retry_enabled = setting.RETRY_ENABLED or False
         cls.max_retry_times = setting.MAX_RETRY_TIMES or 10
         return cls(spider, **kwargs)
@@ -31,12 +31,6 @@ class RetryMiddleware(BaseMiddleware):
             return response
         if response.status != 200:
             self.logger.debug('Abnormal status code: %s' % response.status)
-        """
-        if len(response.content) < 100 and 'window.location.href' in str(response.content):
-            # 这个可能需要先判断响应的大小
-            self.logger.debug('<REDIRECT> %s', response.content)
-            return await self._retry(request)
-        """
         if response.status in self.retry_http_codes:  # 根据状态码判断来决定是否重试
             self.logger.warning(response)
             # self.logger.warning('<CONTENT> %s' % response.content)
@@ -55,7 +49,7 @@ class RetryMiddleware(BaseMiddleware):
         if retries <= request.max_retry_times:  # 小于指定的最大重试次数就接着请求
             request.retry_times = retries
             request.do_filter = False  # 在重试次数内不去重
-            self.logger.info('retry.  %s' % request.cat())
+            self.logger.info('retry: %s' % request.cat())
             return request
         else:  # 超出最大重试次数后删除指纹
             self.logger.info('Max retry.  \n%s' % request.cat())

@@ -24,7 +24,6 @@ sslgen = SSLFactory()
 class DownloadHandler(LogMixin):
     def __init__(self, spider, **kwargs):
         super().__init__(spider)
-        # self._observer.REQUEST_COUNT = 0
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
@@ -63,32 +62,44 @@ class DownloadHandler(LogMixin):
                                 request=request)
             except TimeoutError as timeoutError:
                 self._observer.request_count_fail = 1
-                self.logger.error(timeoutError)
+                self.logger.warning(timeoutError)
                 return Response(url=request.url,
                                 status=601,
-                                request=request)
+                                request=request,
+                                exception=timeoutError)
             except aiohttp.ClientConnectorError as client_conn_error:
                 self._observer.request_count_fail = 1
-                self.logger.error(client_conn_error)
+                self.logger.warning(client_conn_error)
                 return Response(url=request.url,
                                 status=602,
-                                request=request)
+                                request=request,
+                                exception=client_conn_error)
             except aiohttp.InvalidURL as invalid_url:
                 self._observer.request_count_fail = 1
-                self.logger.error(invalid_url, exc_info=True)
+                self.logger.warning(invalid_url)
                 return Response(url=request.url,
                                 status=603,
-                                request=request)
+                                request=request,
+                                exception=invalid_url)
             except aiohttp.ClientHttpProxyError as proxy_error:
                 self._observer.request_count_fail = 1
-                self.logger.error(proxy_error, exc_info=True)
+                self.logger.warning(proxy_error)
                 return Response(url=request.url,
                                 status=604,
-                                request=request)
+                                request=request,
+                                exception=proxy_error)
+            except aiohttp.ServerDisconnectedError as server_disconnected_error:
+                self._observer.request_count_fail = 1
+                self.logger.warning(server_disconnected_error)
+                return Response(url=request.url,
+                                status=605,
+                                request=request,
+                                exception=server_disconnected_error)
             except Exception as exception:
                 self._observer.request_count_fail = 1
                 self.logger.warning(request.cat())
                 self.logger.error(exception, exc_info=True)
                 return Response(url=request.url,
                                 status=999,
-                                request=request)
+                                request=request,
+                                exception=exception)
