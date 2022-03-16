@@ -95,6 +95,13 @@ class DownloadHandler(LogMixin):
                                 status=605,
                                 request=request,
                                 exception=server_disconnected_error)
+            except aiohttp.ClientOSError as client_os_error:
+                self._observer.request_count_fail = 1
+                self.logger.warning(client_os_error)
+                return Response(url=request.url,
+                                status=606,
+                                request=request,
+                                exception=client_os_error)
             except Exception as exception:
                 self._observer.request_count_fail = 1
                 self.logger.warning(request.cat())

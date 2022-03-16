@@ -15,7 +15,7 @@ PIPELINE_MANAGER = 'ReSpider.pipelines.PipelineManager'  # 管道管理
 
 # 重试
 RETRY_ENABLED = False
-RETRY_HTTP_CODES = [999, 600, 601, 602, 603, 604, 605, 400, 401, 405, 408, 500, 502, 503, 504]
+RETRY_HTTP_CODES = [999, 600, 601, 602, 603, 604, 605, 606, 400, 401, 405, 408, 500, 502, 503, 504]
 MAX_RETRY_TIMES = 5  # 最大重试次数
 
 # 管道
