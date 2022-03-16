@@ -129,7 +129,7 @@ class Engine(LogMixin):
             self._add_task(response)
         elif response is None:
             # 返回的response是 None 的话重新请求
-            self._add_task(response)
+            self._add_task(request)
         else:
             self.loop.create_task(self._process_response(response, request, spider))
 
