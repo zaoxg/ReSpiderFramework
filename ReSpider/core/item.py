@@ -149,7 +149,8 @@ class IoItem(MyBytes, Item):
     data_directory: str = None
     filename: str = None
     filetype: str = None
-    mode: str = 'w'
+    mode: str = 'wb'  # bytes 写入 wb
+    encoding: str = None
 
     def set_attribute(self,
                       data_directory=None,
