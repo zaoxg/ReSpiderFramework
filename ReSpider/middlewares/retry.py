@@ -32,7 +32,7 @@ class RetryMiddleware(BaseMiddleware):
         if response.status != 200:
             self.logger.debug('Abnormal status code: %s' % response.status)
         if response.status in self.retry_http_codes:  # 根据状态码判断来决定是否重试
-            self.logger.warning(response)
+            self.logger.info(response.exception)
             # self.logger.warning('<CONTENT> %s' % response.content)
             # 出现异常状态码时，去重新处理请求进行重试
             return await self._retry(request)  # 重试的请求 返回 <Request>

@@ -15,6 +15,7 @@ class Response:
         # self.text = text
         self.request = request
         self.meta = request.meta if request else None
+        self.exception = None
         self.__text = None
         self.__selector = None
 
