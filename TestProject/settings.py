@@ -34,6 +34,7 @@ MAX_RETRY_TIMES = 5  # 最大重试次数
 # 管道
 ITEM_PIPELINES = {
     'ReSpider.pipelines.file.CSVPipeline': 4,
+    'ReSpider.pipelines.redis.RedisPipeline': 5,
     'ReSpider.pipelines.file.FilePipeline': 6,
     'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
 }

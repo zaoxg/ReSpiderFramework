@@ -16,6 +16,7 @@ __all__ = [
 ]
 
 from collections import UserList, UserString
+import json
 
 
 class ItemMetaclass(type):
@@ -273,10 +274,13 @@ class RdsItem(dict, Item):
     rds_type: str = 'LIST'
     key: str = None
 
-    def __init__(self, initdict=None, **kwargs):
+    def __init__(self, initdict=None,
+                 key: str = None, rds_type: str = None, **kwargs):
         if initdict is None:
             initdict = {}
         super().__init__(self, **initdict)
+        self.key = key
+        self.rds_type = rds_type or self.rds_type
         for key, val in kwargs.items():
             self.__dict__[key] = val
 
@@ -285,3 +289,17 @@ class RdsListItem(MyArray, Item):
     pipeline: str = 'RedisPipeline'
     rds_type: str = 'LIST'
     key: str = None
+
+    def __init__(self, initlist: list = None,
+                 key: str = None, rds_type: str = None, **kwargs):
+        if initlist.__len__() > 0:
+            if isinstance(initlist[0], dict):
+                initlist = list(map(json.dumps, initlist))
+        super().__init__(initlist, **kwargs)
+        self.key = key
+        self.rds_type = rds_type or self.rds_type
+
+    def append(self, item) -> None:
+        if isinstance(item, dict):
+            item = json.dumps(item, ensure_ascii=False)
+        self.data.append(item)

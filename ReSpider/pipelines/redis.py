@@ -38,12 +38,9 @@ class RedisPipeline(BasePipeline):
         self._key = spider.name or spider.__class__.name or spider.__class__.__name__
 
     async def process_item(self, item: RdsItem, spider):
-        key = f'{self._key}:{item.rds_type}'
-        if item.key:
-            key = item.key
+        key = item.key or f'{self._key}:{item.rds_type}'
         if item.rds_type == 'LIST':
             self._r.rpush(key, json.dumps(item))
-            pass
         elif item.rds_type == 'SET':
             # Todo: 实现的话可能需要修改类型
             pass
