@@ -39,18 +39,17 @@ class Downloader(LogMixin):
         :return:
         """
         self._observer.request_count = 1
+        # 经过请求中间件处理
         process_req = await self.middleware.process_request(request)
         process_resp = None
         if isinstance(process_req, Request):
             # 只有request是<Request>时才会发送
             response = await self.handler.download_request(request)  # 真正的 <Response>
+            # 获取到 <Response> 后依次经过 process_response
             process_resp = await self.middleware.process_response(request,
                                                                   response)  # 这个response不一定是 <Response>，也有可能是 <Request>
         if isinstance(process_req, Response):
-            # 当中间件把<Request>改为<Response>时
+            # 当中间件把 <Request> 改为 <Response> 时
             process_resp = await self.middleware.process_response(request, process_req)
         # response = await self.process_response(request, response)  # 这个response不一定是 <Response>，也有可能是 <Request>
-        # if process_resp is None:
-        #     # 测试
-        #     self.logger.warning('Response type is None')
         return process_resp

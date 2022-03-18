@@ -149,20 +149,25 @@ class Engine(LogMixin):
                 self._add_task(r)
             elif isinstance(r, Item):
                 await self.pipelines.process_chain('process_item', r, spider)
+
+        # 获取到回调函数
         callback = request.callback or spider.parse
+
         try:
-            callback_result = callback(response)  # 可能返回个生成器(先看看item怎么返回吧)
+            callback_result = callback(response)  # 返回一个生成器
             if callback_result.__class__.__name__ == 'async_generator':
                 async for result in callback_result:
                     await _process_result(result)
             else:
                 for result in callback_result:
                     await _process_result(result)
+
         except TypeError as type_error:  # 捕获 callback结果为空的异常
             if type_error.args[0] == "'NoneType' object is not iterable":
                 self.logger.debug(f'Function "{callback.__qualname__}" has no return value')
             else:
                 self.logger.error(type_error, exc_info=True)
+
         except Exception as other_exec:  # 执行回调函数的异常
             # 先不管有什么问题, 请求重新入队列
             if request.retry is True:
