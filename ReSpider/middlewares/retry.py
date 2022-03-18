@@ -32,8 +32,7 @@ class RetryMiddleware(BaseMiddleware):
         if response.status != 200:
             self.logger.debug('Abnormal status code: %s' % response.status)
         if response.status in self.retry_http_codes:  # 根据状态码判断来决定是否重试
-            self.logger.info(response.exception)
-            # self.logger.warning('<CONTENT> %s' % response.content)
+            # self.logger.info(response.exception)
             # 出现异常状态码时，去重新处理请求进行重试
             return await self._retry(request)  # 重试的请求 返回 <Request>
         return response
@@ -49,7 +48,7 @@ class RetryMiddleware(BaseMiddleware):
         if retries <= request.max_retry_times:  # 小于指定的最大重试次数就接着请求
             request.retry_times = retries
             request.do_filter = False  # 在重试次数内不去重
-            self.logger.info('retry: %s' % request.cat())
+            self.logger.info('retry: %s' % request)
             return request
         else:  # 超出最大重试次数后删除指纹
             self.logger.info('Max retry.  \n%s' % request.cat())

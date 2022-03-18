@@ -5,7 +5,16 @@ from parsel import Selector
 
 
 class Response:
-    def __init__(self, url, status=200, headers=None, cookies=None, content=b'', text=None, request=None, *args, **kwargs):
+    __text = None
+    __selector = None
+
+    def __init__(
+            self,
+            url, status=200,
+            headers=None, cookies=None,
+            content=b'', text=None,
+            request=None,
+            exception=None, *args, **kwargs):
         self.url = url
         self.status = status
         self.headers = headers or {}
@@ -15,9 +24,9 @@ class Response:
         # self.text = text
         self.request = request
         self.meta = request.meta if request else None
-        self.exception = None
-        self.__text = None
-        self.__selector = None
+        self.exception = exception
+        for key, val in kwargs.items():
+            self.__dict__[key] = val
 
     def __str__(self):
         return f"<Response [{self.status}]>"
