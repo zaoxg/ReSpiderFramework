@@ -40,14 +40,13 @@ class RedisPipeline(BasePipeline):
     async def process_item(self, item: RdsItem, spider):
         key = item.key or f'{self._key}:{item.rds_type}'
         if item.rds_type == 'LIST':
-            self._r.rpush(key, json.dumps(item))
+            self._r.rpush(key, *item)
         elif item.rds_type == 'SET':
-            # Todo: 实现的话可能需要修改类型
-            pass
+            # item: <list>
+            self._r.sadd(key, *item)
         elif item.rds_type == 'HASH':
-            # Todo
-            # 实现的话可能需要修改类型
-            pass
+            # item: <dict>
+            self._r.hset(key, mapping=item)
         return item
 
     def _rpush(self, item, keys=None):
