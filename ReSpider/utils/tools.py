@@ -8,6 +8,7 @@ import re
 import os
 import time
 import datetime
+import base64
 
 
 def get_current_timestamp():
@@ -216,6 +217,20 @@ def read_file(filename, readlines=False, encoding="utf-8"):
 
     return content
 
+
+def str2base64(s: str = None):
+    if s is None:
+        raise ValueError("ckbnm")
+    encoder = base64.b64encode(s.encode("utf-8"))
+    str_encoder = encoder.decode('utf-8')
+    return str_encoder
+
+
+def base64_to_str(s: str = None):
+    if s is None:
+        raise ValueError("ckjnm")
+    decoder = base64.b64decode(s)
+    return decoder
 
 '''
 def exec_js(js_code):
