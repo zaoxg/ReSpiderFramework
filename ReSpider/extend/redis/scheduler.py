@@ -1,4 +1,4 @@
-import ReSpider.setting as settings
+import ReSpider.setting as setting
 from ReSpider.core.scheduler import Scheduler
 import redis
 import pickle
@@ -10,15 +10,14 @@ class RedisScheduler(Scheduler):
 
     def __init__(self, spider=None, **kwargs):
         super().__init__(spider, **kwargs)
-        # self.settings = spider.settings
         self.spider = spider
 
     @classmethod
     def from_settings(cls, spider, **kwargs):
         tag_name = spider.name or spider.__class__.name or spider.__class__.__name__
-        cls.queue = f'{tag_name}:scheduler'
-        cls.df = f'{tag_name}:dupefilter'
-        cls.error_queue = f'{tag_name}:scheduler:error'
+        cls.queue = setting.REDIS_TASK_QUEUE or f'{tag_name}:scheduler'
+        cls.df = setting.REDIS_DUPLICATES or f'{tag_name}:dupefilter'
+        cls.error_queue = setting.FAILED_TASK_QUEUE or f'{tag_name}:scheduler:error'
         cls.redis_key = None
         if isinstance(spider, RedisSpider):
             # self._get = self._get_other
@@ -26,21 +25,22 @@ class RedisScheduler(Scheduler):
         return cls(spider, **kwargs)
 
     def open_spider(self):
-        self._pool = redis.ConnectionPool(host=settings.REDIS_HOST or '127.0.0.1',
-                                          port=settings.REDIS_PORT or 6379,
-                                          password=settings.REDIS_PASSWORD or None,
-                                          db=settings.REDIS_DB or 0)
+        self._pool = redis.ConnectionPool(host=setting.REDIS_HOST or '127.0.0.1',
+                                          port=setting.REDIS_PORT or 6379,
+                                          password=setting.REDIS_PASSWORD or None,
+                                          db=setting.REDIS_DB or 0)
         self._r = redis.Redis(connection_pool=self._pool)
 
     def __len__(self):
         return self._r.llen(self.queue)
 
     def enqueue_request(self, request):
-        # 优先级(循环太多了)
-        if request.meta is not None and request.meta.get('del_fp', False):
-            self.logger.info('DEL FINGERPRINT...')
+        # Todo 理应自动处理优先级且func <verify_priority>干的事太多了
+        if request.del_fp:
+            self.logger.info('del fingerprint. <%s>' % request.fingerprint)
             self._srem(request.fingerprint)  # 删除指纹
-            self._rpush(request, keys=self.error_queue)
+            if setting.SAVE_FAILED_TASK:
+                self._rpush(request, keys=self.error_queue)
             return request
         if request.do_filter:
             if self.verify_fingerprint(request):

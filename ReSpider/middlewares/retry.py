@@ -51,10 +51,8 @@ class RetryMiddleware(BaseMiddleware):
             self.logger.info('retry: %s' % request)
             return request
         else:  # 超出最大重试次数后删除指纹
-            self.logger.info('Max retry.  \n%s' % request.cat())
-            if request.meta is None:
-                request.meta = {}
-            request.meta.setdefault('del_fp', True)
+            self.logger.info('request overstep max retry.  \n%s' % request.cat())
+            request.del_fp = True
             request.do_filter = True
             request.retry_times = 1
             request.set_fp()  # 重新设置指纹

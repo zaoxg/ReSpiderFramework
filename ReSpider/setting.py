@@ -21,14 +21,17 @@ MAX_RETRY_TIMES = 5  # 最大重试次数
 # 管道
 ITEM_PIPELINES = {
     'ReSpider.pipelines.file.CSVPipeline': 4,
-    'ReSpider.pipelines.redis.RedisPipeline': 5,
+    # 'ReSpider.pipelines.redis.RedisPipeline': 5,
     'ReSpider.pipelines.file.FilePipeline': 6,
-    'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
+    # 'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
 }
+
+# 默认User-Agent
+DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
 
 # 下载中间件
 DOWNLOADER_MIDDLEWARES = {
-    'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
+    # 'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
     # 'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 5,
     'ReSpider.middlewares.retry.RetryMiddleware': 8
 }
@@ -51,6 +54,15 @@ REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_PASSWORD = None  # 'admin000'
 REDIS_DB = 0
+
+# 自定义任务队列
+REDIS_TASK_QUEUE = None
+# 自定义去重
+REDIS_DUPE_FILTERS = None
+# 保存失败任务
+SAVE_FAILED_TASK = True
+# 自定义失败任务队列
+FAILED_TASK_QUEUE = None
 
 # 日志配置
 LOG_NAME = None

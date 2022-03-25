@@ -8,15 +8,16 @@ from .response import Response
 
 class Request:
     name = 'request'
+    __do_filter = False
 
     def __init__(self, url: Optional[str], method: Optional[str] = None,
-                 headers=None, params=None, data=None, cookies=None, allow_redirects: bool = True,
+                 headers=None, params: dict = None, data=None, cookies=None, allow_redirects: bool = True,
                  encoding: Optional[str] = 'utf-8',
                  proxy='', timeout: Optional[int] = 30,
                  retry: bool = setting.RETRY_ENABLED, max_retry_times: int = setting.MAX_RETRY_TIMES,
                  meta=None,
                  priority: Optional[int] = 1, do_filter: bool = False,
-                 callback=None, errback=None, *args, **kwargs):
+                 callback=None, errback=None, **kwargs):
         if url is None:
             raise ValueError(f'{self.__class__} url Cannot be empty')
         self._set_url(url)
@@ -25,7 +26,10 @@ class Request:
         else:
             self.method = str(method).upper()
         self.headers = headers or {}
-        self.params = params or ''
+        if params is None:
+            self.params = {}
+        else:
+            self.params = params
         if data is None:
             self.data = {}
         else:
@@ -37,23 +41,15 @@ class Request:
         self.timeout = timeout
         self.meta = meta
         self.priority = priority  # 优先级
-        self.do_filter = do_filter
         self.fingerprint = None  # 指纹
+        self.do_filter = do_filter
         self.retry = retry
         self.retry_times = 0
         self.max_retry_times = max_retry_times
         self.callback = callback
         self.errback = errback
-        if self.do_filter:
-            self._set_fingerprint()
-
-    def _set_url(self, url):
-        if not isinstance(url, str):
-            raise TypeError(f'Request url must be str or unicode, got {type(url).__name__}')
-        if '://' not in url:
-            url = 'http://' + url
-            # raise ValueError('非法url')
-        self.url = url
+        for key, val in kwargs.items():
+            self.__dict__[key] = val
 
     def __str__(self):
         return f"<{self.method} {self.url}>"
@@ -65,17 +61,43 @@ class Request:
 
     __repr__ = __str__
 
+    def _set_url(self, url):
+        if not isinstance(url, str):
+            raise TypeError(f'Request url must be str or unicode, got {type(url).__name__}')
+        if '://' not in url:
+            url = 'http://' + url
+            # raise ValueError('非法url')
+        self.url = url
+
     def copy(self):
         return self.replace()
 
+    @property
+    def do_filter(self):
+        return self.__do_filter
+
+    @do_filter.setter
+    def do_filter(self, val: bool):
+        if self.__do_filter != val:
+            self.__do_filter = val
+        if self.__do_filter:
+            self._set_fingerprint()
+        # else:
+        #     self.fingerprint = None
+
     def _set_fingerprint(self):
-        self.fingerprint = encrypt_md5(self.url + str(self.params) + str(self.data))
+        # @summery: 没有指纹时才会设置指纹
+        if self.fingerprint is None:
+            self.fingerprint = encrypt_md5(self.url + str(self.params) + str(self.data))
 
     def set_fp(self):
         if self.do_filter:
             self._set_fingerprint()
 
     def cat(self):
+        from ReSpider.utils.tools import extract_dict
+        self.__dict__ = extract_dict(self.__dict__, {'url', 'method', 'headers', 'params', 'data', 'cookies', 'allow_redirects', 'encoding', 'proxy', 'timeout', 'meta', 'priority', 'fingerprint', 'retry', 'retry_times', 'max_retry_times', 'callback', 'errback', 'do_filter'})
+        self.__dict__['callback'] = self.callback.__name__ if self.callback else 'parse'
         return self.__dict__
 
     def send(self):
@@ -86,7 +108,7 @@ class Request:
         m = self.method
         hd = self.headers.copy()
         if 'user-agent' not in hd and 'User-Agent' not in hd:
-            hd.update({'user-agent': 'PostmanRuntime/7.28.4'})
+            hd.update({'user-agent': setting.DEFAULT_USER_AGENT})
         kwg = {'headers': hd, 'cookies': self.cookies, 'params': self.params, 'data': self.data}
         return requests.request(url=u, method=m, **kwg)
 
