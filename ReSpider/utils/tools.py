@@ -178,6 +178,18 @@ def firstCharUpper(source_str: str):
 
 
 ################################
+def extract_dict(source_dict: dict, keys=None) -> dict:
+    """
+    # @summary: 从一个字典中提取字典
+    :param source_dict: 需要提取key的原字典
+    :param keys: 提取的key, <iterable>
+    :return:
+    """
+    if keys is None:
+        raise ValueError('if <key> is None, I suggest you use %s' % source_dict)
+    return {key: val for key, val in source_dict.items() if key in keys}
+
+################################
 def mkdir(path):
     try:
         if not os.path.exists(path):
@@ -239,7 +251,6 @@ def exec_js(js_code):
     @param js_code: js代码
     @result: 返回执行结果
     """
-
     return execjs.eval(js_code)
 
 

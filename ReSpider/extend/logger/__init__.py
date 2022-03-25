@@ -5,6 +5,8 @@
 
 import os
 import logging
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
 import ReSpider.setting as setting
 
 
@@ -43,6 +45,7 @@ class LogMixin:
                                       datefmt='%Y-%m-%d %H:%M:%S')
         # FileHandler
         if setting.LOG_TO_FILE is True:
+            _now_time = datetime.now().strftime('%Y-%m-%d')  # 当前日期格式化
             log_file_path = log_path or setting.LOG_PATH
             if not os.path.exists(log_file_path):
                 os.mkdir(log_file_path)
@@ -50,8 +53,11 @@ class LogMixin:
             file_level = log_level_file or setting.LOG_LEVEL_FILE
             log_mode = log_mode or setting.LOG_MODE
             encoding = encoding or setting.LOG_ENCODING
-            file_handler = logging.FileHandler(f'{log_file_path}/{log_file_name}.log',
-                                               mode=log_mode if file_level == 'DEBUG' else 'a', encoding=encoding)
+            # file_handler = logging.FileHandler(f'{log_file_path}/{log_file_name}.log',
+            #                                    mode=log_mode if file_level == 'DEBUG' else 'a', encoding=encoding)
+            file_handler = RotatingFileHandler(filename=f'{log_file_path}/{log_file_name}-{_now_time}.log',
+                                               mode=log_mode if file_level == 'DEBUG' else 'a',
+                                               maxBytes=2 * 1024 * 1024, backupCount=3, encoding=encoding)
             file_handler.setLevel(file_level)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
