@@ -1,8 +1,9 @@
 import ReSpider.setting as setting
 from ReSpider.core.scheduler import Scheduler
-import redis
-import pickle
 from .spider import RedisSpider
+from ReSpider.utils.make_class import make_req_from_json
+import redis
+import json
 
 
 class RedisScheduler(Scheduler):
@@ -16,7 +17,7 @@ class RedisScheduler(Scheduler):
     def from_settings(cls, spider, **kwargs):
         tag_name = spider.name or spider.__class__.name or spider.__class__.__name__
         cls.queue = setting.REDIS_TASK_QUEUE or f'{tag_name}:scheduler'
-        cls.df = setting.REDIS_DUPLICATES or f'{tag_name}:dupefilter'
+        cls.df = setting.REDIS_DUPE_FILTERS or f'{tag_name}:dupefilter'
         cls.error_queue = setting.FAILED_TASK_QUEUE or f'{tag_name}:scheduler:error'
         cls.redis_key = None
         if isinstance(spider, RedisSpider):
@@ -65,18 +66,21 @@ class RedisScheduler(Scheduler):
     def _rpush(self, request, keys=None):
         if keys is None:
             keys = self.queue
-        arg = self._r.rpush(keys, pickle.dumps(request))
+        arg = self._r.rpush(keys,
+                            json.dumps(request.to_dict, ensure_ascii=False))
         return arg
 
     def _lpush(self, request):
         # 根据优先级判断，0从左边插入
-        arg = self._r.lpush(self.queue, pickle.dumps(request))
+        arg = self._r.lpush(self.queue,
+                            json.dumps(request.to_dict, ensure_ascii=False))
         return arg
 
     def _get(self):
         request = self._r.lpop(self.queue)
         if request is not None:
-            return pickle.loads(request)
+            request = make_req_from_json(request)
+            return request
         return None
 
     def _get_other(self):
