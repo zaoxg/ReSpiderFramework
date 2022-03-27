@@ -268,6 +268,29 @@ def base64_to_str(s: str = None):
     decoder = base64.b64decode(s)
     return decoder
 
+
+def del_special(string: str):
+    """
+    >>> del_special("营口东.邦环保科技股份有限公司")
+    >>> "营口东邦环保科技股份有限公司"
+    :param string:
+    :return:
+    """
+    res = re.split('[【|】|{|}|\[|\]|；|、|。|,|。|，|，|！|\!|\.|？| |～|\?\s]', string)
+    return "".join(res)
+
+
+def filter_emoji(desstr, restr=''):
+    """
+    过滤表情
+    """
+    try:
+        co = re.compile(u'[\U00010000-\U0010ffff]')
+    except re.error:
+        co = re.compile(u'[\uD800-\uDBFF]')
+    return co.sub(restr, desstr)
+
+
 '''
 def exec_js(js_code):
     """
