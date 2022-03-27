@@ -23,8 +23,15 @@ class Testing1(ReSpider.Spider):
         req = ReSpider.Request(
             url='https://blog.csdn.net/babybin/article/details/111624905',
             # priority=0,
+            do_filter=True,
             callback=self.parse2
         )
+        # request = {'url': 'https://blog.csdn.net/babybin/article/details/111624905', 'method': 'GET', 'headers': {}, 'params': {}, 'data': {}, 'cookies': {}, 'allow_redirects': True, 'encoding': 'utf-8', 'proxy': '', 'timeout': 30, 'meta': None, 'priority': 1, 'fingerprint': '990aa332b9e08ba7557766ebab3f6f9b', '_Request__do_filter': True, 'retry': False, 'retry_times': 0, 'max_retry_times': 5, 'callback': self.parse, 'errback': None}
+        # req = ReSpider.Request(**request)
+        # self.logger.warning(req)
+        # print(req.cat())
+        import json
+        # print(json.dumps(req.to_dict, ensure_ascii=False))
         yield req
         # for url in self.start_urls:
         #     yield ReSpider.Request(
@@ -59,5 +66,5 @@ class Testing1(ReSpider.Spider):
 
 
 if __name__ == '__main__':
-    testing_1 = Testing1()
+    testing_1 = Testing1(TASK_LIMIT=1)
     testing_1.start()
