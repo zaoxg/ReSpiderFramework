@@ -6,6 +6,7 @@
 import logging
 import os
 import ReSpider.setting as setting
+
 LOG_FORMAT = "%(threadName)s|%(asctime)s|%(filename)s|%(funcName)s|line:%(lineno)d|%(levelname)s| %(message)s"
 
 
@@ -17,11 +18,12 @@ def get_logger():
     _logger_.setLevel(level=logging.DEBUG)
 
     # Formatter
-    # formatter = logging.Formatter("%(asctime)s [%(name)s] [%(levelname)s] [line:%(lineno)d] %(message)s",
+    # formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | line:%(lineno)d - %(message)s",
     #                               datefmt='%Y-%m-%d %H:%M:%S')
     # Formatter
-    formatter = logging.Formatter("%(threadName)s %(asctime)s %(filename)s %(funcName)s line:%(lineno)d %(levelname)s| %(message)s",
-                                  datefmt='%Y-%m-%d %H:%M:%S')
+    formatter = logging.Formatter(
+        "%(threadName)s %(asctime)s %(filename)s %(funcName)s line:%(lineno)d %(levelname)s| %(message)s",
+        datefmt='%Y-%m-%d %H:%M:%S')
     # FileHandler
     """
     file_level = _setting.get('FILE_HANDLER_LEVEL', FILE_HANDLER_LEVEL)
@@ -42,12 +44,12 @@ def get_logger():
 
 
 def get_log(
-       obj=None,
-       log_name=None,
-       log_mode=None,
-       encoding=None,
-       log_path=None,
-       log_level_console=None, log_level_file=None):
+        obj=None,
+        log_name=None,
+        log_mode=None,
+        encoding=None,
+        log_path=None,
+        log_level_console=None, log_level_file=None):
     # _setting = spider.settings
     name = '.'.join([obj.__module__, obj.__class__.__name__])
 
@@ -56,7 +58,7 @@ def get_log(
     logger.setLevel(level=logging.DEBUG)
 
     # Formatter
-    formatter = logging.Formatter("%(asctime)s [%(name)s] [%(levelname)s] [line:%(lineno)d] %(message)s",
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | line:%(lineno)d - %(message)s",
                                   datefmt='%Y-%m-%d %H:%M:%S')
     # FileHandler
     if setting.LOG_TO_FILE is True:
@@ -118,3 +120,6 @@ class Logger:
 
 
 logger = Logger()
+
+
+
