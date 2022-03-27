@@ -9,6 +9,7 @@ import os
 import time
 import datetime
 import base64
+import pickle
 
 
 def get_current_timestamp():
@@ -228,6 +229,29 @@ def read_file(filename, readlines=False, encoding="utf-8"):
         raise e
 
     return content
+
+
+def dumps_obj(obj):
+    return pickle.dumps(obj)
+
+
+def loads_obj(obj_s):
+    return pickle.loads(obj_s)
+
+
+def get_method(obj, func_name):
+    try:
+        return getattr(obj, func_name)
+    except AttributeError:
+        return None
+
+
+def is_callable(obj):
+    return (
+        True
+        if callable(obj)
+        else False
+    )
 
 
 def str2base64(s: str = None):
