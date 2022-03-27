@@ -13,6 +13,7 @@ from ReSpider.extend import LogMixin
 # from ReSpider.extend.item import Item
 from ReSpider.core.item import Item
 import functools
+import ReSpider.utils.tools as tools
 
 
 class Engine(LogMixin):
@@ -151,7 +152,14 @@ class Engine(LogMixin):
                 await self.pipelines.process_chain('process_item', r, spider)
 
         # 获取到回调函数
-        callback = request.callback or spider.parse
+        if request.callback:
+            callback = (
+                request.callback
+                if callable(request.callback)
+                else tools.get_method(spider, request.callback)
+            )
+        else:
+            callback = spider.parse
 
         try:
             callback_result = callback(response)  # 返回一个生成器
