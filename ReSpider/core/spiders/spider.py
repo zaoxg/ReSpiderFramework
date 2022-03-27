@@ -8,7 +8,7 @@ from ...http import Request
 
 
 class Spider(Crawler):
-    name = 'base_spider'
+    name = 'spider'
     __custom_setting__ = {}
     start_urls = []
 

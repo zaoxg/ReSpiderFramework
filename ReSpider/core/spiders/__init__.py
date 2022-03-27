@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2021/8/24 17:51
 # @Author  : ZhaoXiangPeng
-# @File    : __init__.py.py
+# @File    : __init__.py
 
 import ReSpider.setting as setting
 from ReSpider.utils.tools import hump2underline
@@ -25,9 +25,14 @@ class Crawler(LogMixin):
         if not setting.LOG_NAME:
             setattr(setting, 'LOG_NAME', self.name)
         super().__init__(self)
-        self.__dict__.update(**kwargs)
+
         if not hasattr(self, 'start_urls'):
             self.start_urls = []
+
+    def __str__(self):
+        return '<%s [%s]>' % (self.__class__.__base__.__name__, self.name)
+
+    # __repr__ = __str__
 
     def start_requests(self):
         raise NotImplementedError
