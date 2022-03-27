@@ -44,6 +44,13 @@ HEART_BEAT_TIME = 3
 # 下载延迟
 DOWNLOAD_DELAY = 0
 
+# MySQL配置
+MYSQL_HOST = ''
+MYSQL_PORT = ''
+MYSQL_DB = ''
+MYSQL_USERNAME = ''
+MYSQL_PASSWORD = ''
+
 # MongoDB配置
 MONGODB_HOST = '127.0.0.1'
 MONGODB_PORT = 27017
@@ -63,6 +70,8 @@ REDIS_DUPE_FILTERS = None
 SAVE_FAILED_TASK = True
 # 自定义失败任务队列
 FAILED_TASK_QUEUE = None
+# 重试失败任务
+RETRY_FAILED_TASK = False
 
 # 日志配置
 LOG_NAME = None
@@ -71,8 +80,11 @@ LOG_TO_CONSOLE = True  # 打印到控制台
 LOG_TO_FILE = False  # 保存到文件
 LOG_MODE = 'w'  # 写文件模式
 LOG_ENCODING = 'utf-8'  # log文件编码
-LOG_LEVEL_CONSOLE = 'DEBUG'
-LOG_LEVEL_FILE = 'WARNING'
+LOG_LEVEL_CONSOLE = 'DEBUG'  # 控制台输出log等级
+LOG_LEVEL_FILE = 'WARNING'  # 文件输出log等级
+LOG_FILE_SIZE = 5 * 1024 * 1024  # 每个日志文件大小, bytes
+LOG_BACKUP_COUNT = 7  # 日志文件保存数量
+
 
 # 请求次数统计
 REQUEST_COUNT_INTERVAL_TIME = 60
