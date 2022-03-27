@@ -60,13 +60,13 @@ class DownloadHandler(LogMixin):
                                 cookies=response.cookies,
                                 content=content,
                                 request=request)
-            except TimeoutError as timeoutError:
+            except TimeoutError as timeout_error:
                 self._observer.request_count_fail = 1
-                self.logger.warning(timeoutError)
+                self.logger.warning(timeout_error)
                 return Response(url=request.url,
                                 status=601,
                                 request=request,
-                                exception=timeoutError)
+                                exception=timeout_error)
             except aiohttp.ClientConnectorError as client_conn_error:
                 self._observer.request_count_fail = 1
                 self.logger.warning(client_conn_error)
