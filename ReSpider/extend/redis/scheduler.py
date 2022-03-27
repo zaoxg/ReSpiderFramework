@@ -1,7 +1,7 @@
 import ReSpider.setting as setting
 from ReSpider.core.scheduler import Scheduler
 from .spider import RedisSpider
-from ReSpider.utils.make_class import make_req_from_json
+import ReSpider.utils.make_class as make_class
 import redis
 import json
 
@@ -79,7 +79,7 @@ class RedisScheduler(Scheduler):
     def _get(self):
         request = self._r.lpop(self.queue)
         if request is not None:
-            request = make_req_from_json(request)
+            request = make_class.make_req_from_json(request)
             return request
         return None
 
@@ -108,10 +108,8 @@ class RedisScheduler(Scheduler):
 
     def verify_fingerprint(self, request):
         """
-        :return:
+        :return: 1 or 0
         """
         fp = request.fingerprint
-        if self._r.sismember(self.df, fp) is False:
-            self._r.sadd(self.df, fp)
-            return True
-        return False
+        # 存在返回 0, 否则返回 1
+        return self._r.sadd(self.df, fp)
