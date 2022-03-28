@@ -20,9 +20,10 @@ MAX_RETRY_TIMES = 5  # 最大重试次数
 
 # 管道
 ITEM_PIPELINES = {
-    'ReSpider.pipelines.file.CSVPipeline': 4,
+    # 'ReSpider.pipelines.file.CSVPipeline': 4,
+    # 'ReSpider.pipelines.file.FilePipeline': 4,
     # 'ReSpider.pipelines.redis.RedisPipeline': 5,
-    'ReSpider.pipelines.file.FilePipeline': 6,
+    'ReSpider.pipelines.mysql.MySQLPipeline': 6
     # 'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
 }
 
@@ -45,11 +46,11 @@ HEART_BEAT_TIME = 3
 DOWNLOAD_DELAY = 0
 
 # MySQL配置
-MYSQL_HOST = ''
-MYSQL_PORT = ''
-MYSQL_DB = ''
-MYSQL_USERNAME = ''
-MYSQL_PASSWORD = ''
+MYSQL_HOST = '127.0.0.1'
+MYSQL_PORT = 3306
+MYSQL_DB = 'crawler'
+MYSQL_USERNAME = 'root'
+MYSQL_PASSWORD = 'kcidea1509'
 
 # MongoDB配置
 MONGODB_HOST = '127.0.0.1'

@@ -25,9 +25,6 @@ def get_cookies_from_str(cookie_str: str):
     @summary: 自己懒得写, Copy from https://github.com/Boris-code/feapder/blob/master/feapder/utils/tools.py
     >>> get_cookies_from_str("key=value; key2=value2; key3=; key4=; ")
     {'key': 'value', 'key2': 'value2', 'key3': '', 'key4': ''}
-    Args:
-        cookie_str: key=value; key2=value2; key3=; key4=
-    Returns:
     """
     cookies = {}
     for cookie in cookie_str.split(";"):
@@ -190,6 +187,7 @@ def extract_dict(source_dict: dict, keys=None) -> dict:
         raise ValueError('if <key> is None, I suggest you use %s' % source_dict)
     return {key: val for key, val in source_dict.items() if key in keys}
 
+
 ################################
 def mkdir(path):
     try:
@@ -271,10 +269,8 @@ def base64_to_str(s: str = None):
 
 def del_special(string: str):
     """
-    >>> del_special("营口东.邦环保科技股份有限公司")
-    >>> "营口东邦环保科技股份有限公司"
-    :param string:
-    :return:
+    # :param string:
+    # :return:
     """
     res = re.split('[【|】|{|}|\[|\]|；|、|。|,|。|，|，|！|\!|\.|？| |～|\?\s]', string)
     return "".join(res)
@@ -289,6 +285,26 @@ def filter_emoji(desstr, restr=''):
     except re.error:
         co = re.compile(u'[\uD800-\uDBFF]')
     return co.sub(restr, desstr)
+
+
+def list2str(datas):
+    """
+    列表转字符串
+    :param datas: [1, 2]
+    :return: (1, 2)
+    """
+    data_str = str(tuple(datas))
+    data_str = re.sub(",\)$", ")", data_str)
+    return data_str
+
+
+def make_sql_from_(table, data):
+    keys = [f"`{key}`" for key in data.keys()]
+    keys = list2str(keys)
+    values = [f"`{value}`" for value in data.values()]
+    values = list2str(values)
+    sql = f'''INSERT INTO {table} {keys} VALUES {values};'''.replace('\'', '')
+    return sql
 
 
 '''

@@ -24,7 +24,7 @@ class Testing1(ReSpider.Spider):
             url='https://blog.csdn.net/babybin/article/details/111624905',
             # priority=0,
             do_filter=True,
-            callback=self.parse2
+            callback=self.parse
         )
         # request = {'url': 'https://blog.csdn.net/babybin/article/details/111624905', 'method': 'GET', 'headers': {}, 'params': {}, 'data': {}, 'cookies': {}, 'allow_redirects': True, 'encoding': 'utf-8', 'proxy': '', 'timeout': 30, 'meta': None, 'priority': 1, 'fingerprint': '990aa332b9e08ba7557766ebab3f6f9b', '_Request__do_filter': True, 'retry': False, 'retry_times': 0, 'max_retry_times': 5, 'callback': self.parse, 'errback': None}
         # req = ReSpider.Request(**request)
@@ -50,6 +50,7 @@ class Testing1(ReSpider.Spider):
         #         yield ReSpider.Request(url=url)
 
     async def parse(self, response):
+        yield item.MysqlItem({'name': 'baidu', 'url': 'www.baidu.com'}, table='website')
         # print(response.headers)
         # self.logger.info(response.cookies)
         self.logger.warning(response.cookiejar)

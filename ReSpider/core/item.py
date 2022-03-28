@@ -389,3 +389,21 @@ class RdsListItem(MyArray, Item):
         if self.__to_json:
             item = json.dumps(item, ensure_ascii=False)
         self.data.append(item)
+
+
+class MysqlItem(dict, Item):
+    pipeline: str = 'MySQLPipeline'
+    table: str = None
+
+    def __init__(self, initdict=None, table=None, **kwargs):
+        if initdict is None:
+            initdict = {}
+        super().__init__(self, **initdict)
+        self.table = table
+        for key, val in kwargs.items():
+            self.__dict__[key] = val
+
+
+class MysqlListItem(MyArray, Item):
+    pipeline = 'MySQLPipeline'
+    table = None

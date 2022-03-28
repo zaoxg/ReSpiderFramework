@@ -11,28 +11,26 @@ import redis
 class RedisDB:
     def __init__(self,
                  host=None, port=None,
-                 ip_port=None, db=None,
+                 db=None,
                  user_pass=None):
-        if ip_port is None:
-            host = setting.REDIS_HOST
+        if host is None:
+            self._host = setting.REDIS_HOST
         if port is None:
-            port = setting.REDIS_PORT
+            self._port = setting.REDIS_PORT
         if db is None:
-            db = setting.REDIS_DB
-        self.__redis = None
+            self._db = setting.REDIS_DB
+        if user_pass is None:
+            self._user_pass = setting.REDIS_PASSWORD
+        self._redis = None
         self._db = None
+        self.get_connect()
 
     def get_connect(self):
-        self._pool = redis.ConnectionPool(host=self.redis_host,
-                                          port=self.redis_port,
-                                          password=self.redis_password,
-                                          db=self.redis_db)
-        self.__redis = redis.Redis(connection_pool=self._pool)
-
-    @property
-    def _redis(self):
-        # 需要实现重连逻辑
-        return self.__redis
+        self._pool = redis.ConnectionPool(host=self._host,
+                                          port=self._port,
+                                          password=self._user_pass,
+                                          db=self._db)
+        self._redis = redis.Redis(connection_pool=self._pool)
 
     def sadd(self, table, values):
         """
