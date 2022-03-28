@@ -73,5 +73,5 @@ setuptools.setup(
     packages=packages,
     python_requires=">=3.7",
     install_requires=requires,
-    entry_points={"console_scripts": ["respider = ReSpider.extend.cmd.cmdline:execute", "ReSpider = ReSpider.extend.cmd.cmdline:execute"]}
+    entry_points={"console_scripts": ["respider = ReSpider.cmd.cmdline:execute", "ReSpider = ReSpider.cmd.cmdline:execute"]}
 )
