@@ -62,8 +62,19 @@ class MysqlDB:
             # 释放掉conn,将连接放回到连接池中
             await self._pool.release(conn)
 
-    def add(self):
-        pass
+    def add(self, sql):
+        conn, cur = await self.get_cursor()
+        await conn.begin()
+        try:
+            await cur.execute(sql)
+            await conn.commit()
+        except Exception:
+            await conn.rollback()  # 回滚
+        finally:
+            if cur:
+                await cur.close()
+            # 释放掉conn,将连接放回到连接池中
+            await self._pool.release(conn)
 
     def delete(self):
         pass

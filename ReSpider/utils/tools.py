@@ -237,6 +237,11 @@ def loads_obj(obj_s):
     return pickle.loads(obj_s)
 
 
+def dumps_json(value, **kwargs):
+    return json.dumps(value,
+                      ensure_ascii=False, default=str, **kwargs)
+
+
 def get_method(obj, func_name):
     try:
         return getattr(obj, func_name)
@@ -298,13 +303,45 @@ def list2str(datas):
     return data_str
 
 
-def make_sql_from_(table, data):
-    keys = [f"`{key}`" for key in data.keys()]
-    keys = list2str(keys)
-    values = [f"`{value}`" for value in data.values()]
-    values = list2str(values)
-    sql = f'''INSERT INTO {table} {keys} VALUES {values};'''.replace('\'', '')
-    return sql
+def format_sql_value(value):
+    if isinstance(value, str):
+        value = value.strip()
+
+    elif isinstance(value, (list, dict)):
+        value = dumps_json(value)
+
+    elif isinstance(value, (datetime.date, datetime.time)):
+        value = str(value)
+
+    elif isinstance(value, bool):
+        value = int(value)
+
+    return value
+
+
+def make_sql_insert(table, data):
+    ls = [(k, v) for k, v in data.items() if v is not None]
+    keys = ', '.join([i[0] for i in ls])
+    values = ', '.join(repr(i[1]) for i in ls)
+    sentence = f'INSERT INTO {table} ({keys}) VALUES ({values});'
+    return sentence
+
+
+def make_sql_update(table, data, condition):
+    sentence = 'UPDATE {table} SET {key_values} WHERE {condition}'
+    key_values = []
+    for key, value in data.items():
+        value = format_sql_value(value)
+        if isinstance(value, str):
+            key_values.append(f'{key}={repr(value)}')
+        elif value is None:
+            key_values.append(f'{key}=null')
+        else:
+            key_values.append(f'{key}={value}')
+    key_values = ', '.join(key_values)
+    condition = ' AND '.join([f'%s=%r' % (k, v) for k, v in condition.items()])
+    sentence.format(table=table, key_values=key_values, condition=condition)
+    return sentence
 
 
 '''
