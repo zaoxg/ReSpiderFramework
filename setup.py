@@ -49,6 +49,8 @@ requires = [
     "redis>=2.10.6,<4.0.0",
     "pymongo>=3.11.2",
     "motor>=2.3.1",
+    "PyMySQL>=0.9.3",
+    "aiomysql>=0.0.21",
     "pyppeteer>=0.2.5",
     "PyExecJS>=1.5.1"
 ]
@@ -58,7 +60,7 @@ setuptools.setup(
     version=version,
     author="zhaoxiangpeng",
     author_email="zhaoxiangpengSR@gmail.com",
-    description="ReSpider是一款基于 aiohttp 请求库的python爬虫程序",
+    description="ReSpider是一款基于 aiohttp 请求库的python爬虫程序\nBut not just aiohttp",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/zaoxg/ReSpiderFramework",
