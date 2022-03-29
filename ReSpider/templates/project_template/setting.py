@@ -6,7 +6,7 @@
 # WORKER_PATH = re.sub(r'([\\/]items$)|([\\/]spiders$)|([\\/]utils$)', '', os.getcwd())
 #
 # SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
-# # SCHEDULER = 'ReSpider.component.redis.scheduler.RedisScheduler'  # redis 队列
+# # SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
 #
 # DOWNLOADER = 'ReSpider.core.downloader.Downloader'
 # SSL_FINGERPRINT = False  # ssl指纹
@@ -20,11 +20,15 @@
 #
 # # 管道
 # ITEM_PIPELINES = {
-#     'ReSpider.pipelines.files.CSVPipeline': 4,
-#     'ReSpider.pipelines.redis.RedisPipeline': 5,
-#     'ReSpider.pipelines.files.FilesPipeline': 6,
-#     'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
+#     'ReSpider.pipelines.file.CSVPipeline': 4,
+#     'ReSpider.pipelines.file.FilePipeline': 4,
+#     # 'ReSpider.pipelines.redis.RedisPipeline': 5,
+#     # 'ReSpider.pipelines.mysql.MySQLPipeline': 6
+#     # 'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
 # }
+#
+# # 默认User-Agent
+# DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
 #
 # # 下载中间件
 # DOWNLOADER_MIDDLEWARES = {
@@ -41,6 +45,13 @@
 # # 下载延迟
 # DOWNLOAD_DELAY = 0
 #
+# # MySQL配置
+# MYSQL_HOST = '127.0.0.1'
+# MYSQL_PORT = 3306
+# MYSQL_DB = 'crawler'
+# MYSQL_USERNAME = 'root'
+# MYSQL_PASSWORD = 'root'
+#
 # # MongoDB配置
 # MONGODB_HOST = '127.0.0.1'
 # MONGODB_PORT = 27017
@@ -52,6 +63,17 @@
 # REDIS_PASSWORD = None  # 'admin000'
 # REDIS_DB = 0
 #
+# # 自定义任务队列
+# REDIS_TASK_QUEUE = None
+# # 自定义去重
+# REDIS_DUPE_FILTERS = None
+# # 保存失败任务
+# SAVE_FAILED_TASK = True
+# # 自定义失败任务队列
+# FAILED_TASK_QUEUE = None
+# # 重试失败任务
+# RETRY_FAILED_TASK = False
+#
 # # 日志配置
 # LOG_NAME = None
 # LOG_PATH = f'{WORKER_PATH}/log/'  # 保存日志目录
@@ -59,8 +81,11 @@
 # LOG_TO_FILE = False  # 保存到文件
 # LOG_MODE = 'w'  # 写文件模式
 # LOG_ENCODING = 'utf-8'  # log文件编码
-# LOG_LEVEL_CONSOLE = 'DEBUG'
-# LOG_LEVEL_FILE = 'WARNING'
+# LOG_LEVEL_CONSOLE = 'DEBUG'  # 控制台输出log等级
+# LOG_LEVEL_FILE = 'WARNING'  # 文件输出log等级
+# LOG_FILE_SIZE = 5 * 1024 * 1024  # 每个日志文件大小, bytes
+# LOG_BACKUP_COUNT = 7  # 日志文件保存数量
+#
 #
 # # 请求次数统计
 # REQUEST_COUNT_INTERVAL_TIME = 60

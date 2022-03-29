@@ -46,7 +46,7 @@ class DownloadHandler(LogMixin):
         kwargs.setdefault('allow_redirects', request.allow_redirects)
         kwargs.setdefault('timeout', aiohttp.ClientTimeout(total=request.timeout))
         kwargs.setdefault('proxy', request.proxy)
-        if setting.__dict__.get('SSL_FINGERPRINT', False) is True:
+        if setting.SSL_FINGERPRINT:
             kwargs.setdefault('ssl', sslgen())
 
         async with aiohttp.ClientSession(cookies=request.cookies,
