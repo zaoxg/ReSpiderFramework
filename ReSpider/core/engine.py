@@ -55,7 +55,6 @@ class Engine(LogMixin):
             self.loop.run_until_complete(self._next_request(spider))
         except Exception as e:
             self.logger.error('[execute] %s' % e, exc_info=True)
-            # print('execute ', e)
         finally:
             self.loop.run_until_complete(self.loop.shutdown_asyncgens())
             # self.loop.close()

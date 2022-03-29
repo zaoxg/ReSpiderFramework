@@ -47,7 +47,7 @@ class MiddlewareManager(LogMixin):
 
     def __init__(self, spider=None, *middlewares, **kwargs):
         super().__init__(spider)
-        self.logger.debug('MIDDLEWARES START INIT ...')
+        self.logger.debug('[%s] START INIT ...' % getattr(self, '__class__').__name__)
         self._observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self)
@@ -56,10 +56,10 @@ class MiddlewareManager(LogMixin):
         self.methods = defaultdict(deque)
         for middleware in middlewares:
             mwname = middleware.__class__.__name__
-            self.logger.debug('"%s" MIDDLEWARE START INIT ...' % mwname)
+            self.logger.debug('"%s" start init ...' % mwname)
             self._add_middleware(middleware)
-            self.logger.debug('"%s" MIDDLEWARE INIT SUCCESS.' % mwname)
-        self.logger.debug('MIDDLEWARES INIT SUCCESS.')
+            self.logger.debug('"%s" init success.' % mwname)
+        self.logger.debug('[%s] INIT SUCCESS.' % getattr(self, '__class__').__name__)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):

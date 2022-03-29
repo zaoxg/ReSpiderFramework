@@ -15,7 +15,7 @@ class Downloader(LogMixin):
         # if self._observer:
         #     self._observer.register(self)
         self.handler = DownloadHandler.from_crawler(spider, observer=self._observer)
-        self.middleware = DownloaderMiddlewareManager.from_crawler(spider, observer=self._observer)
+        self.middleware = DownloaderMiddleware.from_crawler(spider, observer=self._observer)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
@@ -41,7 +41,14 @@ class Downloader(LogMixin):
         """
         self._observer.request_count = 1
         # 经过请求中间件处理
-        process_req = await self.middleware.process_request(request)
+        try:
+            process_req = await self.middleware.process_request(request)
+        except Exception as e:
+            # 在出现异常时，任务将重新入队
+            self.logger.warning(
+                '[%s] Call %s: %s' % (self.__class__.__name__, request, e)
+            )
+            return request
         process_resp = None
         if isinstance(process_req, Request):
             # 只有request是<Request>时才会发送
@@ -56,7 +63,7 @@ class Downloader(LogMixin):
         return process_resp
 
 
-class DownloaderMiddlewareManager(MiddlewareManager):
+class DownloaderMiddleware(MiddlewareManager):
 
     name = 'downloader middlewares manager'
 
@@ -80,12 +87,13 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         :param request:
         :return:
         """
-        if self.methods['process_request']:
-            for mwfn in self.methods['process_request']:
-                request = await mwfn(request)
-                if isinstance(request, Response):
-                    # 返回的是<Response>就直接返回
-                    return request
+        if not self.methods['process_request']:
+            return request
+        for mwfn in self.methods['process_request']:
+            request = await mwfn(request)
+            if isinstance(request, Response):
+                # 返回的是<Response>就直接返回
+                return request
         return request
 
     async def process_response(self, request, response):
@@ -96,12 +104,13 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         :return:
         """
         # 过中间件
-        if self.methods['process_response']:
-            for mwfn in self.methods['process_response']:
-                response = await mwfn(request, response)  # 当异常时这个response是 <Request>
-                if isinstance(response, Request):
-                    # 返回的是<Request>就直接返回
-                    return request
+        if not self.methods['process_response']:
+            return response
+        for mwfn in self.methods['process_response']:
+            response = await mwfn(request, response)  # 当异常时这个response是 <Request>
+            if isinstance(response, Request):
+                # 返回的是<Request>就直接返回
+                return request
         if isinstance(response, Response):
             return response
         return response
