@@ -6,13 +6,15 @@
 import ReSpider.setting as setting
 import aiomysql
 import asyncio
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MysqlDB:
     def __init__(self,
                  host=None, port=None,
                  user=None, password=None,
-                 db=None):
+                 db=None, loop=None, **kwargs):
         if host is None:
             self._host = setting.MYSQL_HOST
         if port is None:
@@ -24,17 +26,18 @@ class MysqlDB:
         if db is None:
             self._db = setting.MYSQL_DB
         self._pool = None
+        self._loop = loop
         self.get_mysql()
 
     def get_mysql(self):
-        loop = asyncio.get_event_loop()
+        loop = self._loop or asyncio.get_event_loop()
         task = loop.create_task(self.get_connect())
         loop.run_until_complete(task)
 
     async def get_connect(self):
         self._pool = await aiomysql.create_pool(
-            minsize=5,  # 连接池最小值
-            maxsize=10,  # 连接池最大值
+            minsize=1,  # 连接池最小值
+            maxsize=32,  # 连接池最大值
             host=self._host,
             port=self._port,
             user=self._username,
@@ -43,38 +46,72 @@ class MysqlDB:
             autocommit=False,  # 自动提交模式
         )
 
+    @property
+    def pool(self):
+        if self._pool is None:
+            self.get_mysql()
+        return self._pool
+
     async def get_cursor(self):
-        conn = await self._pool.acquire()
-        cur = await conn.cursor(aiomysql.DictCursor)
-        return conn, cur
+        conn = await self.pool.acquire()
+        cursor = await conn.cursor()
+        return conn, cursor
 
-    async def excute(self, sql):
-        conn, cur = await self.get_cursor()
+    def close_mysql(self):
+        loop = self._loop or asyncio.get_event_loop()
+        task = loop.create_task(self.close_connect())
+        loop.run_until_complete(task)
+
+    async def close_connect(self):
+        self._pool.close()
+        await self._pool.wait_closed()
+
+    async def release(self, conn=None):
+        await self.pool.release(conn)
+
+    async def execute(self, sql):
+        affect_count = None
+        conn, cursor = await self.get_cursor()
         await conn.begin()
         try:
-            await cur.execute(sql)
+            affect_count = await cursor.execute(sql)
             await conn.commit()
-        except Exception:
+        except Exception as e:
             await conn.rollback()  # 回滚
+            logger.warning(e, exc_info=True)
         finally:
-            if cur:
-                await cur.close()
+            if cursor:
+                await cursor.close()
             # 释放掉conn,将连接放回到连接池中
-            await self._pool.release(conn)
+            await self.release(conn)
+        return affect_count
 
-    def add(self, sql):
-        conn, cur = await self.get_cursor()
-        await conn.begin()
+    async def executemany(self, sql, datas):
+        affect_count = None
+        conn, cursor = await self.get_cursor()
         try:
-            await cur.execute(sql)
+            affect_count = await cursor.executemany(sql, datas)
             await conn.commit()
-        except Exception:
-            await conn.rollback()  # 回滚
+        except Exception as e:
+            await conn.rollback()
+            logger.warning(e, exc_info=True)
         finally:
-            if cur:
-                await cur.close()
-            # 释放掉conn,将连接放回到连接池中
-            await self._pool.release(conn)
+            await self.release(conn)
+        return affect_count
+
+    async def add(self, sql):
+        return await self.execute(sql)
+
+    async def add_batch(self, sql, datas):
+        """
+        @summary: 批量添加数据
+        ---------
+        @ param sql: insert ignore into (xxx,xxx) values (%s, %s, %s)
+        # param datas: 列表 [{}, {}, {}]
+        ---------
+        @result: 添加行数
+        """
+        return await self.executemany(sql, datas)
 
     def delete(self):
         pass
@@ -84,8 +121,3 @@ class MysqlDB:
 
     def find(self):
         pass
-
-
-if __name__ == '__main__':
-    mysql = MysqlDB()
-    mysql.add()

@@ -10,6 +10,7 @@ import time
 import datetime
 import base64
 import pickle
+from typing import List
 
 
 def get_current_timestamp():
@@ -342,6 +343,75 @@ def make_sql_update(table, data, condition):
     condition = ' AND '.join([f'%s=%r' % (k, v) for k, v in condition.items()])
     sentence.format(table=table, key_values=key_values, condition=condition)
     return sentence
+
+
+def make_batch_sql(
+    table, datas, auto_update=False, update_columns=(), update_columns_value=()
+):
+    """
+    @summary: 生产批量的sql
+    ---------
+    @param table:
+    @param datas: 表数据 [{...}]
+    @param auto_update: 使用的是replace into， 为完全覆盖已存在的数据
+    @param update_columns: 需要更新的列 默认全部，当指定值时，auto_update设置无效，当duplicate key冲突时更新指定的列
+    @param update_columns_value: 需要更新的列的值 默认为datas里边对应的值, 注意 如果值为字符串类型 需要主动加单引号， 如 update_columns_value=("'test'",)
+    ---------
+    @result:
+    """
+    if not datas:
+        return
+
+    keys = list(datas[0].keys())
+    values_placeholder = ["%s"] * len(keys)
+
+    values = []
+    for data in datas:
+        value = []
+        for key in keys:
+            current_data = data.get(key)
+            current_data = format_sql_value(current_data)
+
+            value.append(current_data)
+
+        values.append(value)
+
+    keys = ["`{}`".format(key) for key in keys]
+    keys = list2str(keys).replace("'", "")
+
+    values_placeholder = list2str(values_placeholder).replace("'", "")
+
+    if update_columns:
+        if not isinstance(update_columns, (tuple, list)):
+            update_columns = [update_columns]
+        if update_columns_value:
+            update_columns_ = ", ".join(
+                [
+                    "`{key}`={value}".format(key=key, value=value)
+                    for key, value in zip(update_columns, update_columns_value)
+                ]
+            )
+        else:
+            update_columns_ = ", ".join(
+                ["`{key}`=values(`{key}`)".format(key=key) for key in update_columns]
+            )
+        sql = "insert into `{table}` {keys} values {values_placeholder} on duplicate key update {update_columns}".format(
+            table=table,
+            keys=keys,
+            values_placeholder=values_placeholder,
+            update_columns=update_columns_,
+        )
+    elif auto_update:
+        sql = "replace into `{table}` {keys} values {values_placeholder}".format(
+            table=table, keys=keys, values_placeholder=values_placeholder
+        )
+    else:
+        sql = "insert ignore into `{table}` {keys} values {values_placeholder}".format(
+            table=table, keys=keys, values_placeholder=values_placeholder
+        )
+
+    return sql, values
+
 
 
 '''
