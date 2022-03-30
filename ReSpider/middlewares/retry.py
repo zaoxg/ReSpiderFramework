@@ -55,5 +55,5 @@ class RetryMiddleware(BaseMiddleware):
             request.del_fp = True
             request.do_filter = True
             request.retry_times = 1
-            request.set_fp()  # 重新设置指纹
+            # request.set_fingerprint()  # 重新设置指纹
             return request
