@@ -3,6 +3,10 @@
 # @Author  : ZhaoXiangPeng
 # @File    : log_mixin.py
 
+__all__ = [
+    "LogMixin"
+]
+
 import os
 import logging
 from datetime import datetime

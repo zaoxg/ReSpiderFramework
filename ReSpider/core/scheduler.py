@@ -1,7 +1,5 @@
 import asyncio
-# from asyncio import Queue
-from queue import Queue, PriorityQueue
-from queue import Empty
+from asyncio import PriorityQueue
 from ..extend import LogMixin
 
 
@@ -13,7 +11,6 @@ class Scheduler(LogMixin):
         self._observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self)
-        # print(self._observer.observers())
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
@@ -58,7 +55,7 @@ class Scheduler(LogMixin):
         """
         try:
             request = self.queue.get_nowait()
-        except Empty:
+        except asyncio.queues.QueueEmpty:
             request = None
         # print(type(request))
         return request

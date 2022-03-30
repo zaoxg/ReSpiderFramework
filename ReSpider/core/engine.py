@@ -24,17 +24,17 @@ class Engine(LogMixin):
         self.logger.info('ENGINE START INIT ...')
         self.spider = spider
         # self.settings = spider.settings
+        self.loop = self.observer.loop
+        asyncio.set_event_loop(self.loop)
         self.scheduler = load_object(setting.SCHEDULER).from_crawler(spider, observer=self.observer)
         self.downloader = load_object(setting.DOWNLOADER).from_crawler(spider, observer=self.observer)
         self.pipelines = load_object(setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)
-        self.loop = self.observer.loop
         self.logger.info('ENGINE INIT SUCCESS.')
 
     def start(self):
         self.observer.engine_status = 'START'
         start_time = time.time()
         self.logger.info('IT\'S EXCELLENT. IT\'S FLEXIBLE ...')
-        # self.pipelines.open_spider()
         start_requests = self.spider.start_requests()
         self.execute(self.spider, start_requests)
         self.observer.engine_status = 'STOP'

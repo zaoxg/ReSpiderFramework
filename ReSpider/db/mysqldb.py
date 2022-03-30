@@ -7,6 +7,7 @@ import ReSpider.setting as setting
 import aiomysql
 import asyncio
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,7 +79,11 @@ class MysqlDB:
             await conn.commit()
         except Exception as e:
             await conn.rollback()  # 回滚
-            logger.warning(e, exc_info=True)
+            logger.warning(
+                """
+                error: %s
+                sql:   %s
+                """ % (e, sql), exc_info=True)
         finally:
             if cursor:
                 await cursor.close()
@@ -94,7 +99,11 @@ class MysqlDB:
             await conn.commit()
         except Exception as e:
             await conn.rollback()
-            logger.warning(e, exc_info=True)
+            logger.warning(
+                """
+                error: %s
+                sql:   %s
+                """ % (e, sql), exc_info=True)
         finally:
             await self.release(conn)
         return affect_count
@@ -116,8 +125,19 @@ class MysqlDB:
     def delete(self):
         pass
 
-    def update(self):
-        pass
+    async def update(self, sql):
+        return await self.execute(sql)
 
-    def find(self):
-        pass
+    async def find(self, sql, limit: int = 0, to_json: bool = False):
+        conn, cursor = await self.get_cursor()
+        await cursor.execute(sql)
+        if limit == 1:
+            result = await cursor.fetchone()  # 全部查出来，截取 不推荐使用
+        elif limit > 1:
+            result = await cursor.fetchmany(limit)  # 全部查出来，截取 不推荐使用
+        else:
+            result = await cursor.fetchall()
+        if to_json:
+            columns = [i[0] for i in cursor.description]
+        await self.release(conn)
+        return result
