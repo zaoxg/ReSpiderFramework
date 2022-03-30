@@ -7,7 +7,6 @@ import ReSpider.setting as setting
 import aiomysql
 import asyncio
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -29,6 +28,10 @@ class MysqlDB:
         self._pool = None
         self._loop = loop
         self.get_mysql()
+
+    @classmethod
+    def from_url(cls, url, **kwargs):
+        """解析还是直接传呢"""
 
     def get_mysql(self):
         loop = self._loop or asyncio.get_event_loop()

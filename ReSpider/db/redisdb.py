@@ -23,9 +23,9 @@ class RedisDB:
             self._user_pass = setting.REDIS_PASSWORD
         self._redis = None
         self._db = None
-        self.get_connect()
+        self.get_redis()
 
-    def get_connect(self):
+    def get_redis(self):
         self._pool = redis.ConnectionPool(host=self._host,
                                           port=self._port,
                                           password=self._user_pass,
