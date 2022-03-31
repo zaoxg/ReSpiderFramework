@@ -5,8 +5,10 @@
 
 from .create_spider import CreateSpider
 from .create_project import CreateProject
+from .create_setting import CreateSetting
 
 __all__ = [
     'CreateSpider',
-    'CreateProject'
+    'CreateProject',
+    'CreateSetting',
 ]

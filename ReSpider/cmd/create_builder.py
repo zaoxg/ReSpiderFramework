@@ -3,7 +3,7 @@
 # @Author  : ZhaoXiangPeng
 # @File    : create_builder.py
 
-from .create import CreateSpider, CreateProject
+from .create import *
 import argparse
 
 
@@ -24,6 +24,11 @@ def main():
         "spider_type=2 RedisSpider;",
         metavar=""
     )
+    create.add_argument(
+        '--setting',
+        help='创建全局配置文件' 'ReSpider create --setting',
+        action="store_true"
+    )
 
     args = create.parse_args()
     if args.spider:
@@ -37,6 +42,10 @@ def main():
         except:
             raise ValueError("spider_type error, support 1, 2, 3")
         CreateSpider().create(spider_name, spider_type)
+
     elif args.project:
         CreateProject().create(args.project)
+
+    elif args.setting:
+        CreateSetting().create()
 

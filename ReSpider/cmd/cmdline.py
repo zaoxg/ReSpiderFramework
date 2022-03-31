@@ -20,7 +20,7 @@ def _print_commands():
     print("  ReSpider <command> [options] [args]\n")
     print("Available commands:")
     cmds = {
-        "create": "create project、spider",
+        "create": "create project、spider、setting",
         # "shell": "debug response",
         # "zip": "zip project",
     }
