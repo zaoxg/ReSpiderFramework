@@ -31,6 +31,7 @@ def main():
     )
 
     args = create.parse_args()
+    # print(args)
     if args.spider:
         spider_name, *spider_type = args.spider
         if not spider_type:

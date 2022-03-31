@@ -39,7 +39,7 @@ class CreateSpider:
         else:
             raise ValueError("spider type error, support 1 2 3")
         template_path = os.path.abspath(
-            os.path.join(__file__, '../../../../templates', template)
+            os.path.join(__file__, '../../../templates', template)
         )
         with open(template_path, 'r', encoding='utf-8') as file:
             spider_template = file.read()

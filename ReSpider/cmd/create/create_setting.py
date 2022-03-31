@@ -15,8 +15,8 @@ class CreateSetting:
                 print("取消覆盖  退出")
                 return
 
-            template_file_path = os.path.abspath(
-                os.path.join(__file__, "../../../../templates/project_template/setting.py")
-            )
-            shutil.copy(template_file_path, "./", follow_symlinks=False)
-            print("配置文件生成成功, 如有旧版setting文件(settings.py), 请删除.")
+        template_file_path = os.path.abspath(
+            os.path.join(__file__, "../../../templates/project_template/setting.py")
+        )
+        shutil.copy(template_file_path, "./", follow_symlinks=False)
+        print("配置文件生成成功, 如有旧版setting文件(settings.py), 请删除.")

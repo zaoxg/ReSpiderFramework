@@ -35,7 +35,7 @@ class CreateProject:
             print('%s 项目已经存在' % project_name)
         else:
             template_path = os.path.abspath(
-                os.path.join(__file__, '../../../../templates/project_template')
+                os.path.join(__file__, '../../../templates/project_template')
             )
             shutil.copytree(
                 template_path, project_name, copy_function=self.copy_callback
