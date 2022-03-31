@@ -10,7 +10,7 @@ import time
 import datetime
 import base64
 import pickle
-from typing import List
+import functools
 
 
 def get_current_timestamp():
@@ -412,6 +412,18 @@ def make_batch_sql(
 
     return sql, values
 
+
+def retry(retry_times=3):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(retry_times):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    print(e)
+        return wrapper
+    return decorator
 
 
 '''

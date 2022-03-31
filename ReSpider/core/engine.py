@@ -11,7 +11,7 @@ from ReSpider.http import Request
 from ReSpider.extend.misc import load_object
 from ReSpider.extend.logger import LogMixin
 # from ReSpider.extend.item import Item
-from ReSpider.core.item import Item
+from ReSpider.item import Item
 import functools
 import ReSpider.utils.tools as tools
 

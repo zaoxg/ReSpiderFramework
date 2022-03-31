@@ -10,11 +10,8 @@ import ReSpider.setting as setting
 from ReSpider.http import Response
 from ReSpider.extend.logger import LogMixin
 from ._ssl import SSLFactory
-
 if sys.version_info >= (3, 8):
     from asyncio.exceptions import TimeoutError
-    if sys.platform.startswith('win'):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 else:
     from asyncio import TimeoutError
 
@@ -27,7 +24,6 @@ class DownloadHandler(LogMixin):
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        # cls.settings = spider.settings
         cls._observer: object = kwargs.pop('observer', None)
         return cls(spider, **kwargs)
 

@@ -5,7 +5,7 @@
 
 import ReSpider.setting as setting
 from ..extend.logger import LogMixin
-from ..extend.item import Item
+from ..item import Item
 from ..middlewares import MiddlewareManager
 from ..core.observer import Observer
 

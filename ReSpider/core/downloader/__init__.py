@@ -1,6 +1,6 @@
 from .handlers import DownloadHandler
 from ReSpider.http import Request, Response
-from ...middlewares import MiddlewareManager
+from ReSpider.middlewares import MiddlewareManager
 # from .middleware import DownloaderMiddlewareManager
 from ReSpider.extend.logger import LogMixin
 from ReSpider.core.observer import Observer

@@ -47,7 +47,7 @@ class MiddlewareManager(LogMixin):
 
     def __init__(self, spider=None, *middlewares, **kwargs):
         super().__init__(spider)
-        self.logger.debug('[%s] START INIT ...' % getattr(self, '__class__').__name__)
+        self.logger.debug('%s START INIT ...' % getattr(self, '__class__').__name__)
         self._observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self)
@@ -59,7 +59,7 @@ class MiddlewareManager(LogMixin):
             self.logger.debug('"%s" start init ...' % mwname)
             self._add_middleware(middleware)
             self.logger.debug('"%s" init success.' % mwname)
-        self.logger.debug('[%s] INIT SUCCESS.' % getattr(self, '__class__').__name__)
+        self.logger.debug('%s INIT SUCCESS.' % getattr(self, '__class__').__name__)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):

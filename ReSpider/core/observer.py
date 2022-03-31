@@ -8,6 +8,9 @@ import asyncio
 import time
 from ReSpider.extend.logger import LogMixin
 import ReSpider.setting as setting
+import sys
+if sys.platform.startswith('win'):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # 被观察者列表
 # 	调度器
@@ -38,7 +41,6 @@ OPERATION_TIME = 20  # 操作间隔时间
 
 class Observer(LogMixin):
     loop = asyncio.get_event_loop()
-    asyncio.set_event_loop(loop)
     _task_count = 0
     __observers = {}  # 主要的被观察对象 scheduler, middleware manager(download, pipeline)
     __pipelines = {}  # 被观察的 pipeline obj 列表

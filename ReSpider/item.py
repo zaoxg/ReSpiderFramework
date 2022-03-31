@@ -181,7 +181,7 @@ class IoItem(MyBytes, Item):
     data_directory: str = None
     filename: str = None
     filetype: str = None
-    mode: str = 'wb'  # bytes 写入 wb
+    mode = 'wb'  # bytes 写入 wb
     encoding: str = None
 
     def set_attribute(self,
@@ -200,7 +200,7 @@ class FileItem(MyStr, Item):
     data_directory: str = None
     filename: str = None
     filetype: str = None
-    mode: str = 'w'
+    mode = 'w'
     encoding: str = 'utf-8'
 
     def set_attribute(self,
@@ -221,7 +221,7 @@ class CSVItem(dict, Item):
     data_directory: str = None
     filename: str = None
     filetype: str = 'csv'
-    mode: str = 'a'
+    mode = 'a'
     encoding: str = 'utf-8'
     __fieldnames = None
 
@@ -259,7 +259,7 @@ class CSVListItem(MyArray, Item):
     data_directory: str = None
     filename: str = None
     filetype: str = 'csv'
-    mode: str = 'a'
+    mode = 'a'
     encoding: str = 'utf-8'
     __fieldnames = None
 

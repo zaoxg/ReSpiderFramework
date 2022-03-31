@@ -2,8 +2,8 @@ import os
 import re
 import ReSpider.setting as setting
 from ReSpider.pipelines import BasePipeline
-from ReSpider.extend.item import CSVItem, CSVItems, FileItem
-from ReSpider.core.item import MyArray
+# from ReSpider.extend.item import FileItem
+from ReSpider.item import CSVListItem, CSVItem, FileItem
 import aiofiles
 import csv
 from aiocsv import AsyncDictWriter
@@ -17,8 +17,8 @@ class FilePipeline(BasePipeline):
 
     async def process_item(self, item: FileItem, spider):
         item.filename = re.sub(r'[\\/:*?"<>|]', '`', item.filename)
-        file = f'{item.filename}.{item.filetype}'
-        data_path = item.data_directory or setting.DATA_PATH
+        file: str = f'{item.filename}.{item.filetype}'
+        data_path: str = item.data_directory or setting.DATA_PATH
         self.logger.debug(f'{data_path}/{file}')
         if not os.path.exists(data_path):
             os.mkdir(data_path)
@@ -27,11 +27,8 @@ class FilePipeline(BasePipeline):
         if mode[-1] == 'b':
             encoding = None
         async with aiofiles.open(f'{data_path}/{file}', mode=mode, encoding=encoding) as fp:
-            if isinstance(item, FileItem):
-                await fp.write(item.get('source'))  # 兼容旧版本
-            else:
-                await fp.write(item.data)
-        return item    # Todo 为了兼容后续版本数据处理的pipeline
+            await fp.write(item.data)
+        return item
 
 
 class CSVPipeline(BasePipeline):
@@ -61,18 +58,16 @@ class CSVPipeline(BasePipeline):
             if self.column_index.get(filename, False) is False:  # 表头是否写入过使用<dict>来存储
                 await self.writer.writeheader()
                 self.column_index[filename] = True
-            if isinstance(item, CSVItems):  # 传入多个item
-                await self.writer.writerows(item.get('rows'))
-            elif isinstance(item, MyArray):
+            if isinstance(item, CSVListItem):
                 await self.writer.writerows(item)
             else:
                 await self.writer.writerow(item)
         return item
 
     def _get_fieldnames(self, item):
-        if isinstance(item, CSVItems):
+        if not item.fieldnames:
             try:
-                fieldnames = item['rows'][0].keys()
+                fieldnames = item[0].keys()
             except IndexError:
                 self.logger.warning('<CSVItems Type> "rows" Field is Empty')
                 return None
