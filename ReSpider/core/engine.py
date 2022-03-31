@@ -25,7 +25,6 @@ class Engine(LogMixin):
         self.spider = spider
         # self.settings = spider.settings
         self.loop = self.observer.loop
-        asyncio.set_event_loop(self.loop)
         self.scheduler = load_object(setting.SCHEDULER).from_crawler(spider, observer=self.observer)
         self.downloader = load_object(setting.DOWNLOADER).from_crawler(spider, observer=self.observer)
         self.pipelines = load_object(setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)

@@ -9,8 +9,12 @@ import asyncio
 import logging
 logger = logging.getLogger(__name__)
 
+__all__ = [
+    "AsyncMysqlDB"
+]
 
-class MysqlDB:
+
+class AsyncMysqlDB:
     def __init__(self,
                  host=None, port=None,
                  user=None, password=None,

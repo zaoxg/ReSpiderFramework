@@ -7,6 +7,10 @@
 import ReSpider.setting as setting
 import redis
 
+__all__ = [
+    "RedisDB"
+]
+
 
 class RedisDB:
     def __init__(self,
