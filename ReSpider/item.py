@@ -3,6 +3,9 @@
 # @Author  : ZhaoXiangPeng
 # @File    : item.py
 
+from collections import UserList, UserString
+import json
+
 __all__ = [
     "Item",
     "DataItem",
@@ -17,9 +20,6 @@ __all__ = [
     "MysqlItem",
     "MysqlListItem"
 ]
-
-from collections import UserList, UserString, UserDict
-import json
 
 
 class ItemMetaclass(type):
