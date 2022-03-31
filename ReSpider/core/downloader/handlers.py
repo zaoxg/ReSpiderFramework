@@ -7,9 +7,9 @@ import sys
 import asyncio
 import aiohttp
 import ReSpider.setting as setting
+from ReSpider.http import Response
+from ReSpider.extend.logger import LogMixin
 from ._ssl import SSLFactory
-from ...http import Response
-from ...extend.logger import LogMixin
 
 if sys.version_info >= (3, 8):
     from asyncio.exceptions import TimeoutError
@@ -62,7 +62,7 @@ class DownloadHandler(LogMixin):
                                 request=request)
             except TimeoutError as timeout_error:
                 self._observer.request_count_fail = 1
-                self.logger.warning(timeout_error)
+                self.logger.warning('TimeoutError: %s' % timeout_error)
                 return Response(url=request.url,
                                 status=601,
                                 request=request,

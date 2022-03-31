@@ -6,7 +6,7 @@
 import math
 import asyncio
 import time
-from ReSpider.extend import LogMixin
+from ReSpider.extend.logger import LogMixin
 import ReSpider.setting as setting
 
 # 被观察者列表

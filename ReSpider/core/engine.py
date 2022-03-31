@@ -8,8 +8,8 @@ import time
 import ReSpider.setting as setting
 from ReSpider.core.observer import Observer
 from ReSpider.http import Request
-from ReSpider.extend import load_object
-from ReSpider.extend import LogMixin
+from ReSpider.extend.misc import load_object
+from ReSpider.extend.logger import LogMixin
 # from ReSpider.extend.item import Item
 from ReSpider.core.item import Item
 import functools
@@ -23,7 +23,6 @@ class Engine(LogMixin):
         super().__init__(spider)
         self.logger.info('ENGINE START INIT ...')
         self.spider = spider
-        # self.settings = spider.settings
         self.loop = self.observer.loop
         self.scheduler = load_object(setting.SCHEDULER).from_crawler(spider, observer=self.observer)
         self.downloader = load_object(setting.DOWNLOADER).from_crawler(spider, observer=self.observer)

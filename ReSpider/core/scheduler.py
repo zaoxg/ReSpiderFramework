@@ -1,6 +1,6 @@
 import asyncio
 from asyncio import PriorityQueue
-from ..extend import LogMixin
+from ..extend.logger import LogMixin
 
 
 class Scheduler(LogMixin):
