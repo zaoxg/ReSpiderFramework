@@ -24,7 +24,7 @@
 #     'ReSpider.pipelines.file.FilePipeline': 4,
 #     # 'ReSpider.pipelines.redis.RedisPipeline': 5,
 #     # 'ReSpider.pipelines.mysql.MySQLPipeline': 6
-#     # 'ReSpider.pipelines.mongodb.MongoDBPipeline': 8
+#     'ReSpider.pipelines.mongo.MongoPipeline': 8
 # }
 #
 # # 默认User-Agent
@@ -32,9 +32,9 @@
 #
 # # 下载中间件
 # DOWNLOADER_MIDDLEWARES = {
-#     'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
+#     # 'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
 #     # 'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 5,
-#     'ReSpider.middlewares.retry.RetryMiddleware': 8
+#     # 'ReSpider.middlewares.retry.RetryMiddleware': 8
 # }
 #
 # # 并发请求
@@ -53,9 +53,13 @@
 # MYSQL_PASSWORD = 'root'
 #
 # # MongoDB配置
+#
 # MONGODB_HOST = '127.0.0.1'
 # MONGODB_PORT = 27017
 # MONGODB_DB = 'data_temp'
+# MONGODB_USERNAME = None
+# MONGODB_PASSWORD = None
+# MONGODB_URL = None  # 如果需要使用密码, 需要使用url: mongodb://username:password@host:port
 #
 # # Redis配置
 # REDIS_HOST = '127.0.0.1'
