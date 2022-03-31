@@ -36,10 +36,10 @@ class DownloadHandler(LogMixin):
         kwargs = {}
         if request.headers:
             headers = request.headers
-        elif setting.__dict__.get('headers', False):
-            headers = setting.__dict__.get('headers')
         else:
-            headers = {}
+            headers = {
+                'User-Agent': setting.DEFAULT_USER_AGENT
+            }
         kwargs.setdefault('headers', headers)
         kwargs.setdefault('params', request.params)
         kwargs.setdefault('data', request.data)
