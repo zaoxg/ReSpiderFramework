@@ -1,7 +1,7 @@
 import ReSpider.setting as setting
+from ReSpider.item import DataListItem, DataItem
 from . import BasePipeline
 from ..db.mongodb import AsyncMongoDB as MongoDB
-from ..core.item import DataListItem, DataItem
 
 __all__ = [
     "MongoPipeline"

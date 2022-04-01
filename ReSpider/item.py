@@ -156,7 +156,7 @@ class MyStr(UserString):
 
 
 class DataItem(dict, Item):
-    pipeline = 'MongoDBPipeline'
+    pipeline = 'MongoPipeline'
     collection = None
 
     def __init__(self, initdict=None, collection=None, **kwargs):
@@ -169,7 +169,7 @@ class DataItem(dict, Item):
 
 
 class DataListItem(MyArray, Item):
-    pipeline = 'MongoDBPipeline'
+    pipeline = 'MongoPipeline'
     collection = None
 
     def set_attribute(self, collection=None, **kwargs):
