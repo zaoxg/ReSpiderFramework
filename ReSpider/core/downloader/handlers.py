@@ -4,7 +4,6 @@
 # @File    : handlers.py
 
 import sys
-import asyncio
 import aiohttp
 import ReSpider.setting as setting
 from ReSpider.http import Response

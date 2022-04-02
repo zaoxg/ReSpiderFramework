@@ -18,7 +18,7 @@ from ReSpider.core.spiders import Crawler
 
 class Core:
 
-    async def main_stream(self, request: Request, spider: Crawler, semaphore):
+    async def single_flow(self, request: Request, spider: Crawler, semaphore):
         # 获取任务
         # 处理请求
         # 发送请求
@@ -28,6 +28,10 @@ class Core:
         semaphore.release()  # 释放锁
         if response:
             await self.process_response(request, response, spider)
+
+    async def next_request(self):
+        """从任务队列获取一个请求, 需重写"""
+        raise NotImplementedError
 
     async def process_request(self, request: Request, spider: Crawler):
         raise NotImplementedError
@@ -172,12 +176,15 @@ class Engine(Core, LogMixin):
         self._init_start_request(start_requests)
         self.logger.info('TASK INIT SUCCESS.')
         try:
-            self.loop.run_until_complete(self._next_request(spider))
+            self.loop.run_until_complete(
+                # 运行住流程, 由主流程创建单一任务
+                self.start_master_flow(spider)
+            )
         except Exception as e:
             self.logger.error('[execute] %s' % e, exc_info=True)
         finally:
-            self.loop.run_until_complete(self.loop.shutdown_asyncgens())
-            # self.loop.close()
+            self.loop.run_until_complete(
+                self.loop.shutdown_asyncgens())
             self.loop.stop()
             self.logger.info('THE END.')
 
@@ -185,7 +192,7 @@ class Engine(Core, LogMixin):
     async def heart_beat(cls):
         await asyncio.sleep(setting.HEART_BEAT_TIME)
 
-    async def _next_request(self, spider):
+    async def start_master_flow(self, spider):
         """
         不断的获取请求
         :param spider:
@@ -194,7 +201,7 @@ class Engine(Core, LogMixin):
         task_limit = setting.TASK_LIMIT or setting.CONCURRENT_REQUESTS
         semaphore = asyncio.Semaphore(value=task_limit)
         while True:
-            request = await self.scheduler.next_request()
+            request = await self.next_request()
             if request is None:
                 await self.heart_beat()
                 tasks = asyncio.all_tasks(self.loop)
@@ -215,7 +222,7 @@ class Engine(Core, LogMixin):
             await asyncio.sleep(setting.DOWNLOAD_DELAY or 0)
             # 创建一个任务
             self.loop.create_task(
-                self.main_stream(
+                self.single_flow(
                     request, spider, semaphore)
             )
 
@@ -238,19 +245,17 @@ class Engine(Core, LogMixin):
         for start_request in start_requests or []:
             self._add_task_to_scheduler(request=start_request)
 
-    def _next_request_from_scheduler(self, spider):
-        request = self.scheduler.next_request()
-        if not request:
-            return
-        return request
-
     @classmethod
-    def _set_request_retry(cls, req):
+    def _set_request_retry(cls, req: Request) -> Request:
         req.retry_times += 1
         return req
 
     def _add_task_to_scheduler(self, request):
         self.scheduler.enqueue_request(request)
+
+    async def next_request(self) -> Request:
+        request = await self.scheduler.next_request()
+        return request
 
     async def process_request(
             self, request: Request, spider) -> Response:
@@ -285,7 +290,7 @@ class Engine(Core, LogMixin):
         if isinstance(exception, TypeError):
             self.logger.error(exception, exc_info=True)
         elif isinstance(exception, NotImplementedError):
-            self.logger.warning('需要重写')
+            self.logger.warning(exception)
             raise exception
         else:
             if request.retry:
