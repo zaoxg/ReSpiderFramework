@@ -13,11 +13,12 @@ from ReSpider.extend.misc import load_object
 from ReSpider.extend.logger import LogMixin
 from ReSpider.item import Item
 import ReSpider.utils.tools as tools
+from ReSpider.core.spiders import Crawler
 
 
 class Core:
 
-    async def main_stream(self, request: Request, spider, semaphore):
+    async def main_stream(self, request: Request, spider: Crawler, semaphore):
         # 获取任务
         # 处理请求
         # 发送请求
@@ -28,17 +29,17 @@ class Core:
         if response:
             await self.process_response(request, response, spider)
 
-    async def process_request(self, request: Request, spider):
+    async def process_request(self, request: Request, spider: Crawler):
         raise NotImplementedError
 
     async def process_response(
             self,
-            request: Request, response: Response, spider=None):
+            request: Request, response: Response, spider: Crawler = None):
         """
         统一处理 Response, 成功进入正常的处理流程, 否则到处理异常请求的流程
         :param request: 请求, 如果是异常响应, 需要把请求重新入队列
-        :param response: Response
-        :param spider: Spider对象, 部分组件需要使用spider的属性
+        :param response: <Response>
+        :param spider: <Spider>, 部分组件需要使用spider的属性
         :return:
         """
         if response:
@@ -52,7 +53,7 @@ class Core:
     async def process_succeed_response(
             self,
             request: Request, response: Response,
-            spider=None):
+            spider: Crawler = None):
         """
         使用定义的 callback 处理响应
         :param response: success Response
@@ -81,15 +82,14 @@ class Core:
             elif isinstance(callback_result, Coroutine):
                 pass
             else:
-                print('process_succeed_response: else')
                 pass
 
         except Exception as exception:
-            await self.handle_callback_error(request, exception)
+            await self.handle_callback_error(request, exception, spider)
 
     async def process_failed_response(
             self, request: Request, response: Response,
-            spider=None):
+            spider: Crawler = None):
         """
         处理失败的响应, 需要重写
         :param request:
@@ -100,7 +100,7 @@ class Core:
         pass
 
     async def process_callback_result(
-            self, callback_result, spider):
+            self, callback_result, spider: Crawler):
         """
         处理回调函数的结果, 上一层是一个循环
         :param callback_result: 回调函数的返回结果
@@ -129,7 +129,7 @@ class Core:
     async def handle_callback_item(self, item: Item, spider):
         raise NotImplementedError
 
-    async def handle_callback_error(self, request: Request, exception: Exception):
+    async def handle_callback_error(self, request: Request, exception: Exception, spider: Crawler = None):
         raise NotImplementedError
 
 
@@ -219,22 +219,6 @@ class Engine(Core, LogMixin):
                     request, spider, semaphore)
             )
 
-    async def process_request(
-            self, request: Request, spider) -> Response:
-        """返回值必须是 <Response>
-        在处理请求时 出现异常 或 处理后非<Response> 返回的是 <Request>
-        """
-        response_result = None
-        try:
-            response_result = await self._process_download(request, spider)
-        except Exception as e:
-            self.logger.warning('Process request: %s' % e, exc_info=True)
-            self._add_task_to_scheduler(request)  # 下载出错时任务重新加入队里
-        else:
-            if isinstance(response_result, Response):
-                return response_result
-        self._add_task_to_scheduler(request)
-
     async def _process_download(self, request: Request, spider=None):
         """
         下载请求,
@@ -244,37 +228,6 @@ class Engine(Core, LogMixin):
         """
         response = await self.downloader.fetch(request)
         return response
-
-    async def handle_callback_item(self, item: Item, spider):
-        """处理回调函数返回的Item, 重写"""
-        await self.pipelines.process_chain(
-            'process_item', item, spider
-        )
-
-    async def handle_callback_request(self, request: Request):
-        """处理回调函数返回 Request
-        加入任务队列, （Todo 也许需要立马执行而不入队列）
-        """
-        self._add_task_to_scheduler(request)
-
-    async def handle_callback_error(self, request: Request, exception: Exception):
-        """处理异常回调, 错误统一处理, 入需重试则入队列"""
-        if isinstance(exception, TypeError):
-            self.logger.error(exception, exc_info=True)
-        elif isinstance(exception, NotImplementedError):
-            self.logger.warning('需要重写')
-            raise exception
-        else:
-            if request.retry:
-                self._add_task_to_scheduler(
-                    self._set_request_retry(request))
-            self.logger.error(exception, exc_info=True)
-
-    async def process_failed_response(
-            self, request: Request, response: Response,
-            spider=None):
-        """处理错误(失败)的响应"""
-        self._add_task_to_scheduler(request)
 
     def _init_start_request(self, start_requests):
         """
@@ -298,3 +251,50 @@ class Engine(Core, LogMixin):
 
     def _add_task_to_scheduler(self, request):
         self.scheduler.enqueue_request(request)
+
+    async def process_request(
+            self, request: Request, spider) -> Response:
+        """返回值必须是 <Response>
+        在处理请求时 出现异常 或 处理后非<Response> 返回的是 <Request>
+        """
+        response_result = None
+        try:
+            response_result = await self._process_download(request, spider)
+        except Exception as e:
+            spider.logger.warning('Process request: %s' % e, exc_info=True)
+            self._add_task_to_scheduler(request)  # 下载出错时任务重新加入队里
+        else:
+            if isinstance(response_result, Response):
+                return response_result
+        self._add_task_to_scheduler(request)
+
+    async def handle_callback_item(self, item: Item, spider):
+        """处理回调函数返回的Item, 重写"""
+        await self.pipelines.process_chain(
+            'process_item', item, spider
+        )
+
+    async def handle_callback_request(self, request: Request):
+        """处理回调函数返回 Request
+        加入任务队列, （Todo 也许需要立马执行而不入队列）
+        """
+        self._add_task_to_scheduler(request)
+
+    async def handle_callback_error(self, request: Request, exception: Exception, spider=None):
+        """处理异常回调, 错误统一处理, 入需重试则入队列"""
+        if isinstance(exception, TypeError):
+            self.logger.error(exception, exc_info=True)
+        elif isinstance(exception, NotImplementedError):
+            self.logger.warning('需要重写')
+            raise exception
+        else:
+            if request.retry:
+                self._add_task_to_scheduler(
+                    self._set_request_retry(request))
+            spider.logger.error(exception, exc_info=True)
+
+    async def process_failed_response(
+            self, request: Request, response: Response,
+            spider=None):
+        """处理错误(失败)的响应"""
+        self._add_task_to_scheduler(request)
