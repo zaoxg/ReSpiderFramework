@@ -5,18 +5,135 @@
 
 import asyncio
 import time
+from typing import AsyncGenerator, Generator, Coroutine
 import ReSpider.setting as setting
 from ReSpider.core.observer import Observer
-from ReSpider.http import Request
+from ReSpider.http import Request, Response
 from ReSpider.extend.misc import load_object
 from ReSpider.extend.logger import LogMixin
-# from ReSpider.extend.item import Item
 from ReSpider.item import Item
-import functools
 import ReSpider.utils.tools as tools
 
 
-class Engine(LogMixin):
+class Core:
+
+    async def main_stream(self, request: Request, spider, semaphore):
+        # 获取任务
+        # 处理请求
+        # 发送请求
+        # 处理响应
+        # 处理callback
+        response = await self.process_request(request, spider)
+        semaphore.release()  # 释放锁
+        if response:
+            await self.process_response(request, response, spider)
+
+    async def process_request(self, request: Request, spider):
+        raise NotImplementedError
+
+    async def process_response(
+            self,
+            request: Request, response: Response, spider=None):
+        """
+        统一处理 Response, 成功进入正常的处理流程, 否则到处理异常请求的流程
+        :param request: 请求, 如果是异常响应, 需要把请求重新入队列
+        :param response: Response
+        :param spider: Spider对象, 部分组件需要使用spider的属性
+        :return:
+        """
+        if response:
+            await self.process_succeed_response(
+                request, response, spider
+            )
+        else:
+            await self.process_failed_response(
+                request, response, spider)
+
+    async def process_succeed_response(
+            self,
+            request: Request, response: Response,
+            spider=None):
+        """
+        使用定义的 callback 处理响应
+        :param response: success Response
+        :param request:
+        :param spider:
+        :return:
+        """
+        if request.callback:
+            callback = (
+                request.callback
+                if callable(request.callback)
+                else tools.get_method(spider, request.callback)
+            )
+        else:
+            callback = spider.parse
+
+        try:
+            callback_result = callback(response)  # 返回一个生成器
+
+            if isinstance(callback_result, AsyncGenerator):
+                async for result in callback_result:
+                    await self.process_callback_result(result, spider)
+            elif isinstance(callback_result, Generator):
+                for result in callback_result:
+                    await self.process_callback_result(result, spider)
+            elif isinstance(callback_result, Coroutine):
+                pass
+            else:
+                print('process_succeed_response: else')
+                pass
+
+        except Exception as exception:
+            await self.handle_callback_error(request, exception)
+
+    async def process_failed_response(
+            self, request: Request, response: Response,
+            spider=None):
+        """
+        处理失败的响应, 需要重写
+        :param request:
+        :param response: 失败的 Response
+        :param spider:
+        :return:
+        """
+        pass
+
+    async def process_callback_result(
+            self, callback_result, spider):
+        """
+        处理回调函数的结果, 上一层是一个循环
+        :param callback_result: 回调函数的返回结果
+        :param spider:
+        :return:
+        """
+        if callback_result is None:
+            pass
+        elif isinstance(callback_result, Request):
+            # 响应为新的请求, 加入到任务队列
+            await self.handle_callback_request(
+                callback_result
+            )
+
+        elif isinstance(callback_result, Item):
+            await self.handle_callback_item(
+                callback_result, spider
+            )
+
+        elif isinstance(callback_result, Response):
+            pass
+
+    async def handle_callback_request(self, request: Request):
+        raise NotImplementedError
+
+    async def handle_callback_item(self, item: Item, spider):
+        raise NotImplementedError
+
+    async def handle_callback_error(self, request: Request, exception: Exception):
+        raise NotImplementedError
+
+
+class Engine(Core, LogMixin):
     observer = Observer()
 
     def __init__(self, spider):
@@ -24,9 +141,14 @@ class Engine(LogMixin):
         self.logger.info('ENGINE START INIT ...')
         self.spider = spider
         self.loop = self.observer.loop
-        self.scheduler = load_object(setting.SCHEDULER).from_crawler(spider, observer=self.observer)
-        self.downloader = load_object(setting.DOWNLOADER).from_crawler(spider, observer=self.observer)
-        self.pipelines = load_object(setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)
+
+        self.scheduler = load_object(
+            setting.SCHEDULER).from_crawler(spider, observer=self.observer)
+        self.downloader = load_object(
+            setting.DOWNLOADER).from_crawler(spider, observer=self.observer)
+        self.pipelines = load_object(
+            setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)
+
         self.logger.info('ENGINE INIT SUCCESS.')
 
     def start(self):
@@ -76,108 +198,83 @@ class Engine(LogMixin):
             if request is None:
                 await self.heart_beat()
                 tasks = asyncio.all_tasks(self.loop)
-                self.logger.debug(f'Not has new request, Current Event loop has %s task.' % tasks.__len__())
+                self.logger.debug(
+                    f'Not has new request, Current Event loop has %s task.' % tasks.__len__())
+
                 if not self.scheduler.has_pending_requests() and len(tasks) <= 1:
                     if setting.ALWAYS_RUNNING is True:
                         setting.HEART_BEAT_TIME = 60  # 把心跳时间修改为60s
                         self.logger.debug('Continuous Monitoring...')
                         continue
                     else:
-                        self.logger.info('Event loop has %s task, Stop running' % tasks.__len__())
+                        self.logger.info(
+                            'Event loop has %s task, Stop running' % tasks.__len__())
                     break
                 continue
             await semaphore.acquire()  # 同时只能task_limit个去操作scheduler
             await asyncio.sleep(setting.DOWNLOAD_DELAY or 0)
-            task = self.loop.create_task(self._process_request(request, spider, semaphore))
-            task.add_done_callback(functools.partial(self._handle_response_output, request, spider))
+            # 创建一个任务
+            self.loop.create_task(
+                self.main_stream(
+                    request, spider, semaphore)
+            )
 
-    async def _process_request(self, request, spider, semaphore):
+    async def process_request(
+            self, request: Request, spider) -> Response:
+        """返回值必须是 <Response>
+        在处理请求时 出现异常 或 处理后非<Response> 返回的是 <Request>
+        """
+        response_result = None
         try:
-            response = await self._process_download(request, spider)
+            response_result = await self._process_download(request, spider)
         except Exception as e:
             self.logger.warning('Process request: %s' % e, exc_info=True)
-            self._add_task(request)  # 下载出错时任务重新加入队里
+            self._add_task_to_scheduler(request)  # 下载出错时任务重新加入队里
         else:
-            return response
-        finally:
-            # 释放锁
-            semaphore.release()
+            if isinstance(response_result, Response):
+                return response_result
+        self._add_task_to_scheduler(request)
 
-    async def _process_download(self, request, spider=None):
+    async def _process_download(self, request: Request, spider=None):
         """
-        把<Request>添加到<Response>
+        下载请求,
         :param request:
         :param spider:
-        :return:
+        :return: Response or Request
         """
         response = await self.downloader.fetch(request)
         return response
 
-    def _handle_response_output(self, request, spider, future: asyncio.Task):
+    async def handle_callback_item(self, item: Item, spider):
+        """处理回调函数返回的Item, 重写"""
+        await self.pipelines.process_chain(
+            'process_item', item, spider
+        )
+
+    async def handle_callback_request(self, request: Request):
+        """处理回调函数返回 Request
+        加入任务队列, （Todo 也许需要立马执行而不入队列）
         """
-        处理响应
-        :param response:
-        :param request:
-        :param spider:
-        :return:
-        """
-        response = future.result()
-        if isinstance(response, Request):
-            # 返回的response是<Request>的话就加到任务队列
-            self._add_task(response)
-        elif response is None:
-            # 返回的response是 None 的话重新请求
-            self._add_task(request)
+        self._add_task_to_scheduler(request)
+
+    async def handle_callback_error(self, request: Request, exception: Exception):
+        """处理异常回调, 错误统一处理, 入需重试则入队列"""
+        if isinstance(exception, TypeError):
+            self.logger.error(exception, exc_info=True)
+        elif isinstance(exception, NotImplementedError):
+            self.logger.warning('需要重写')
+            raise exception
         else:
-            self.loop.create_task(self._process_response(response, request, spider))
+            if request.retry:
+                self._add_task_to_scheduler(
+                    self._set_request_retry(request))
+            self.logger.error(exception, exc_info=True)
 
-    async def _process_response(self, response, request, spider):
-        """
-        使用定义的 callback 处理响应
-        :param response:
-        :param request:
-        :param spider:
-        :return:
-        """
-        async def _process_result(r):
-            if r is None:
-                pass
-            elif isinstance(r, Request):
-                # 响应为新的请求, 加入到任务队列
-                self._add_task(r)
-            elif isinstance(r, Item):
-                await self.pipelines.process_chain('process_item', r, spider)
-
-        # 获取到回调函数
-        if request.callback:
-            callback = (
-                request.callback
-                if callable(request.callback)
-                else tools.get_method(spider, request.callback)
-            )
-        else:
-            callback = spider.parse
-
-        try:
-            callback_result = callback(response)  # 返回一个生成器
-            if callback_result.__class__.__name__ == 'async_generator':
-                async for result in callback_result:
-                    await _process_result(result)
-            else:
-                for result in callback_result:
-                    await _process_result(result)
-
-        except TypeError as type_error:  # 捕获 callback结果为空的异常
-            if type_error.args[0] == "'NoneType' object is not iterable":
-                self.logger.debug(f'Function "{callback.__qualname__}" has no return value')
-            else:
-                self.logger.error(type_error, exc_info=True)
-
-        except Exception as other_exec:  # 执行回调函数的异常
-            # 先不管有什么问题, 请求重新入队列
-            if request.retry is True:
-                self._add_task(self._set_request_retry(request))
-            self.logger.error('spider parse error: %s' % other_exec, exc_info=True)
+    async def process_failed_response(
+            self, request: Request, response: Response,
+            spider=None):
+        """处理错误(失败)的响应"""
+        self._add_task_to_scheduler(request)
 
     def _init_start_request(self, start_requests):
         """
@@ -186,7 +283,7 @@ class Engine(LogMixin):
         :return:
         """
         for start_request in start_requests or []:
-            self._add_task(request=start_request)
+            self._add_task_to_scheduler(request=start_request)
 
     def _next_request_from_scheduler(self, spider):
         request = self.scheduler.next_request()
@@ -199,5 +296,5 @@ class Engine(LogMixin):
         req.retry_times += 1
         return req
 
-    def _add_task(self, request):
+    def _add_task_to_scheduler(self, request):
         self.scheduler.enqueue_request(request)

@@ -23,7 +23,7 @@ ITEM_PIPELINES = {
     'ReSpider.pipelines.file.CSVPipeline': 4,
     'ReSpider.pipelines.file.FilePipeline': 4,
     # 'ReSpider.pipelines.redis.RedisPipeline': 5,
-    # 'ReSpider.pipelines.mysql.MySQLPipeline': 6
+    'ReSpider.pipelines.mysql.MySQLPipeline': 6
     # 'ReSpider.pipelines.mongo.MongoPipeline': 8
 }
 

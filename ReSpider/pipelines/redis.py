@@ -5,7 +5,7 @@
 
 import ReSpider.setting as setting
 from ..pipelines import BasePipeline
-from ReSpider.core.item import RdsItem
+from ReSpider.item import RdsItem
 import redis
 import json
 

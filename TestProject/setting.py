@@ -46,11 +46,11 @@
 # DOWNLOAD_DELAY = 0
 #
 # # MySQL配置
-# MYSQL_HOST = '127.0.0.1'
-# MYSQL_PORT = 3306
-# MYSQL_DB = 'crawler'
-# MYSQL_USERNAME = 'root'
-# MYSQL_PASSWORD = 'root'
+MYSQL_HOST = '127.0.0.1'
+MYSQL_PORT = 3306
+MYSQL_DB = 'crawler'
+MYSQL_USERNAME = 'root'
+MYSQL_PASSWORD = 'kcidea1509'
 #
 # # MongoDB配置
 #

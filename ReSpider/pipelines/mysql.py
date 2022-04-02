@@ -4,7 +4,7 @@
 # @File    : mysql.py
 
 from ReSpider.utils.tools import make_sql_insert, make_batch_sql
-from ReSpider.core.item import MysqlItem, MysqlListItem
+from ReSpider.item import MysqlItem, MysqlListItem
 from ..db.mysqldb import AsyncMysqlDB as MysqlDB
 from . import BasePipeline
 

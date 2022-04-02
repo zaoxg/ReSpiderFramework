@@ -71,3 +71,5 @@ class PipelineManager(MiddlewareManager):
                 except ValueError as ve:
                     self.logger.error(ve, exc_info=True)
                     raise ValueError(ve)
+                except Exception as exception:
+                    self.logger.error(exception)
