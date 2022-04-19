@@ -21,40 +21,24 @@ class Testing1(ReSpider.Spider):
 
     def start_requests(self):
         req = ReSpider.Request(
-            url='https://blog.csdn.net/babybin/article/details/111624905',
+            # url='https://blog.csdn.net/babybin/article/details/111624905',
+            url='http://127.0.0.1:8000/',
             # priority=0,
-            do_filter=True,
+            do_filter=False,
             callback=self.parse
         )
-        # request = {'url': 'https://blog.csdn.net/babybin/article/details/111624905', 'method': 'GET', 'headers': {}, 'params': {}, 'data': {}, 'cookies': {}, 'allow_redirects': True, 'encoding': 'utf-8', 'proxy': '', 'timeout': 30, 'meta': None, 'priority': 1, 'fingerprint': '990aa332b9e08ba7557766ebab3f6f9b', '_Request__do_filter': True, 'retry': False, 'retry_times': 0, 'max_retry_times': 5, 'callback': self.parse, 'errback': None}
-        # req = ReSpider.Request(**request)
-        # self.logger.warning(req)
-        # print(req.cat())
-        import json
-        # print(json.dumps(req.to_dict, ensure_ascii=False))
         yield req
-        # for url in self.start_urls:
-        #     yield ReSpider.Request(
-        #         url=url,
-        #         method='GET',
-        #         allow_redirects=False,
-        #         do_filter=True
-        #     )
+
+    def parse(self, response):
         # yield ReSpider.Request(
         #     url='https://blog.csdn.net/babybin/article/details/111624905',
-        #     priority=0,
-        #     callback=self.parse
+        #     callback=self.parse2
         # )
-        # if self.start_urls:
-        #     for url in self.start_urls:
-        #         yield ReSpider.Request(url=url)
-
-    async def parse(self, response):
-        yield item.MysqlItem({'name': 'baidu', 'url': 'www.baidu.com'}, table='website')
+        # yield item.MysqlItem({'name': 'baidu', 'url': 'www.baidu.com'}, table='website')
         # print(response.headers)
-        # self.logger.info(response.cookies)
-        self.logger.warning(response.cookiejar)
-        yield response.cookiejar
+        self.logger.info(response)
+        # self.logger.warning(response.cookiejar)
+        # yield response.cookiejar
         # self.logger.info(response.headers)
 
     async def parse2(self, response):
@@ -67,5 +51,5 @@ class Testing1(ReSpider.Spider):
 
 
 if __name__ == '__main__':
-    testing_1 = Testing1(TASK_LIMIT=1)
+    testing_1 = Testing1(TASK_LIMIT=100)
     testing_1.start()

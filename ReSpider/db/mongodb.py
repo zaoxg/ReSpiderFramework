@@ -75,7 +75,7 @@ class AsyncMongoDB:
         except Exception as e:
             logger.warning('error: %s' % e)
         else:
-            affect_count = len(result.inserted_id)
+            affect_count = 1
         return affect_count
 
     async def add_batch(self, coll_name: str, datas: list):

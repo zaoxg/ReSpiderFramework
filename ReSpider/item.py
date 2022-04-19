@@ -167,6 +167,9 @@ class DataItem(dict, Item):
         for key, val in kwargs.items():
             self.__dict__[key] = val
 
+    def __len__(self):
+        return 1
+
 
 class DataListItem(MyArray, Item):
     pipeline = 'MongoPipeline'

@@ -426,6 +426,26 @@ def retry(retry_times=3):
     return decorator
 
 
+def exception_wrapper(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            args[0].logger.warning(e, exec_info=True)
+    return wrapper
+
+
+def spilt_path(path: str) -> tuple:
+    """
+    :param path: 输入一个文件的全路径，将文件名和路径分割开
+    如果给出的是一个目录和文件名，则输出路径和文件名
+    如果给出的是一个目录名，则输出路径和为空文件名
+    仅仅是以 "PATH" 中最后一个 '/' 作为分隔符，分隔后，将索引为0的视为目录（路径），将索引为1的视为文件名
+    """
+    return os.path.split(path)
+
+
 '''
 def exec_js(js_code):
     """

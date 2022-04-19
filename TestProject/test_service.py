@@ -43,7 +43,7 @@ html = """
 
 @app.get('/')
 async def get():
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
     return HTMLResponse(html)
 
 
@@ -54,4 +54,4 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         data = next(array)
         await websocket.send_text(data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
