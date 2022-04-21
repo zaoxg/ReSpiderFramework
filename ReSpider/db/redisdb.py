@@ -123,3 +123,5 @@ class RedisDB:
             pipe.hset(table, key, val)
         return pipe.execute()
 
+    def __getattr__(self, item):
+        return getattr(self._redis, item)
