@@ -1,39 +1,53 @@
+import json
 import ReSpider.setting as setting
+from ReSpider.extend.misc import load_object
 from ReSpider.core.scheduler import Scheduler
 from .spider import RedisSpider
 import ReSpider.utils.make_class as make_class
-import redis
-import json
+from ReSpider.db.redisdb import RedisDB
 
 
 class RedisScheduler(Scheduler):
     name = 'redis scheduler'
 
-    def __init__(self, spider=None, **kwargs):
+    def __init__(self, spider,
+                 dupefilter=None, tqcls=None,
+                 server=None,
+                 task_queue=None, failed_queue=None, df_key=None, **kwargs):
         super().__init__(spider, **kwargs)
         self.spider = spider
+        self.server = server
+        self.tqcls = tqcls
+        self.df = dupefilter
+        self.task_queue = task_queue
+        self.failed_queue = failed_queue
+        self.df_key = df_key
 
     @classmethod
     def from_settings(cls, spider, **kwargs):
-        tag_name = spider.name or spider.__class__.name or spider.__class__.__name__
-        cls.queue = setting.REDIS_TASK_QUEUE or f'{tag_name}:scheduler'
-        cls.df = setting.REDIS_DUPE_FILTERS or f'{tag_name}:dupefilter'
-        cls.error_queue = setting.FAILED_TASK_QUEUE or f'{tag_name}:scheduler:error'
+        tag_name = spider.redis_key or spider.name
+
+        server = RedisDB
+        dupefilter_obj = load_object(setting.DUPEFILTER)
+
+        task_queue_key = setting.REDIS_TASK_QUEUE % {'redis_key': tag_name}
+        dupefilter_key = setting.REDIS_DUPE_FILTERS % {'redis_key': tag_name}
+        failed_queue_key = setting.FAILED_TASK_QUEUE % {'redis_key': tag_name}
+
         cls.redis_key = None
+
         if isinstance(spider, RedisSpider):
             # self._get = self._get_other
             cls.redis_key = spider.redis_key
-        return cls(spider, **kwargs)
+        return cls(spider, dupefilter=dupefilter_obj, server=server,
+                   task_queue=task_queue_key, failed_queue=failed_queue_key, df_key=dupefilter_key, **kwargs)
 
     def open_spider(self):
-        self._pool = redis.ConnectionPool(host=setting.REDIS_HOST or '127.0.0.1',
-                                          port=setting.REDIS_PORT or 6379,
-                                          password=setting.REDIS_PASSWORD or None,
-                                          db=setting.REDIS_DB or 0)
-        self._r = redis.Redis(connection_pool=self._pool)
+        self.server = self.server()
+        self.df = self.df.from_settings(server=self.server, key=self.df_key)
 
     def __len__(self):
-        return self._r.llen(self.queue)
+        return self.server.llen(self.task_queue)
 
     def enqueue_request(self, request):
         # Todo 理应自动处理优先级且func <verify_priority>干的事太多了
@@ -41,14 +55,12 @@ class RedisScheduler(Scheduler):
             self.logger.info('del fingerprint. <%s>' % request.fingerprint)
             self._srem(request.fingerprint)  # 删除指纹
             if setting.SAVE_FAILED_TASK:
-                self._rpush(request, keys=self.error_queue)
+                self.server.rpush(request, key=self.failed_queue)
             return request
-        if request.do_filter:
-            if self.verify_fingerprint(request):
-                self.verify_priority(request)
-        else:
-            self.verify_priority(request)
-        return request
+        if request.do_filter and self.df.verify_fingerprint(request):
+            return False
+        self.verify_priority(request)
+        return True
 
     async def next_request(self):
         try:
@@ -56,42 +68,42 @@ class RedisScheduler(Scheduler):
             if request is None:
                 request = self._get_other()
         except Exception as e:
-            self.logger.error('[NEXT REQUEST ERROR] %s' % e, exc_info=True)
+            self.logger.error('Next request error: %s' % e, exc_info=True)
         else:
             return request
 
     def has_pending_requests(self):
-        return self._r.llen(self.queue) > 0
+        return self.__len__() > 0
 
-    def _rpush(self, request, keys=None):
-        if keys is None:
-            keys = self.queue
-        arg = self._r.rpush(keys,
-                            json.dumps(request.to_dict, ensure_ascii=False))
+    def _rpush(self, request, key=None):
+        if key is None:
+            key = self.task_queue
+        arg = self.server.rpush(key,
+                                json.dumps(request.to_dict, ensure_ascii=False))
         return arg
 
     def _lpush(self, request):
         # 根据优先级判断，0从左边插入
-        arg = self._r.lpush(self.queue,
-                            json.dumps(request.to_dict, ensure_ascii=False))
+        arg = self.server.lpush(self.task_queue,
+                                json.dumps(request.to_dict, ensure_ascii=False))
         return arg
 
     def _get(self):
-        request = self._r.lpop(self.queue)
+        request = self.server.lpop(self.task_queue)
         if request is not None:
             request = make_class.make_req_from_json(request)
             return request
         return None
 
     def _get_other(self):
-        request = self._r.lpop(self.redis_key) if self.redis_key else None
+        request = self.server.lpop(self.redis_key) if self.redis_key else None
         if request is not None:
             return self.spider.make_request(request)
         return None
 
     def _srem(self, fp):
         # 从集合删除一个元素
-        self._r.srem(self.df, fp)
+        self.server.srem(self.df, fp)
 
     def verify_priority(self, request):
         """
@@ -105,11 +117,3 @@ class RedisScheduler(Scheduler):
         else:
             res = self._rpush(request)
         return res
-
-    def verify_fingerprint(self, request):
-        """
-        :return: 1 or 0
-        """
-        fp = request.fingerprint
-        # 存在返回 0, 否则返回 1
-        return self._r.sadd(self.df, fp)

@@ -6,7 +6,8 @@
 # WORKER_PATH = re.sub(r'([\\/]items$)|([\\/]spiders$)|([\\/]utils$)', '', os.getcwd())
 #
 # SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
-# # SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
+SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
+DUPEFILTER = 'ReSpider.extend.redis.dupefilter.RFPDupeFilters'
 #
 # DOWNLOADER = 'ReSpider.core.downloader.Downloader'
 # SSL_FINGERPRINT = False  # ssl指纹

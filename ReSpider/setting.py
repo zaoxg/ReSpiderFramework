@@ -6,7 +6,10 @@ import re
 WORKER_PATH = re.sub(r'([\\/]items$)|([\\/]spiders$)|([\\/]utils$)', '', os.getcwd())
 
 SCHEDULER = 'ReSpider.core.scheduler.Scheduler'  # python <Queue> 队列
+DUPEFILTER = 'ReSpider.dupefilter.RFPDupeFilters'  # 去重组件
+
 # SCHEDULER = 'ReSpider.extend.redis.scheduler.RedisScheduler'  # redis 队列
+# DUPEFILTER = 'ReSpider.extend.redis.dupefilter.RFPDupeFilters
 
 DOWNLOADER = 'ReSpider.core.downloader.Downloader'
 SSL_FINGERPRINT = False  # ssl指纹
@@ -15,7 +18,8 @@ PIPELINE_MANAGER = 'ReSpider.pipelines.PipelineManager'  # 管道管理
 
 # 重试
 RETRY_ENABLED = False
-RETRY_HTTP_CODES = [999, 600, 601, 602, 603, 604, 605, 606, 400, 401, 405, 408, 500, 502, 503, 504]
+RETRY_HTTP_CODES = [400, 401, 405, 408, 500, 502, 503, 504, 522,
+                    999, 600, 601, 602, 603, 604, 605, 606]
 MAX_RETRY_TIMES = 5  # 最大重试次数
 
 # 管道
@@ -23,7 +27,7 @@ ITEM_PIPELINES = {
     'ReSpider.pipelines.file.CSVPipeline': 4,
     'ReSpider.pipelines.file.FilePipeline': 4,
     # 'ReSpider.pipelines.redis.RedisPipeline': 5,
-    'ReSpider.pipelines.mysql.MySQLPipeline': 6
+    # 'ReSpider.pipelines.mysql.MySQLPipeline': 6
     # 'ReSpider.pipelines.mongo.MongoPipeline': 8
 }
 
@@ -68,13 +72,13 @@ REDIS_PASSWORD = None
 REDIS_DB = 0
 
 # 自定义任务队列
-REDIS_TASK_QUEUE = None
+REDIS_TASK_QUEUE = '%(redis_key)s:scheduler'
 # 自定义去重
-REDIS_DUPE_FILTERS = None
+REDIS_DUPE_FILTERS = '%(redis_key)s:dupefilter'
 # 保存失败任务
 SAVE_FAILED_TASK = True
 # 自定义失败任务队列
-FAILED_TASK_QUEUE = None
+FAILED_TASK_QUEUE = '%(redis_key)s:scheduler:failed'
 # 重试失败任务
 RETRY_FAILED_TASK = False
 

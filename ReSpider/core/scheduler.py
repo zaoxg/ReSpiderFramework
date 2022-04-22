@@ -1,29 +1,36 @@
 import asyncio
 from asyncio import PriorityQueue
-from ..extend.logger import LogMixin
+from ReSpider.extend.logger import LogMixin
+from ReSpider.extend.misc import load_object
+import ReSpider.setting as setting
 
 
 class Scheduler(LogMixin):
     name = 'scheduler'
 
-    def __init__(self, spider, **kwargs):
+    def __init__(self, spider,
+                 dupefilter=None,
+                 tqcls=None, **kwargs):
         super().__init__(spider)
+        self.df = dupefilter
+        self.tqcls = tqcls
         self._observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
-        # cls.settings = spider.settings
         return cls.from_settings(spider, **kwargs)
 
     @classmethod
     def from_settings(cls, spider, **kwargs):
-        return cls(spider, **kwargs)
+        dupefilter_obj = load_object(setting.DUPEFILTER)
+        dupefilter = dupefilter_obj.from_settings()
+        return cls(spider, dupefilter=dupefilter, tqcls=PriorityQueue, **kwargs)
 
     def open_spider(self):
-        self.queue = PriorityQueue()
-        self.df = set()
+        self.task_queue = self.tqcls()
+        self.df.open()
 
     def close_spider(self):
         pass
@@ -33,20 +40,18 @@ class Scheduler(LogMixin):
         返回队列任务数
         :return:
         """
-        return self.queue.qsize()
+        return self.task_queue.qsize()
 
     def enqueue_request(self, request):
         """
-        向队列中插入一个请求
+        向队列中插入一个请求, 如果需要去重则将指纹加入去重器
         :param request:
-        :return:
+        :return: success -> True, failed -> False
         """
-        if request.do_filter:
-            if self.verify_fingerprint(request):
-                self.queue.put_nowait(request)
-        else:
-            self.queue.put_nowait(request)
-        return request
+        if request.do_filter and self.df.verify_fingerprint(request):
+            return False
+        self.task_queue.put_nowait(request)
+        return True
 
     async def next_request(self):
         """
@@ -54,10 +59,9 @@ class Scheduler(LogMixin):
         :return:
         """
         try:
-            request = self.queue.get_nowait()
+            request = self.task_queue.get_nowait()
         except asyncio.queues.QueueEmpty:
             request = None
-        # print(type(request))
         return request
 
     def has_pending_requests(self):
@@ -65,19 +69,8 @@ class Scheduler(LogMixin):
         判断队列中是否有请求
         :return:
         """
-        return self.queue.qsize() > 0
+        return self.task_queue.qsize() > 0
 
     def _srem(self, fp):
         # 从集合删除一个元素
         self.df.remove(fp)
-
-    def verify_fingerprint(self, request):
-        """
-        先来个指纹
-        :return:
-        """
-        fp = request.fingerprint
-        if fp not in self.df:
-            self.df.add(fp)
-            return True
-        return False

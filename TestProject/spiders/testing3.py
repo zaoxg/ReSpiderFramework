@@ -30,7 +30,7 @@ class Testing3(ReSpider.Spider):
                 #     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
                 # },
                 priority=randint(0, 10),
-                do_filter=False,
+                do_filter=True,
             )
 
     def parse(self, response):

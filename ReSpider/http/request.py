@@ -18,6 +18,26 @@ class Request:
                  meta=None,
                  priority: Optional[int] = 1, do_filter: bool = False,
                  callback=None, errback=None, **kwargs):
+        """
+        :param url: <str> 请求的链接
+        :param method: <str> 请求类型 ["GET", "POST", "PUT", "DELETE", and so on...]
+        :param headers: <dict> 请求headers
+        :param params: url中 `?`后面的参数, https://www.baidu.com?wd=spider
+        :param data: 请求body, JSON or dict
+        :param cookies: cookie, 一般是dict 或者 `key=value; key1=value1` 字符串
+        :param allow_redirects: <bool> 是否允许重定向, True: 允许, False: 不允许
+        :param encoding: <str> 编码, 默认是utf-8
+        :param proxy: <str> 代理, 字符串形式, aiohttp只支持http协议的, http://127.0.0.1:10809
+        :param timeout: <int> 请求等待时间,超出后抛出Timeout 异常
+        :param retry: <bool> 是否重试, 为空默认为设置中的配置, True: 重试
+        :param max_retry_times: 最大重试次数
+        :param meta: <dict> 一般为需要携带的参数
+        :param priority: <int> 请求的优先级, 数值越小优先级越高, 则优先发送请求
+        :param do_filter: <bool> 是否开启去重
+        :param callback: <function> 请求得到响应后的回调
+        :param errback: <function> 请求失败后的回调 (未实现)
+        :return: Request
+        """
         if url is None:
             raise ValueError(f'{self.__class__} url Cannot be empty')
         self._set_url(url)
@@ -39,6 +59,8 @@ class Request:
         self.encoding = encoding or 'utf-8'
         self.proxy = proxy
         self.timeout = timeout
+        if not meta:
+            meta = {}
         self.meta = meta
         self.priority = priority  # 优先级
         self.do_filter = do_filter
