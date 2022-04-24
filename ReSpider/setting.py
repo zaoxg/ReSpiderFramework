@@ -32,7 +32,9 @@ ITEM_PIPELINES = {
 }
 
 # 默认User-Agent
-DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
+DEFAULT_USERAGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
+# 随机User-Agent
+RANDOM_USERAGENT = False
 
 # 下载中间件
 DOWNLOADER_MIDDLEWARES = {
