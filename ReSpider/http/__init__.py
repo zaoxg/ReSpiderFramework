@@ -3,8 +3,8 @@
 # @Author  : ZhaoXiangPeng
 # @File    : __init__.py
 
-from .request import Request
-from .response import Response
+from ReSpider.http.request import Request
+from ReSpider.http.response import Response
 
 __all__ = [
     'Request',

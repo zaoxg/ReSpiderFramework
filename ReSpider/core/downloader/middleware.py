@@ -3,8 +3,8 @@
 # @Author  : ZhaoXiangPeng
 # @File    : middlewares.py
 
-from ...http import Request, Response
-from ...middlewares import MiddlewareManager
+from ReSpider.http import Request, Response
+from ReSpider.middlewares import MiddlewareManager
 
 
 class DownloaderMiddlewareManager(MiddlewareManager):

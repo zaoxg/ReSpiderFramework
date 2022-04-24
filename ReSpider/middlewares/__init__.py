@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2021/8/24 17:44
 # @Author  : ZhaoXiangPeng
-# @File    : __init__.py.py
+# @File    : __init__.py
 
 import importlib
 from collections import defaultdict, deque
 import ReSpider.setting as setting
-from ..extend.logger import LogMixin
-from ..extend.misc import load_object
-from ..core.observer import Observer
+from ReSpider.extend.logger import LogMixin
+from ReSpider.extend.misc import load_object
+from ReSpider.core.observer import Observer
 
 __all__ = [
     'BaseMiddleware',

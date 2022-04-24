@@ -4,10 +4,10 @@
 # @File    : __init__.py
 
 import ReSpider.setting as setting
-from ..extend.logger import LogMixin
-from ..item import Item
-from ..middlewares import MiddlewareManager
-from ..core.observer import Observer
+from ReSpider.extend.logger import LogMixin
+from ReSpider.item import Item
+from ReSpider.middlewares import MiddlewareManager
+from ReSpider.core.observer import Observer
 
 __all__ = [
     'BasePipeline',

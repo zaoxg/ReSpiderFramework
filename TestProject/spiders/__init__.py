@@ -3,6 +3,8 @@
 # @Author  : ZhaoXiangPeng
 # @File    : __init__.py
 
+# from ReSpider.utils.crypto import get_md5
+import ReSpider
 import sys
 import os
 sys.path.append(os.getcwd().replace('\\spiders', '').rsplit('\\', maxsplit=1)[0])
