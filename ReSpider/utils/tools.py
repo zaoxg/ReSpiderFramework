@@ -11,6 +11,7 @@ import datetime
 import base64
 import pickle
 import functools
+from urllib.parse import urlparse, quote, unquote, parse_qs
 
 
 def get_current_timestamp():
@@ -48,6 +49,45 @@ def cookiejar2str(cookies: dict):
     for k, v in cookies.items():
         cookie_list.append(k+'='+v)
     return '; '.join(cookie_list)
+
+
+def url_parse(url: str):
+    """
+    url解析为dict
+    :param url:
+    :return:
+    """
+    query = urlparse(url).query
+    params = parse_qs(query)
+    result = {key: params[key][0] if params[key].__len__() == 1 else params[key] for key in params}
+    return result
+
+
+def query_parse(query: str):
+    string = unquote(query)
+    params = string.split('&')
+    formData = {}
+    for param in params:
+        kvs = param.split('=', maxsplit=1)
+        k = kvs[0]
+        v = kvs[-1]
+        formData[k] = int(v) if v.isdigit() else v
+    jsonFM = json.dumps(formData, ensure_ascii=False)
+    return formData
+
+
+def unquote_url(url: str, encoding='utf-8'):
+    """
+    @summary: url解码
+    """
+    return unquote(url, encoding=encoding)
+
+
+def quote_url(url: str, safe='%;/?:@&=+$,', encoding='utf-8'):
+    """
+    @summary: url编码
+    """
+    return quote(url, safe=safe, encoding=encoding)
 
 
 def table_json(table, save_one_blank=True):
