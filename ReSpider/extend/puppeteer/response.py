@@ -3,8 +3,7 @@
 # @Author  : ZhaoXiangPeng
 # @File    : response.py
 
-# from ReSpider import Response
-from ...http import Response
+from ReSpider import Response
 
 
 class PuppeteerResponse(Response):

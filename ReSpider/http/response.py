@@ -15,6 +15,16 @@ class Response:
             content=b'', text=None,
             request=None,
             exception=None, *args, **kwargs):
+        """
+        :param url: <URL>object 响应的URL
+        :param status: <int> 响应状态码, 6xx/9xx为自定义的状态码, 多为各种异常
+        :param headers: <> 由服务端返回响应的头
+        :param cookies: 由服务端返回的cookie, 一般为 Response Headers 的Set-Cookie字段
+        :param content: <bytes> 响应的源码
+        :param text: <str> 响应的字符串格式源码
+        :param request: <Request> 获得此 Response 所发起请求的 Request
+        :param exception: 异常, 目前只在错误状态码时使用
+        """
         self.url = url
         self.status = status
         self.headers = headers or {}

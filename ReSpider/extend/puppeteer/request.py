@@ -1,5 +1,5 @@
 # from ReSpider import Request
-from ...http import Request
+from ReSpider.http import Request
 import copy
 
 

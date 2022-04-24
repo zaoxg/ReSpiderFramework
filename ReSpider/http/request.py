@@ -1,6 +1,6 @@
 from typing import Optional
 import ReSpider.setting as setting
-from ReSpider.utils import encrypt_md5
+from ReSpider.utils.crypto import get_md5
 import ReSpider.utils.tools as tools
 import requests
 import aiohttp
@@ -148,7 +148,7 @@ class Request:
     def _set_fingerprint(self):
         # @summery: 没有指纹时才会设置指纹
         if self.fingerprint is None:
-            self.fingerprint = encrypt_md5(self.url + str(self.params) + str(self.data))
+            self.fingerprint = get_md5(self.url + str(self.params) + str(self.data))
 
     def copy(self): return self.replace()
 
