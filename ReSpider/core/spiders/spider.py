@@ -4,7 +4,7 @@
 # @File    : spider.py
 
 from . import Crawler
-from ...http import Request
+from ReSpider.http import Request
 
 
 class Spider(Crawler):
