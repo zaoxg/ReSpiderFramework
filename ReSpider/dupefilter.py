@@ -42,9 +42,10 @@ class RFPDupeFilters(DupeFilters):
 
     @classmethod
     def from_settings(cls, **kwargs):
-        # 搞个磁盘缓存去重
-        path = setting.WORKER_PATH
-        return cls(path=path)
+        # TODO 搞个磁盘缓存去重
+        # 需要考虑同步写入文件速度的问题，所以下次再搞
+        # path = setting.WORKER_PATH
+        return cls()
 
     def verify_fingerprint(self, request) -> bool:
         """

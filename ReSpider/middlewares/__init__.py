@@ -47,7 +47,7 @@ class MiddlewareManager(LogMixin):
 
     def __init__(self, spider=None, *middlewares, **kwargs):
         super().__init__(spider)
-        self.logger.debug('%s START INIT ...' % getattr(self, '__class__').__name__)
+        self.logger.debug('%s: start init' % getattr(self, '__class__').__name__)
         self._observer = kwargs.pop('observer', None)
         if self._observer:
             self._observer.register(self)
@@ -56,10 +56,10 @@ class MiddlewareManager(LogMixin):
         self.methods = defaultdict(deque)
         for middleware in middlewares:
             mwname = middleware.__class__.__name__
-            self.logger.debug('"%s" start init ...' % mwname)
+            # self.logger.debug('"%s": start init ...' % mwname)
             self._add_middleware(middleware)
-            self.logger.debug('"%s" init success.' % mwname)
-        self.logger.debug('%s INIT SUCCESS.' % getattr(self, '__class__').__name__)
+            self.logger.debug('%s: init ok.' % mwname)
+        self.logger.debug('%s: init success' % getattr(self, '__class__').__name__)
 
     @classmethod
     def from_crawler(cls, spider, **kwargs):
@@ -123,7 +123,7 @@ class MiddlewareManager(LogMixin):
             mwfn(spider)
 
     def open_spider(self, spider=None):
-        self.logger.debug('Process parallel "open_spider"')
+        self.logger.debug('Process parallel: "open_spider"')
         return self._process_parallel('open_spider', spider or self.spider)
 
     def close_spider(self, spider=None):

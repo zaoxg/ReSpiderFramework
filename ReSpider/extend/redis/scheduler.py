@@ -1,8 +1,8 @@
 import json
+from .spider import RedisSpider
 import ReSpider.setting as setting
 from ReSpider.extend.misc import load_object
 from ReSpider.core.scheduler import Scheduler
-from .spider import RedisSpider
 import ReSpider.utils.make_class as make_class
 from ReSpider.db.redisdb import RedisDB
 

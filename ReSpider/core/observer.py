@@ -57,7 +57,7 @@ class Observer(LogMixin):
     __latestMessage = None
 
     def register(self, obj, default=None):
-        self.logger.debug('<%s> register in observer.' % obj.__class__.__name__)
+        # self.logger.debug('<%s> register in observer.' % obj.__class__.__name__)
         if default is None:
             self.__observers.update({obj.__class__.__name__: obj})
         elif default == 'pipeline':

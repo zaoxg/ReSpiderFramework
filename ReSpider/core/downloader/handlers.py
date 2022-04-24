@@ -33,7 +33,7 @@ class DownloadHandler(LogMixin):
             headers = request.headers
         else:
             headers = {
-                'User-Agent': setting.DEFAULT_USER_AGENT
+                'User-Agent': setting.DEFAULT_USERAGENT
             }
         kwargs.setdefault('headers', headers)
         kwargs.setdefault('params', request.params)
