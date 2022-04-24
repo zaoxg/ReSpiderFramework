@@ -24,6 +24,11 @@ class Crawler(LogMixin):
             setattr(setting, key, val)
         if not setting.LOG_NAME:
             setattr(setting, 'LOG_NAME', self.name)
+        for key, val in kwargs.items():
+            if setting.__dict__.get(key):
+                setattr(setting, key, val)
+                continue
+            setattr(self.__class__, key, val)
         super().__init__(self)
 
         if not hasattr(self, 'start_urls'):
