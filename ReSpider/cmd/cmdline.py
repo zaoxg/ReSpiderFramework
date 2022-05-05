@@ -12,7 +12,7 @@ def _print_commands():
     """
     @summery: copy form https://github.com/Boris-code/feapder/blob/master/feapder/commands/cmdline.py
     """
-    with open(join(dirname(dirname(dirname(__file__))), "VERSION"), "rb") as f:
+    with open(join(dirname(dirname(__file__)), "VERSION"), "rb") as f:
         version = f.read().decode("ascii").strip()
 
     print("ReSpider {}".format(version))

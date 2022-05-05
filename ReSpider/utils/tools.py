@@ -250,6 +250,16 @@ def is_exist(file_path):
     return os.path.exists(file_path)
 
 
+def get_files(filepath: str, depth: int = 3, file_type: str = None) -> list:
+    """
+    获取给定目录下的所有文件
+    """
+    for root, dirs, files in os.walk(filepath):
+        for drs in dirs:
+            return get_files(os.path.join(root, drs), depth=1)
+        return files
+
+
 def read_file(filename, readlines=False, encoding="utf-8"):
     """
     @summary: 读文件
