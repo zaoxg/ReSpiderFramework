@@ -164,7 +164,7 @@ class Request:
         m = self.method
         hd = self.headers.copy()
         if 'user-agent' not in hd and 'User-Agent' not in hd:
-            hd.update({'user-agent': setting.DEFAULT_USER_AGENT})
+            hd.update({'user-agent': setting.DEFAULT_USERAGENT})
         kwg = {'headers': hd, 'cookies': self.cookies, 'params': self.params, 'data': self.data}
         return requests.request(url=u, method=m, **kwg)
 

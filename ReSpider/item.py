@@ -376,8 +376,10 @@ class RdsListItem(MyArray, Item):
     def __init__(self, initlist: list = None,
                  key: str = None, rds_type: str = None,
                  to_json: bool = False, **kwargs):
+        if initlist is None:
+            initlist = []
+        self.__to_json = to_json
         if to_json and initlist.__len__() > 0:
-            self.__to_json = to_json
             initlist = list(map(json.dumps, initlist))
         else:
             initlist = initlist
@@ -391,7 +393,7 @@ class RdsListItem(MyArray, Item):
         :param to_json: if to_json is True -> JSON(item)
         :return:
         """
-        if self.__to_json:
+        if to_json or self.__to_json:
             item = json.dumps(item, ensure_ascii=False)
         self.data.append(item)
 

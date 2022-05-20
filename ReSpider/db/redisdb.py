@@ -123,5 +123,15 @@ class RedisDB:
             pipe.hset(table, key, val)
         return pipe.execute()
 
+    # ########################################  String结构操作  ########################################
+
+    def get(self, table):
+        return self._redis.mget(table)
+
+    def set(self, table, value,
+            ex=None, px=None, nx=False, xx=False, keepttl=False):
+        return self._redis.set(table, value,
+                               ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl)
+
     def __getattr__(self, item):
         return getattr(self._redis, item)
