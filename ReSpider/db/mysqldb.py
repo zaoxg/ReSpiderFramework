@@ -19,16 +19,11 @@ class AsyncMysqlDB:
                  host=None, port=None,
                  user=None, password=None,
                  db=None, loop=None, **kwargs):
-        if host is None:
-            self._host = setting.MYSQL_HOST
-        if port is None:
-            self._port = setting.MYSQL_PORT
-        if user is None:
-            self._username = setting.MYSQL_USERNAME
-        if password is None:
-            self._password = setting.MYSQL_PASSWORD
-        if db is None:
-            self._db = setting.MYSQL_DB
+        self._host = host or setting.MYSQL_HOST
+        self._port = port or setting.MYSQL_PORT
+        self._username = user or setting.MYSQL_USERNAME
+        self._password = password or setting.MYSQL_PASSWORD
+        self._db = db or setting.MYSQL_DB
         self._pool = None
         self._loop = loop
         self.get_mysql()

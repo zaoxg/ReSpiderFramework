@@ -17,16 +17,11 @@ class RedisDB:
                  host=None, port=None,
                  db=None,
                  user_pass=None):
-        if host is None:
-            self._host = setting.REDIS_HOST
-        if port is None:
-            self._port = setting.REDIS_PORT
-        if db is None:
-            self._db = setting.REDIS_DB
-        if user_pass is None:
-            self._user_pass = setting.REDIS_PASSWORD
+        self._host = host or setting.REDIS_HOST
+        self._port = port or setting.REDIS_PORT
+        self._db = db or setting.REDIS_DB
+        self._user_pass = user_pass or setting.REDIS_PASSWORD
         self._redis = None
-        self._db = None
         self.get_redis()
 
     def get_redis(self):
@@ -35,6 +30,12 @@ class RedisDB:
                                           password=self._user_pass,
                                           db=self._db)
         self._redis = redis.Redis(connection_pool=self._pool)
+
+    def keys(self, pattern='*') -> list:
+        """
+        获取当前库中所有的key
+        """
+        return self._redis.keys(pattern)
 
     def sadd(self, table, values):
         """
@@ -122,6 +123,13 @@ class RedisDB:
         for key, val in datas:
             pipe.hset(table, key, val)
         return pipe.execute()
+
+    def hgetall(self, table) -> dict:
+        """
+        获取Hash结构所有的键值对
+        {b'a': b'1', b'c': b'2'}
+        """
+        return self._redis.hgetall(table)
 
     # ########################################  String结构操作  ########################################
 

@@ -24,16 +24,11 @@ class AsyncMongoDB:
         if url:
             self.get_mongo(url)
         else:
-            if host is None:
-                self._host = setting.MONGODB_HOST
-            if port is None:
-                self._port = setting.MONGODB_PORT
-            if db is None:
-                self._db = setting.MONGODB_DB
-            if username is None:
-                self._username = setting.MONGODB_USERNAME
-            if password is None:
-                self._password = setting.MONGODB_PASSWORD
+            self._host = host or setting.MONGODB_HOST
+            self._port = port or setting.MONGODB_PORT
+            self._db = db or setting.MONGODB_DB
+            self._username = username or setting.MONGODB_USERNAME
+            self._password = password or setting.MONGODB_PASSWORD
             self.get_mongo()
 
     @classmethod
