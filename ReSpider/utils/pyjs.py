@@ -76,7 +76,7 @@ def int_overflow(val):
     return val
 
 
-def unsigned_right_shitf(n, i):
+def unsigned_right_shift(n, i):
     # 无符号右移
     # 数字小于0，则转为32位无符号uint
     if n < 0:
