@@ -5,6 +5,12 @@
 
 import time
 import ctypes
+from urllib.parse import unquote, quote
+
+
+def encodeURI(url):
+    url = unquote(url)
+    return quote(url,safe='!@#$&*()=:/;?+\'"')
 
 
 def charCodeAt(s: str, i: int = 0):
