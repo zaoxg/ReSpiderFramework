@@ -22,6 +22,19 @@ def get_current_date(date_format="%Y-%m-%d %H:%M:%S"):
     return datetime.datetime.now().strftime(date_format)
 
 
+def date_format(date_str, _format: str = None):
+    if _format is None:
+        if '-' in _format: _format = '%Y-%m-%d'
+        elif '.' in _format: _format = '%Y.%m.%d'
+        elif '/' in _format: _format = '%Y/%m/%d'
+        elif '年' in _format: _format = '%Y年%m月%d日'
+        else: _format = '%Y%m%d'
+    date = (datetime.datetime
+            .strptime(date_str, _format)
+            .strftime(_format))
+    return date
+
+
 def get_cookies_from_str(cookie_str: str):
     """
     @summary: 自己懒得写, Copy from https://github.com/Boris-code/feapder/blob/master/feapder/utils/tools.py
