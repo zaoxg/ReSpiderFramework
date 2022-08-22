@@ -35,7 +35,7 @@ class Crawler(LogMixin):
             self.start_urls = []
 
     def __str__(self):
-        return '<%s [%s]>' % (self.__class__.__base__.__name__, self.__class__.__name__)
+        return '<%s [%s]>' % (self.__class__.__base__.__name__, self.__class__.name)
 
     # __repr__ = __str__
 

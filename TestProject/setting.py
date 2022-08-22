@@ -31,12 +31,12 @@
 # # 默认User-Agent
 # DEFAULT_USERAGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
 #
-# # 下载中间件
-# DOWNLOADER_MIDDLEWARES = {
-#     # 'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
-#     # 'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 5,
-#     # 'ReSpider.middlewares.retry.RetryMiddleware': 8
-# }
+# 下载中间件
+DOWNLOADER_MIDDLEWARES = {
+    # 'ReSpider.middlewares.useragent.UserAgentMiddleware': 2,
+    # 'ReSpider.extend.puppeteer.downloadmiddleware.PuppeteerMiddleware': 5,
+    'ReSpider.middlewares.retry.RetryMiddleware': 8
+}
 #
 # # 并发请求
 # TASK_LIMIT = CONCURRENT_REQUESTS = 4
@@ -104,7 +104,7 @@ MYSQL_PASSWORD = 'kcidea1509'
 # # PUPPETEER SETTING(浏览器渲染)
 # PUPPETEER_SETTING = dict(
 #     PUPPETEER_HEADLESS=False,  # 无头
-#     PUPPETEER_EXECUTABLE_PATH='D:/Package/Chromium64/chrome.exe',
+#     PUPPETEER_EXECUTABLE_PATH='D:/Package/Chromium89/chrome.exe',
 #     PUPPETEER_USER_DIR=None,  # 用户数据目录
 #     # pyppeteer timeout
 #     PUPPETEER_DOWNLOAD_TIMEOUT=60,
@@ -112,7 +112,7 @@ MYSQL_PASSWORD = 'kcidea1509'
 #     PUPPETEER_WINDOW_WIDTH=1400,
 #     PUPPETEER_WINDOW_HEIGHT=700
 # )
-#
+
 # # cookies 池配置
 # COOKIE_POOL_KEY = None
 #
