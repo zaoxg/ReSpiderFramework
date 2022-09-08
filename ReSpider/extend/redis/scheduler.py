@@ -53,7 +53,9 @@ class RedisScheduler(Scheduler):
         # Todo 理应自动处理优先级且func <verify_priority>干的事太多了
         if request.del_fp:
             self.logger.info('del fingerprint. <%s>' % request.fingerprint)
-            self._srem(request.fingerprint)  # 删除指纹
+            # 判断 fingerprint 不为<None>才删除
+            request.fingerprint and self._srem(request.fingerprint)  # 删除指纹
+            # 保存失败任务种子
             if setting.SAVE_FAILED_TASK:
                 self.server.rpush(request, key=self.failed_queue)
             return request
