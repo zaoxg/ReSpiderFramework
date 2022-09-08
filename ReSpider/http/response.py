@@ -41,6 +41,8 @@ class Response:
     def __str__(self):
         return f"<Response [{self.status}]>"
 
+    __repr__ = __str__
+
     @property
     def apparent_encoding(self):
         return cchardet.detect(self.content).get('encoding', 'utf-8')
@@ -134,5 +136,3 @@ class Response:
         :return:
         """
         self.request = request
-
-    __repr__ = __str__
