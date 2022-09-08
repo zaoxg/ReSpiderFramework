@@ -31,6 +31,8 @@ ITEM_PIPELINES = {
     # 'ReSpider.pipelines.mongo.MongoPipeline': 8
 }
 
+# 框架User-Agent
+FRAMEWORK_USERAGENT = 'ReSpider-1.0.3'
 # 默认User-Agent
 DEFAULT_USERAGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36'
 # 随机User-Agent
@@ -123,6 +125,11 @@ COOKIE_POOL_KEY = None
 
 # ip池配置
 PROXY_POOL_URL = None
+
+# 消息通知
+# 钉钉消息通知
+DINGTALK_WEBHOOK = 'https://oapi.dingtalk.com/robot/send?access_token=41c3e45e6080d296d3e0b987f0aacd2827797c94de045f471522410be62a3aad'
+
 
 # 加载自定义的setting
 # 需要把自定义的path加入到这里（作用域）
