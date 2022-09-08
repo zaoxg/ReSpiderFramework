@@ -142,7 +142,7 @@ class Engine(Core, LogMixin):
 
     def __init__(self, spider):
         super().__init__(spider)
-        self.logger.info('ENGINE START INIT ...')
+        self.logger.debug('ENGINE START INIT ...')
         self.spider = spider
         self.loop = self.observer.loop
 
@@ -153,12 +153,12 @@ class Engine(Core, LogMixin):
         self.pipelines = load_object(
             setting.PIPELINE_MANAGER).from_crawler(spider, observer=self.observer)
 
-        self.logger.info('ENGINE INIT SUCCESS.')
+        self.logger.debug('ENGINE INIT SUCCESS.')
 
     def start(self):
         self.observer.engine_status = 'START'
         start_time = time.time()
-        self.logger.info('IT\'S EXCELLENT. IT\'S FLEXIBLE ...')
+        self.logger.debug('IT\'S EXCELLENT. IT\'S FLEXIBLE ...')
         start_requests = self.spider.start_requests()
         self.execute(self.spider, start_requests)
         self.observer.engine_status = 'STOP'
@@ -174,7 +174,7 @@ class Engine(Core, LogMixin):
         """
         # 把 starts_requests 加入调度器队列
         self._init_start_request(start_requests)
-        self.logger.info('TASK INIT SUCCESS.')
+        self.logger.debug('TASK INIT SUCCESS.')
         try:
             self.loop.run_until_complete(
                 # 运行住流程, 由主流程创建单一任务
@@ -214,7 +214,7 @@ class Engine(Core, LogMixin):
                         self.logger.debug('Continuous Monitoring...')
                         continue
                     else:
-                        self.logger.info(
+                        self.logger.debug(
                             'Event loop has %s task, Stop running' % tasks.__len__())
                     break
                 continue

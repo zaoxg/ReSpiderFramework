@@ -51,7 +51,7 @@ class Crawler(LogMixin):
         raise NotImplementedError
 
     def start(self):
-        self.logger.info('SPIDER START INIT ...')
+        self.logger.debug('SPIDER START INIT ...')
         from ReSpider.core.engine import Engine
         engine = Engine(self)
         engine.start()
