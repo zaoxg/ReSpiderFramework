@@ -31,5 +31,5 @@ class MySQLPipeline(BasePipeline):
             sql = make_sql_insert(table, item)
             add_count = await self._mysql.add(sql)
         if add_count:
-            self.logger.info('入库 %s 行数 %s 条, 影响行数 %s 条' % (item.table, len(item), add_count))
+            self.logger.debug('入库 %s 行数 %s 条, 影响行数 %s 条' % (item.table, len(item), add_count))
         return item

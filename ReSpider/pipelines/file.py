@@ -16,7 +16,7 @@ class FilePipeline(BasePipeline):
 
     async def process_item(self, item: FileItem, spider):
         if not item:
-            self.logger.info('%s 保存异常' % item.filename)
+            self.logger.warning('%s 保存异常' % item.filename)
             return item
         item.filename = re.sub(r'[\\/:*?"<>|]', '`', str(item.filename))
         file: str = f'{item.filename}.{item.filetype}'

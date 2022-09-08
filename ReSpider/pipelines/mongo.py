@@ -26,5 +26,5 @@ class MongoPipeline(BasePipeline):
         else:
             add_count = await self._db.add(collection, item)
         if add_count:
-            self.logger.info('入库 %s 行数 %s 条, 影响行数 %s 条' % (collection, len(item), add_count))
+            self.logger.debug('入库 %s 行数 %s 条, 影响行数 %s 条' % (collection, len(item), add_count))
         return item  # Todo 为了兼容后续版本数据处理的pipeline
