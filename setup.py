@@ -6,7 +6,7 @@
 发布流程
 py -m pip install twine  # 您将需要它来将您的项目分发上传到PyPI
 # 打包为 whl文件
-py -m build --wheel
+
 # 检查
 twine check dist/*
 # 更新/发布
@@ -40,7 +40,7 @@ packages.extend([
 
 requires = [
     "urllib3>=1.25.8",
-    "requests>=2.22.0",
+    "requests==2.22.0",
     "aiohttp>=3.7.3",
     "cchardet>=2.1.7",
     "parsel>=1.6.0",
@@ -67,7 +67,7 @@ setuptools.setup(
     project_urls={
         "Bug Tracker": "https://github.com/zaoxg/ReSpiderFramework/issues",
     },
-    keywords='aiohttp spider',
+    keywords='respider',
     classifiers=[
         "Programming Language :: Python :: 3"
     ],
