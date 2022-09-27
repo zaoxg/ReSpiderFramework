@@ -74,6 +74,13 @@ def number_join(array: list, seq: str):
     return seq.join(new_array)
 
 
+def arrayToHex(array: list) -> str:
+    """
+    [1, 2, 4, 8, 16] -> 0102040810
+    """
+    return ''.join('{:02x}'.format(x) for x in array)
+
+
 def int_overflow(val):
     # 这个函数可以得到32位int溢出结果，因为python的int一旦超过宽度就会自动转为long，永远不会溢出，有的结果却需要溢出的int作为参数继续参与运算
     maxint = 2147483647
@@ -96,3 +103,13 @@ def unsigned_right_shift(n, i):
 
 def left_shift(x, y):
     return ctypes.c_int(x << y).value
+
+
+def leftShift(x, y):
+    x, y = ctypes.c_int32(x).value, y % 32
+    return ctypes.c_int32(x << y).value
+
+
+def Unsigned_right_shift(x, y):
+    x, y = ctypes.c_uint32(x).value, y % 32
+    return ctypes.c_uint32(x >> y).value
