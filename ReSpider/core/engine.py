@@ -84,7 +84,8 @@ class Core:
                 for result in callback_result:
                     await self.process_callback_result(result, spider)
             elif isinstance(callback_result, Coroutine):
-                pass
+                """如果是async方法且没有返回值, callback_result是<Coroutine>, 进入这个逻辑判断, 使用await进行调用, 防止没有进入"""
+                await callback_result
             else:
                 pass
 
