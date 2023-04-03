@@ -14,6 +14,12 @@ import functools
 from urllib.parse import urlparse, quote, unquote, parse_qs
 
 
+def maybe_make_list(obj):
+    if obj is not None and not isinstance(obj, (tuple, list)):
+        return [obj]
+    return obj
+
+
 def get_current_timestamp():
     return int(time.time())
 

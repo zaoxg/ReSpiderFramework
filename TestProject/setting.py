@@ -101,17 +101,17 @@ MYSQL_PASSWORD = 'kcidea1509'
 # # 数据存储
 # DATA_PATH = f'{WORKER_PATH}/data/'
 #
-# # PUPPETEER SETTING(浏览器渲染)
-# PUPPETEER_SETTING = dict(
-#     PUPPETEER_HEADLESS=False,  # 无头
-#     PUPPETEER_EXECUTABLE_PATH='D:/Package/Chromium89/chrome.exe',
-#     PUPPETEER_USER_DIR=None,  # 用户数据目录
-#     # pyppeteer timeout
-#     PUPPETEER_DOWNLOAD_TIMEOUT=60,
-#     # pyppeteer browser window
-#     PUPPETEER_WINDOW_WIDTH=1400,
-#     PUPPETEER_WINDOW_HEIGHT=700
-# )
+# PUPPETEER SETTING(浏览器渲染)
+PUPPETEER_SETTING = dict(
+    PUPPETEER_HEADLESS=False,  # 无头
+    PUPPETEER_EXECUTABLE_PATH='D:/Package/Chromium89/chrome.exe',
+    PUPPETEER_USER_DIR=None,  # 用户数据目录
+    # pyppeteer timeout
+    PUPPETEER_DOWNLOAD_TIMEOUT=60,
+    # pyppeteer browser window
+    PUPPETEER_WINDOW_WIDTH=1400,
+    PUPPETEER_WINDOW_HEIGHT=700
+)
 
 # # cookies 池配置
 # COOKIE_POOL_KEY = None

@@ -39,7 +39,7 @@ packages.extend([
 ])
 
 requires = [
-    "urllib3>=1.25.8",
+    "urllib3==1.25.8",
     "requests==2.22.0",
     "aiohttp>=3.7.3",
     "cchardet>=2.1.7",

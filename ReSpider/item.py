@@ -18,7 +18,8 @@ __all__ = [
     "RdsItemHash",
     "RdsListItem",
     "MysqlItem",
-    "MysqlListItem"
+    "MysqlListItem",
+    "WebApiItem"
 ]
 
 
@@ -414,3 +415,9 @@ class MysqlItem(dict, Item):
 class MysqlListItem(MyArray, Item):
     pipeline = 'MySQLPipeline'
     table = None
+
+
+class WebApiItem(Item):
+    def __init__(self, api: str, method: str = 'POST'):
+        super().__init__()
+
