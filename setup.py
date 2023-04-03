@@ -6,7 +6,7 @@
 发布流程
 py -m pip install twine  # 您将需要它来将您的项目分发上传到PyPI
 # 打包为 whl文件
-
+python -m build --wheel
 # 检查
 twine check dist/*
 # 更新/发布
