@@ -38,6 +38,7 @@ class DownloadHandler(LogMixin):
         kwargs.setdefault('headers', headers)
         kwargs.setdefault('params', request.params)
         kwargs.setdefault('data', request.data)
+        kwargs.setdefault('json', request.json)
         kwargs.setdefault('allow_redirects', request.allow_redirects)
         kwargs.setdefault('timeout', aiohttp.ClientTimeout(total=request.timeout))
         kwargs.setdefault('proxy', request.proxy)

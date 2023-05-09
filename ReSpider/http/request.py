@@ -11,7 +11,7 @@ class Request:
     name = 'request'
 
     def __init__(self, url: Optional[str], method: Optional[str] = None,
-                 headers=None, params: dict = None, data=None, cookies=None, allow_redirects: bool = True,
+                 headers=None, params: dict = None, data=None, json=None, cookies=None, allow_redirects: bool = True,
                  encoding: Optional[str] = 'utf-8',
                  proxy='', timeout: Optional[int] = 30,
                  retry: bool = setting.RETRY_ENABLED, max_retry_times: int = setting.MAX_RETRY_TIMES,
@@ -46,14 +46,9 @@ class Request:
         else:
             self.method = str(method).upper()
         self.headers = headers or {}
-        if params is None:
-            self.params = {}
-        else:
-            self.params = params
-        if data is None:
-            self.data = {}
-        else:
-            self.data = data
+        self.params = params
+        self.data = data
+        self.json = json
         self.cookies = cookies or {}
         self.allow_redirects = allow_redirects
         self.encoding = encoding or 'utf-8'
