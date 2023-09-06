@@ -94,6 +94,7 @@ class Request:
         kwargs.setdefault('headers', self.headers)
         kwargs.setdefault('params', self.params)
         kwargs.setdefault('data', self.data)
+        kwargs.setdefault('json', self.json)
         kwargs.setdefault('allow_redirects', self.allow_redirects)
         kwargs.setdefault('timeout', aiohttp.ClientTimeout(total=self.timeout))
         kwargs.setdefault('proxy', self.proxy)

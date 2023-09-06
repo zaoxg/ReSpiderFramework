@@ -79,13 +79,19 @@ class AsyncMysqlDB:
         try:
             affect_count = await cursor.execute(sql)
             await conn.commit()
+        except aiomysql.IntegrityError as e:
+            await conn.rollback()
+            logger.warning("""
+                    error: %s
+                    sql:   %s
+                    """ % (e, sql))
         except Exception as e:
             await conn.rollback()  # 回滚
-            logger.warning(
+            logger.exception(
                 """
                 error: %s
                 sql:   %s
-                """ % (e, sql), exc_info=True)
+                """ % (e, sql))
         finally:
             if cursor:
                 await cursor.close()
